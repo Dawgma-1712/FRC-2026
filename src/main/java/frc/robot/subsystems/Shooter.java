@@ -12,6 +12,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Shooter extends SubsystemBase {
     
     private final TalonFX shooterMotor = new TalonFX(IdConstants.SHOOTER_MOTOR_ID);
@@ -31,10 +33,12 @@ public class Shooter extends SubsystemBase {
         slot0configs.kD = ShooterConstants.SHOOTER_KD;
         shooterMotor.getConfigurator().apply(slot0configs);
 
+
     }
 
     public void stop() {
-        shooterMotor.set(0);
+        velocityDutyCycle.Velocity = 0;
+        shooterMotor.setControl(velocityDutyCycle);
     }
 
     // A 2D kinematics equation, neglects air resistance
@@ -85,6 +89,17 @@ public class Shooter extends SubsystemBase {
             }
         );
 
+    }
+
+    @Override
+    public void periodic() {
+
+        String finalString = SmartDashboard.getString("a", "None-") + 
+        SmartDashboard.getString("Action 1", "None-") + 
+        SmartDashboard.getString("Action 2", "None-") +
+        SmartDashboard.getString("Action 3", "None");
+
+        SmartDashboard.putString("Final String", finalString);
     }
 
 }

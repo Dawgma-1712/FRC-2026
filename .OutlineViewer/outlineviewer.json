@@ -1,0 +1,27 @@
+{
+  "Clients": {
+    "open": true
+  },
+  "Connections": {
+    "open": true
+  },
+  "NetworkTables Settings": {
+    "listenAddress": "10.17.12.2",
+    "mode": "Server"
+  },
+  "Persistent Values": {
+    "open": false
+  },
+  "Server": {
+    "Publishers": {
+      "open": true
+    },
+    "Subscribers": {
+      "open": true
+    },
+    "open": true
+  },
+  "Transitory Values": {
+    "open": false
+  }
+}
