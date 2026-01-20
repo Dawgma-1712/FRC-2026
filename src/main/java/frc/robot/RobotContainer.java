@@ -7,61 +7,26 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Joystick;
 
 public class RobotContainer {
 
-  // subsystems
-  private final Shooter shooter = new Shooter();
+  private final ModularAutoHandler autoHandler;
 
-  // auto stuff
-  public SendableChooser<String> startingSide = new SendableChooser<String>();
-  public SendableChooser<String> action1 = new SendableChooser<String>();
-  public SendableChooser<String> action2 = new SendableChooser<String>();
-  public SendableChooser<String> action3 = new SendableChooser<String>();
+  // subsystems
+  private final Shooter shooter;
+
+  private final Joystick driver;
+  private final Joystick operator;
 
   public RobotContainer() {
 
-    // autoChooser = AutoBuilder.buildAutoChooser();
-    // SmartDashboard.putData(autoChooser);
+    shooter = new Shooter();
+    autoHandler = new ModularAutoHandler();
 
-    startingSide.addOption("Left", "L-");
-    startingSide.addOption("Mid", "M-");
-    startingSide.addOption("Right", "R-");
-    SmartDashboard.putData("Starting Side", startingSide);
-
-    action1.addOption("Gather Depot", "Gd-");
-    action1.addOption("Gather Human", "Gh-");
-    action1.addOption("Gather Neutral", "Gn-");
-    action1.addOption("Shoot Q1", "S1-");
-    action1.addOption("Shoot Q2", "S2-");
-    action1.addOption("Shoot Q3", "S3-");
-    action1.addOption("Shoot Q4", "S4-");
-    SmartDashboard.putData("Action 1", action1);
-
-    action2.addOption("Gather Depot", "Gd-");
-    action2.addOption("Gather Human", "Gh-");
-    action2.addOption("Gather Neutral", "Gn-");
-    action2.addOption("Shoot Q1", "S1-");
-    action2.addOption("Shoot Q2", "S2-");
-    action2.addOption("Shoot Q3", "S3-");
-    action2.addOption("Shoot Q4", "S4-");
-    SmartDashboard.putData("Action 2", action2);
-
-    action3.addOption("Gather Depot", "Gd");
-    action3.addOption("Gather Human", "Gh");
-    action3.addOption("Gather Neutral", "Gn");
-    action3.addOption("Shoot Q1", "S1");
-    action3.addOption("Shoot Q2", "S2");
-    action3.addOption("Shoot Q3", "S3");
-    action3.addOption("Shoot Q4", "S4");
-    SmartDashboard.putData("Action 3", action3);
-
-    SmartDashboard.putString("Final String", startingSide.getSelected() + action1.getSelected() + action2.getSelected() + action3.getSelected());
+    driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
+    operator = new Joystick(OperatorConstants.OPERATOR_JOYSTICK_PORT);
 
     configureBindings();
   }
@@ -71,6 +36,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new ConstructAutoCMD();
+    return autoHandler.getSelectedModularCommand();
   }
 }
