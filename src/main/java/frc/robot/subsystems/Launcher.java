@@ -3,8 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.Constants.IdConstants;
-import frc.robot.Constants.ShooterConstants;
+import frc.Constants.IdConstants;
+import frc.Constants.ShooterConstants;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -12,14 +12,12 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-public class Shooter extends SubsystemBase {
+public class Launcher extends SubsystemBase {
     
     private final TalonFX shooterMotor = new TalonFX(IdConstants.SHOOTER_MOTOR_ID);
     private final VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
 
-    public Shooter() {
+    public Launcher() {
 
         // configure the Kraken
         TalonFXConfiguration configs = new TalonFXConfiguration();
@@ -89,17 +87,6 @@ public class Shooter extends SubsystemBase {
             }
         );
 
-    }
-
-    @Override
-    public void periodic() {
-
-        String finalString = SmartDashboard.getString("a", "None-") + 
-        SmartDashboard.getString("Action 1", "None-") + 
-        SmartDashboard.getString("Action 2", "None-") +
-        SmartDashboard.getString("Action 3", "None");
-
-        SmartDashboard.putString("Final String", finalString);
     }
 
 }

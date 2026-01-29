@@ -4,9 +4,8 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
+import frc.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -15,14 +14,14 @@ public class RobotContainer {
   private final ModularAutoHandler autoHandler;
 
   // subsystems
-  private final Shooter shooter;
+  private final Launcher launcher;
 
   private final Joystick driver;
   private final Joystick operator;
 
   public RobotContainer() {
 
-    shooter = new Shooter();
+    launcher = new Launcher();
     autoHandler = new ModularAutoHandler();
 
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
