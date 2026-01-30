@@ -13,6 +13,9 @@ public final class Constants {
 
   public static class IdConstants {
     public static final int SHOOTER_MOTOR_ID = 0;
+    public static final int INTAKE_MOTOR_ID = 2;// arbitrary value
+    public static final int ANGLE_MOTOR_ID = 1; //arbitrary value
+
   }
 
   public static class ShooterConstants {
