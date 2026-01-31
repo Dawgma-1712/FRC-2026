@@ -2,19 +2,25 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.Constants;
 import frc.Constants.IdConstants;
 import frc.Constants.ShooterConstants;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 
 public class Launcher extends SubsystemBase {
     
-    private final TalonFX shooterMotor = new TalonFX(IdConstants.SHOOTER_MOTOR_ID);
+    private final TalonFX shooterMotor1 = new TalonFX(IdConstants.SHOOTER_MOTOR_ID1);
+    private final TalonFX shooterMotor2 = new TalonFX(IdConstants.SHOOTER_MOTOR_ID2);
+    private final TalonFX shooterMotor3 = new TalonFX(IdConstants.SHOOTER_MOTOR_ID3);
+    private final SparkMax hoodMotor = new SparkMax(Constants.IdConstants.HOOD_MOTOR_ID, MotorType.kBrushed);
+
     private final VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
 
     public Launcher() {
@@ -22,21 +28,40 @@ public class Launcher extends SubsystemBase {
         // configure the Kraken
         TalonFXConfiguration configs = new TalonFXConfiguration();
         configs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        shooterMotor.getConfigurator().apply(configs);
+        shooterMotor1.getConfigurator().apply(configs);
+        shooterMotor2.getConfigurator().apply(configs);
+        shooterMotor3.getConfigurator().apply(configs);
 
         // PID
         Slot0Configs slot0configs = new Slot0Configs();
-        slot0configs.kP = ShooterConstants.SHOOTER_KP;
-        slot0configs.kI = ShooterConstants.SHOOTER_KI;
-        slot0configs.kD = ShooterConstants.SHOOTER_KD;
-        shooterMotor.getConfigurator().apply(slot0configs);
+        slot0configs.kP = ShooterConstants.SHOOTER_KP1;
+        slot0configs.kI = ShooterConstants.SHOOTER_KI1;
+        slot0configs.kD = ShooterConstants.SHOOTER_KD1;
+
+        Slot0Configs slot1configs = new Slot0Configs();
+        slot0configs.kP = ShooterConstants.SHOOTER_KP2;
+        slot0configs.kI = ShooterConstants.SHOOTER_KI2;
+        slot0configs.kD = ShooterConstants.SHOOTER_KD2;
+
+        shooterMotor1.getConfigurator().apply(slot0configs);
+        shooterMotor2.getConfigurator().apply(slot0configs);
+        shooterMotor3.getConfigurator().apply(slot1configs);
+        hoodMotor.getEncoder().setPosition(0); //arbitrary
 
 
     }
 
-    public void stop() {
+    public void stopShooter() {
         velocityDutyCycle.Velocity = 0;
-        shooterMotor.setControl(velocityDutyCycle);
+        shooterMotor1.setControl(velocityDutyCycle);
+        shooterMotor2.setControl(velocityDutyCycle);
+
+    }
+
+    public void stopFeeder() {
+        velocityDutyCycle.Velocity = 0;
+        shooterMotor3.setControl(velocityDutyCycle);
+
     }
 
     // A 2D kinematics equation, neglects air resistance
@@ -66,7 +91,7 @@ public class Launcher extends SubsystemBase {
     public void shootRpm(double desiredRpm) {
 
         velocityDutyCycle.Velocity = desiredRpm / 60;  // in rotations per second
-        shooterMotor.setControl(velocityDutyCycle);
+        shooterMotor1.setControl(velocityDutyCycle);
     
     }
 
