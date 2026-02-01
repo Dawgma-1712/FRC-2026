@@ -11,9 +11,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 // import com.revrobotics.spark.SparkLowLevel.MotorType;
 // import com.revrobotics.spark.SparkMax;
-//if add hooded motor then import these
+// if add hooded motor then import these
 
 public class LauncherIOReal implements LauncherIO{
+
     private final TalonFX shootMotor1 = new TalonFX(IdConstants.SHOOT_MOTOR_ID1);
     private final TalonFX shootMotor2 = new TalonFX(IdConstants.SHOOT_MOTOR_ID2);
 
@@ -25,19 +26,22 @@ public class LauncherIOReal implements LauncherIO{
     private final DigitalInput fuelBeamBreak = new DigitalInput(Constants.IdConstants.LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID);
 
     public LauncherIOReal() {
+
         TalonFXConfiguration shooterConfigs = new TalonFXConfiguration();
-        shooterConfigs.Slot0.kP = Constants.ShooterConstants.SHOOTER_KP1;
-        shooterConfigs.Slot0.kI = Constants.ShooterConstants.SHOOTER_KI1;
-        shooterConfigs.Slot0.kD = Constants.ShooterConstants.SHOOTER_KD1;
+        shooterConfigs.Slot0.kP = Constants.ShooterConstants.SHOOTER_kP;
+        shooterConfigs.Slot0.kI = Constants.ShooterConstants.SHOOTER_kI;
+        shooterConfigs.Slot0.kD = Constants.ShooterConstants.SHOOTER_kD;
+
+        // may have to change whether both motors are spinning clockwise
         shooterConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         shootMotor1.getConfigurator().apply(shooterConfigs);
         shootMotor2.getConfigurator().apply(shooterConfigs);
 
         TalonFXConfiguration feederConfigs = new TalonFXConfiguration();
-        feederConfigs.Slot0.kP = Constants.ShooterConstants.FEEDER_KP2;
-        feederConfigs.Slot0.kI = Constants.ShooterConstants.FEEDER_KI2;
-        feederConfigs.Slot0.kD = Constants.ShooterConstants.FEEDER_KD2;
+        feederConfigs.Slot0.kP = Constants.ShooterConstants.FEEDER_kP;
+        feederConfigs.Slot0.kI = Constants.ShooterConstants.FEEDER_kI;
+        feederConfigs.Slot0.kD = Constants.ShooterConstants.FEEDER_kD;
         
         feedMotor.getConfigurator().apply(feederConfigs);
     }

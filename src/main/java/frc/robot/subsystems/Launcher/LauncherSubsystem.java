@@ -5,12 +5,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.ShooterConstants;
 
-public class LauncherIOSubsystem extends SubsystemBase{
+public class LauncherSubsystem extends SubsystemBase {
+
     LauncherIO io;
 
     //private final LauncherIOInputsAutoLogged LauncherInputs = new LauncherIOInputsAutoLogged();
 
-    public LauncherIOSubsystem(LauncherIO io){
+    public LauncherSubsystem(LauncherIO io){
         this.io = io;
     }
 
@@ -47,18 +48,16 @@ public class LauncherIOSubsystem extends SubsystemBase{
 
 
     private double calculateVelocityFromDistance(double deltaX) {
+
         double g = ShooterConstants.GRAVITY;
         double theta = Math.toRadians(ShooterConstants.SHOOTER_ANGLE);
         double deltaY = ShooterConstants.HUB_HEIGHT_METERS;
 
+        // in m/s
         return Math.sqrt(
             (g * Math.pow(deltaX, 2)) / 
             (2 * Math.pow(Math.cos(theta), 2) * (deltaX * Math.tan(theta) - deltaY))
         );
+
     }
-
-
-
-
-
 }

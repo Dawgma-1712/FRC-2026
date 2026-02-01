@@ -9,19 +9,25 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.Joystick;
 
+import frc.robot.subsystems.Launcher.*;
+import frc.robot.subsystems.Intake.*;
+
 public class RobotContainer {
 
   private final ModularAutoHandler autoHandler;
 
   // subsystems
-  private final Launcher launcher;
+  private final LauncherSubsystem launcher;
+  private final LauncherIOReal launcherIOReal;
 
   private final Joystick driver;
   private final Joystick operator;
 
   public RobotContainer() {
 
-    launcher = new Launcher();
+    launcherIOReal = new LauncherIOReal();
+    launcher = new LauncherSubsystem(launcherIOReal);
+
     autoHandler = new ModularAutoHandler();
 
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);

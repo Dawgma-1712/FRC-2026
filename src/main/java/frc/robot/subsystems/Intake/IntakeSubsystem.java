@@ -4,13 +4,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
 
-public class IntakeIOSubsystem extends SubsystemBase{
+public class IntakeSubsystem extends SubsystemBase{
+    
     IntakeIO io;
     
-    // private final IntakeIOInputsAutoLogged IntakeInputs = new IntakeIOInputsAutoLogged();
-    
-    public IntakeIOSubsystem(IntakeIO io){
-        this.io=io;
+    public IntakeSubsystem(IntakeIO io){
+        this.io = io;
     }
 
      public void setIntakeMotorSpeed(double speed) {

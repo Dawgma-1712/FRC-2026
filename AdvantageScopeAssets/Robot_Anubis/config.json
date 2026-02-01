@@ -1,0 +1,42 @@
+{
+  "name": "Anubis",
+  "isFTC": false,
+  "disableSimplification": false,
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0.0508
+  ],
+  "cameras": [
+    {
+      "name": "limelight",
+      "rotations": [
+        {
+          "axis": "z",
+          "degrees": 0
+        }
+      ],
+      "position": [
+        0.4,
+        0,
+        0.3
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 62.5
+    }
+  ],
+  "components": []
+}
