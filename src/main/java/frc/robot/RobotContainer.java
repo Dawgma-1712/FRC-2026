@@ -20,6 +20,9 @@ public class RobotContainer {
   private final LauncherSubsystem launcher;
   private final LauncherIOReal launcherIOReal;
 
+  private final IntakeSubsystem intake;
+  private final IntakeIOReal intakeIOReal;
+
   private final Joystick driver;
   private final Joystick operator;
 
@@ -27,6 +30,9 @@ public class RobotContainer {
 
     launcherIOReal = new LauncherIOReal();
     launcher = new LauncherSubsystem(launcherIOReal);
+    
+    intakeIOReal = new IntakeIOReal();
+    intake = new IntakeSubsystem(intakeIOReal);
 
     autoHandler = new ModularAutoHandler();
 

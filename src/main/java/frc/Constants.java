@@ -23,8 +23,9 @@ public final class Constants {
     public static final int ANGLE_MOTOR_ID = 1; //arbitrary value
     public static final int INTAKE_MOTOR_ID = 2;// arbitrary value
 
-    public static final int INTAKE_LIMIT_SWITCH_ID = 0;
-    public static final int LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID = 1;
+    public static final int INTAKE_STOWED_SWITCH_ID = 0;
+    public static final int INTAKE_EXTENDED_SWITCH_ID = 1;
+    public static final int LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID = 2;
 
   }
 
@@ -44,6 +45,8 @@ public final class Constants {
     public static final double ANGLE_ACCELERATION = 80;
     public static final double ANGLE_JERK = 1600;
 
+    public static final double EXTENDED_INTAKE_ANGLE = 90;
+
   }
 
   public static class ShooterConstants {
@@ -60,6 +63,8 @@ public final class Constants {
     public static final double FEEDER_kP = 0.1; //These PID values are arbitrary
     public static final double FEEDER_kI = 0.0;
     public static final double FEEDER_kD = 0.0;
+
+    public static final double FEEDER_SPEED_MPS = 15; //idk change
 
   }
 

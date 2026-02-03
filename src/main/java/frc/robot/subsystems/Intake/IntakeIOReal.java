@@ -22,7 +22,8 @@ public class IntakeIOReal implements IntakeIO {
 
     private final MotionMagicVoltage requestControl = new MotionMagicVoltage(0);
 
-    private final DigitalInput limitSwitch = new DigitalInput(IdConstants.INTAKE_LIMIT_SWITCH_ID);
+    private final DigitalInput stowedSwitch = new DigitalInput(IdConstants.INTAKE_STOWED_SWITCH_ID);
+    private final DigitalInput extendedSwitch = new DigitalInput(IdConstants.INTAKE_EXTENDED_SWITCH_ID);
 
     public IntakeIOReal(){
         TalonFXConfiguration angleConfig = new TalonFXConfiguration();
@@ -75,8 +76,11 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public double getAngleMotorPosition() {
-        if(limitSwitch.get()){
+        if(!stowedSwitch.get()){
             ZeroMotorEncoder();
+        }
+        if(!extendedSwitch.get()){
+            angleMotor.setPosition(IntakeConstants.EXTENDED_INTAKE_ANGLE);
         }
         angleMotorPosition=angleMotor.getPosition().getValueAsDouble();
         return angleMotorPosition;
