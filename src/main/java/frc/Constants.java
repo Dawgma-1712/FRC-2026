@@ -20,12 +20,15 @@ public final class Constants {
     public static final int FEED_MOTOR_ID = 5;
     public static final int HOOD_MOTOR_ID = 6;
 
+    public static final int REVOLVER_MOTOR_ID = 7;
+
     public static final int ANGLE_MOTOR_ID = 1; //arbitrary value
     public static final int INTAKE_MOTOR_ID = 2;// arbitrary value
 
     public static final int INTAKE_STOWED_SWITCH_ID = 0;
     public static final int INTAKE_EXTENDED_SWITCH_ID = 1;
     public static final int LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID = 2;
+
 
   }
 
@@ -50,7 +53,6 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-
     public static final double GRAVITY = 9.8;
     public static final double SHOOTER_ANGLE = 30.0;
     public static final double HUB_HEIGHT_METERS = 1.8288;
@@ -66,12 +68,17 @@ public final class Constants {
 
     public static final double FEEDER_SPEED_MPS = 15; //idk change
 
+    public static final double TARGET_VELOCITY_TOLERANCE = 0.95;
   }
 
   public static class VisionConstants {
 
     public static final AprilTagFieldLayout APRIL_TAG_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
+  }
+
+  public static class RevolverConstants{
+    
   }
 
 }
