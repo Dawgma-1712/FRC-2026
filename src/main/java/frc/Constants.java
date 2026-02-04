@@ -27,6 +27,8 @@ public final class Constants {
     public static final int INTAKE_EXTENDED_SWITCH_ID = 1;
     public static final int LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID = 2;
 
+    public static final int CLIMBER_MOTOR=1;
+
   }
 
   public static class IntakeConstants {
@@ -66,6 +68,8 @@ public final class Constants {
 
     public static final double FEEDER_SPEED_MPS = 15; //idk change
 
+    public static final double TARGET_VELOCITY_TOLERANCE = 0.95;
+
   }
 
   public static class VisionConstants {
@@ -73,5 +77,18 @@ public final class Constants {
     public static final AprilTagFieldLayout APRIL_TAG_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
   }
+
+  public static class ClimberConstants{
+    public static final double CLIMBER_kP = 0;
+    public static final double CLIMBER_kI = 0;
+    public static final double CLIMBER_kD = 0;
+
+    public static final double ANGLE_CRUISE_VELOCITY = 40;
+    public static final double ANGLE_ACCELERATION = 80;
+    public static final double ANGLE_JERK = 1600;
+
+  }
+
+
 
 }
