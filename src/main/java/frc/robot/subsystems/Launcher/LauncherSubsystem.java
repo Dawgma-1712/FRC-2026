@@ -18,16 +18,12 @@ public class LauncherSubsystem extends SubsystemBase {
         this.io = io;
     }
 
-    public void setShooterVelocity(double velocity){
-        io.setFeederVelocity(velocity);
+    public void setKickerVelocity(double velocity){
+        io.setKickerVelocity(velocity);
     }
 
-    public double getShooter1Velocity(){
-        return io.getShooter1Velocity();
-    }
-
-    public double getShooter2Velocity(){
-        return io.getShooter2Velocity();
+    public double getKickerVelocity(){
+        return io.getKickerVelocity();
     }
 
     public void setFeederVelocity(double velocity){
@@ -42,26 +38,60 @@ public class LauncherSubsystem extends SubsystemBase {
         return io.hasFuel();
     }
 
+    public void setHoodPosition(double angle){
+        io.setHoodPosition(angle);
+    }
+
+    public double getHoodPosition(){
+        return io.getHoodPosition();
+    }
+
 
     @Override
     public void periodic() {
         // io.updateInputs(LauncherIOInputs);
         SmartDashboard.putBoolean("Has Fuel", hasFuel());
+        SmartDashboard.putNumber("Current Hood Angle", getHoodPosition());
+        SmartDashboard.putNumber("Current Launcher RPS", getKickerVelocity());
     }
 
+    private double calculateIdealLaunchAngle(double distance) {
+        double a = 0.22;
+        double b = -2.85;
+        double c = 5.5;
+        double d = 78.5;
 
+        double idealTheta = (a * Math.pow(distance, 3)) 
+                        + (b * Math.pow(distance, 2)) 
+                        + (c * distance) 
+                        + d;
+        return Math.max(41.0, Math.min(90-ShooterConstants.BASE_ANGLE, idealTheta));
+    }
 
-    private double calculateVelocityFromDistance(double deltaX) {
+    private double calculateHoodPosFromDistance(double distance) {
+        double targetTheta = calculateIdealLaunchAngle(distance);
+        
+        double hoodOffset = 90-ShooterConstants.BASE_ANGLE - targetTheta;
+
+        return Math.max(0, Math.min(ShooterConstants.MAX_HOOD_OFFSET, hoodOffset));
+    }
+
+    private double calculateVelocityFromDistance(double deltaX, double hoodPos) {
         double g = ShooterConstants.GRAVITY;
-        double theta = Math.toRadians(ShooterConstants.SHOOTER_ANGLE);
-        double deltaY = ShooterConstants.HUB_HEIGHT_METERS;
-        // in m/s
-        return Math.sqrt(
-            (g * Math.pow(deltaX, 2)) / 
-            (2 * Math.pow(Math.cos(theta), 2) * (deltaX * Math.tan(theta) - deltaY))
-        );
-    }
+        
+        double thetaDegrees = 90.0 - ShooterConstants.BASE_ANGLE - hoodPos; //how we get the projectile angle 90-base-hood pos add on
+        double thetaRadians = Math.toRadians(thetaDegrees);
+        
+        double deltaY = ShooterConstants.HUB_HEIGHT_METERS-ShooterConstants.LAUNCHER_HEIGHT_METERS;
 
+        double cosTheta = Math.cos(thetaRadians);
+        double tanTheta = Math.tan(thetaRadians);
+        double denominator = 2 * Math.pow(cosTheta, 2) * (deltaX * tanTheta - deltaY);
+
+        if (denominator <= 0) return 0; // Target is physically unreachable at this angle
+
+        return Math.sqrt((g * Math.pow(deltaX, 2)) / denominator);
+    }
 
     private double mpsToRps(double mps) {
         double circumferenceMeters = ShooterConstants.WHEEL_DIAMETER * 0.0254 * Math.PI;
@@ -71,45 +101,47 @@ public class LauncherSubsystem extends SubsystemBase {
     public Command adaptiveShoot(DoubleSupplier distanceSupplier) {
         return this.run(() -> {
             double distance = distanceSupplier.getAsDouble();
-            double requiredMPS = calculateVelocityFromDistance(distance);
+            double targetHood = calculateHoodPosFromDistance(distance);
+            double requiredMPS = calculateVelocityFromDistance(distance, targetHood);
             double targetRPS = mpsToRps(requiredMPS);
 
-            io.setShooterVelocity(targetRPS);
+            io.setHoodPosition(targetHood);
+            io.setKickerVelocity(targetRPS);
 
-            boolean isReady = ((io.getShooter1Velocity()+io.getShooter2Velocity())/2) >= (targetRPS * Constants.ShooterConstants.TARGET_VELOCITY_TOLERANCE) && targetRPS > 0.1;
-
-            if (isReady) {
+            if (readyToShoot(distanceSupplier)) {
                 io.setFeederVelocity(mpsToRps(ShooterConstants.FEEDER_SPEED_MPS));
             } else {
                 io.setFeederVelocity(0);
             }
         })
         .finallyDo((interrupted) -> {
-            io.setShooterVelocity(0);
+            io.setKickerVelocity(0);
             io.setFeederVelocity(0);
-    });
+        });
     }
 
-  public Command prepareLauncher(DoubleSupplier distanceSupplier) {
-    return this.run(() -> {
-        double distance = distanceSupplier.getAsDouble();
-        double requiredMPS = calculateVelocityFromDistance(distance);
-        double targetRPS = mpsToRps(requiredMPS);
-        io.setShooterVelocity(targetRPS);
-    })
-    .finallyDo((interrupted) -> {
-        io.setShooterVelocity(0);
-    });
-}
+    public Command prepareLauncher(DoubleSupplier distanceSupplier) {
+        return this.run(() -> {
+            double distance = distanceSupplier.getAsDouble();
+            double targetHood = calculateHoodPosFromDistance(distance);
+            double targetRPS = mpsToRps(calculateVelocityFromDistance(distance, targetHood));
+            
+            io.setHoodPosition(targetHood);
+            io.setKickerVelocity(targetRPS);
+        })
+        .finallyDo((interrupted) -> {
+            io.setKickerVelocity(0);
+        });
+    }
 
     public boolean readyToShoot(DoubleSupplier distanceSupplier){
         double distance = distanceSupplier.getAsDouble();
-        double requiredMPS = calculateVelocityFromDistance(distance);
-        double targetRPS = mpsToRps(requiredMPS);
+        double targetHood = calculateHoodPosFromDistance(distance);
+        double targetRPS = mpsToRps(calculateVelocityFromDistance(distance, targetHood));
 
+        boolean velocityReady = Math.abs(io.getKickerVelocity() - targetRPS) <= (targetRPS * ShooterConstants.TARGET_VELOCITY_TOLERANCE);
+        boolean hoodReady = Math.abs(io.getHoodPosition() - targetHood) <= ShooterConstants.TARGET_HOOD_TOLERANCE_DEGREES; 
 
-        boolean isReady = ((io.getShooter1Velocity()+io.getShooter2Velocity())/2) >= (targetRPS * 0.95) && targetRPS > 0.1;
-
-        return isReady;
+        return velocityReady && hoodReady && targetRPS > 0.1;
     }
 }

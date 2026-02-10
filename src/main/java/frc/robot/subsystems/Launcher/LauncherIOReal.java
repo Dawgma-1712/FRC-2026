@@ -6,6 +6,7 @@ import frc.Constants.IdConstants;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
@@ -15,28 +16,31 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class LauncherIOReal implements LauncherIO{
 
-    private final TalonFX shootMotor1 = new TalonFX(IdConstants.SHOOT_MOTOR_ID1);
-    private final TalonFX shootMotor2 = new TalonFX(IdConstants.SHOOT_MOTOR_ID2);
+    private final TalonFX kickMotor = new TalonFX(IdConstants.KICK_MOTOR_ID);
 
     private final TalonFX feedMotor = new TalonFX(IdConstants.FEED_MOTOR_ID);
     
-    private final VelocityVoltage shooterControl = new VelocityVoltage(0);
+    private final VelocityVoltage kickerControl = new VelocityVoltage(0);
     private final VelocityVoltage feederControl = new VelocityVoltage(0);
 
-    private final DigitalInput fuelBeamBreak = new DigitalInput(Constants.IdConstants.LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID);
+    private final DigitalInput fuelBeamBreak = new DigitalInput(IdConstants.LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID);
+
+    private final DutyCycleEncoder hoodEncoder = new DutyCycleEncoder(IdConstants.HOOD_ENCODER_ID,40,0);
+    //we are saying that the range for this encoder has a maximum of 40 and the zero is at 0
+    //We say 40 because that is the max angle of the hood and 0 is the start
+    //FOR WIRING USE THE BLACK RED WHITE TRIPLET OF WIRES AND PLUG INTO DIO
 
     public LauncherIOReal() {
 
-        TalonFXConfiguration shooterConfigs = new TalonFXConfiguration();
-        shooterConfigs.Slot0.kP = Constants.ShooterConstants.SHOOTER_kP;
-        shooterConfigs.Slot0.kI = Constants.ShooterConstants.SHOOTER_kI;
-        shooterConfigs.Slot0.kD = Constants.ShooterConstants.SHOOTER_kD;
+        TalonFXConfiguration kickConfigs = new TalonFXConfiguration();
+        kickConfigs.Slot0.kP = Constants.ShooterConstants.KICKER_kP;
+        kickConfigs.Slot0.kI = Constants.ShooterConstants.KICKER_kI;
+        kickConfigs.Slot0.kD = Constants.ShooterConstants.KICKER_kD;
 
         // may have to change whether both motors are spinning clockwise
-        shooterConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        kickConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        shootMotor1.getConfigurator().apply(shooterConfigs);
-        shootMotor2.getConfigurator().apply(shooterConfigs);
+        kickMotor.getConfigurator().apply(kickConfigs);
 
         TalonFXConfiguration feederConfigs = new TalonFXConfiguration();
         feederConfigs.Slot0.kP = Constants.ShooterConstants.FEEDER_kP;
@@ -47,19 +51,13 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     @Override
-    public void setShooterVelocity(double rps) {
-        shootMotor1.setControl(shooterControl.withVelocity(rps));
-        shootMotor2.setControl(shooterControl.withVelocity(rps));
+    public void setKickerVelocity(double rps) {
+        kickMotor.setControl(kickerControl.withVelocity(rps));
     }
 
     @Override
-    public double getShooter1Velocity(){
-        return shootMotor1.getVelocity().getValueAsDouble();
-    }
-
-    @Override
-    public double getShooter2Velocity(){
-        return shootMotor2.getVelocity().getValueAsDouble();
+    public double getKickerVelocity(){
+        return kickMotor.getVelocity().getValueAsDouble();
     }
 
     @Override
@@ -73,13 +71,24 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     @Override
+    public double getHoodPosition(){
+        return hoodEncoder.get();
+    }
+
+    @Override
+    public void setHoodPosition(double angle){
+        //write logic here depending on if you use a servo or something else
+        //1 rotation of the motor equals 17/360 degree change physically
+    }
+
+    @Override
     public boolean hasFuel(){
         return !fuelBeamBreak.get(); 
     }
 
     @Override
     public void updateInputs(LauncherIOInputs inputs) {
-        inputs.shootMotorVelocity = shootMotor1.getVelocity().getValueAsDouble();
+        inputs.kickMotorVelocity = kickMotor.getVelocity().getValueAsDouble();
         inputs.feedMotorVelocity = feedMotor.getVelocity().getValueAsDouble();
         inputs.hasFuel = hasFuel();
     }

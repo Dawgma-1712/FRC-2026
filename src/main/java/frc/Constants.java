@@ -15,8 +15,7 @@ public final class Constants {
 
   public static class IdConstants {
 
-    public static final int SHOOT_MOTOR_ID1 = 3;//arbitrary all
-    public static final int SHOOT_MOTOR_ID2 = 4;
+    public static final int KICK_MOTOR_ID = 3;//arbitrary all
     public static final int FEED_MOTOR_ID = 5;
     public static final int HOOD_MOTOR_ID = 6;
 
@@ -28,6 +27,8 @@ public final class Constants {
     public static final int INTAKE_STOWED_SWITCH_ID = 0;
     public static final int INTAKE_EXTENDED_SWITCH_ID = 1;
     public static final int LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID = 2;
+    
+    public static final int HOOD_ENCODER_ID = 3;
 
     public static final int CLIMBER_MOTOR=1;
 
@@ -54,14 +55,14 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-    public static final double GRAVITY = 9.8;
-    public static final double SHOOTER_ANGLE = 30.0;
+    public static final double GRAVITY = 9.8;    
     public static final double HUB_HEIGHT_METERS = 1.8288;
+    public static final double LAUNCHER_HEIGHT_METERS = 1; //completely arbitrary
     public static final double WHEEL_DIAMETER = 4; // in inches
 
-    public static final double SHOOTER_kP = 0.1;
-    public static final double SHOOTER_kI = 0.0;
-    public static final double SHOOTER_kD = 0.0;
+    public static final double KICKER_kP = 0.1;
+    public static final double KICKER_kI = 0.0;
+    public static final double KICKER_kD = 0.0;
 
     public static final double FEEDER_kP = 0.1; //These PID values are arbitrary
     public static final double FEEDER_kI = 0.0;
@@ -70,6 +71,11 @@ public final class Constants {
     public static final double FEEDER_SPEED_MPS = 15; //idk change
 
     public static final double TARGET_VELOCITY_TOLERANCE = 0.95;
+    public static final double TARGET_HOOD_TOLERANCE_DEGREES = 1.0;
+
+    public static final double BASE_ANGLE = 9.0;
+    public static final double MAX_HOOD_OFFSET = 40.0;
+
   }
 
   public static class VisionConstants {
