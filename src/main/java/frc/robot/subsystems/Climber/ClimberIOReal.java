@@ -42,13 +42,15 @@ public class ClimberIOReal implements ClimberIO {
     public void ZeroMotorEncoder(){
         climberMotor.setPosition(0);
     }
-        @Override
-   public void setClimberPose(double rps){
-    climberMotor.getPosition();
-   }
-   public double getClimberVelocity(){
-    return climberMotor.getVelocity().getValueAsDouble();
-   }
+
+    public double getClimberVelocity(){
+        return climberMotor.getVelocity().getValueAsDouble();
+    }
+
+    @Override
+    public void setClimberPose() {
+        
+    }
 
 
 
