@@ -6,6 +6,17 @@ import edu.wpi.first.apriltag.AprilTagFields;
 // Remember to use the correct subclass so our code stays organized please
 public final class Constants {
 
+  public static class DriveConstants {
+        // Auto constants
+        public static final int drive_kP = 10;
+        public static final int drive_kI = 0;
+        public static final int drive_kD = 0;
+
+        public static final int rotation_kP = 7;
+        public static final int rotation_kI = 0;
+        public static final int rotation_kD = 0;
+    }
+
   public static class OperatorConstants {
 
     public static final int DRIVER_JOYSTICK_PORT = 0;
