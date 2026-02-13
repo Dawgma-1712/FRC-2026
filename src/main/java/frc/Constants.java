@@ -104,16 +104,16 @@ public final class Constants {
 
       public static final double LIMELIGHT_VIEW_RANGE = 5.0; // distance in meters that the limelight can see
       public static final Transform3d LIMELIGHT_LEFT_TO_ROBOT = new Transform3d(
-                                                                  new Translation3d(-0.3429, 0.276, 0.1524),
+                                                                  new Translation3d(-0, 0.276, 0.1524),
                                                                   new Rotation3d(0, Math.toRadians(-30), Math.toRadians(135)
                                                               ));
       public static final Transform3d LIMELIGHT_RIGHT_TO_ROBOT = new Transform3d(
-                                                                  new Translation3d(-0.3429, -0.276, 0.1524), 
+                                                                  new Translation3d(-0, -0.276, 0.1524), 
                                                                   new Rotation3d(0, Math.toRadians(-30), Math.toRadians(-135)
                                                               ));
 
-      public static final double LIMELIGHT_HORIZONTAL_FOV = 82; // in degrees
-      public static final double LIMELIGHT_VERTICAL_FOV = 56.2; // in degrees
+      public static final double LIMELIGHT_HORIZONTAL_FOV = Math.toRadians(82); // in radians
+      public static final double LIMELIGHT_VERTICAL_FOV = Math.toRadians(56.2); // in radians
       public static final double INCHES_PER_METER = 39.37;
 
     }

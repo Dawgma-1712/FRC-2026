@@ -1,15 +1,23 @@
 package frc.robot.subsystems;
 
+import java.util.Arrays;
+
 import limelight.Limelight;
 import limelight.networktables.AngularVelocity3d;
 import limelight.networktables.Orientation3d;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import limelight.networktables.LimelightSettings.LEDMode;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+
 import frc.Constants.VisionConstants;
+import frc.Constants.VisionConstants.SimulationConstants;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -30,7 +38,11 @@ public class Vision extends SubsystemBase {
     Pigeon2 pigeon;
 
     // AdvantageScope stuff
-    StructArrayPublisher<Pose3d> aprilTagPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArray", Pose3d.struct).publish();
+    StructPublisher<Pose3d> limelightLeftPublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightLeft", Pose3d.struct).publish();
+    StructPublisher<Pose3d> limelightRightPublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightRight", Pose3d.struct).publish();
+    StructArrayPublisher<Pose3d> aprilTagLeftPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArrayLeft", Pose3d.struct).publish();
+    StructArrayPublisher<Pose3d> aprilTagRightPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArrayRight", Pose3d.struct).publish();
+
 
     // configures the target limelight initially, only needed once in the initializer
     private void configureLimelight(Limelight limelight, Pose3d offset) {
@@ -63,8 +75,8 @@ public class Vision extends SubsystemBase {
         this.drivetrain = drivetrain;
         this.pigeon = drivetrain.getPigeon2();
         
-        configureLimelightMegatag(limelightLeft);
-        configureLimelightMegatag(limelightRight);
+        configureLimelight(limelightLeft, new Pose3d().transformBy(SimulationConstants.LIMELIGHT_LEFT_TO_ROBOT));
+        configureLimelight(limelightRight, new Pose3d().transformBy(SimulationConstants.LIMELIGHT_RIGHT_TO_ROBOT));
 
     }
 
@@ -72,20 +84,77 @@ public class Vision extends SubsystemBase {
      * ADVANTAGESCOPE SIM METHODS
      */
     
+    private final Pose3d[] visibleTagBufferLeft = new Pose3d[32];
+    private final Pose3d[] visibleTagBufferRight = new Pose3d[32];
+
     @Override
     public void simulationPeriodic() {
 
-        Pose3d drivetrainPose = new Pose3d(drivetrain.getState().Pose);
-        AprilTagFieldLayout aprilTagPoses = VisionConstants.APRIL_TAG_POSES;
+      Pose3d drivetrainPose = new Pose3d(drivetrain.getState().Pose);
 
+      // field relative limelight positions based on the transforms in Constants
+      Pose3d limelightLeftPose = drivetrainPose.transformBy(SimulationConstants.LIMELIGHT_LEFT_TO_ROBOT);
+      Pose3d limelightRightPose = drivetrainPose.transformBy(SimulationConstants.LIMELIGHT_RIGHT_TO_ROBOT);
+      
+      AprilTagFieldLayout aprilTagPoses = VisionConstants.APRIL_TAG_POSES;
 
+      limelightLeftPublisher.set(limelightLeftPose);
+      limelightRightPublisher.set(limelightRightPose);
+
+      int visibleCountLeft = 0;
+      int visibleCountRight = 0;
+      // check each aprilTag to see if it's visible
+      for (int i = 1; i <= 32; i++) {
+        Pose3d tagPose = aprilTagPoses.getTagPose(i).orElse(new Pose3d());  // the orElse is because getTagPoses returns an optional, and should never be called if the tagIds are correct
+
+        if (isAprilTagVisible(limelightLeftPose, tagPose, i)) {
+          visibleTagBufferLeft[visibleCountLeft] = tagPose;
+          visibleCountLeft++;
+        }
+        if (isAprilTagVisible(limelightRightPose, tagPose, i)) {
+          visibleTagBufferRight[visibleCountRight] = tagPose;
+          visibleCountRight++;
+        }
+      }
+      aprilTagLeftPosePublisher.set(Arrays.copyOfRange(visibleTagBufferLeft, 0, visibleCountLeft));
+      aprilTagRightPosePublisher.set(Arrays.copyOfRange(visibleTagBufferRight, 0, visibleCountRight));
 
     }
 
   public boolean isAprilTagVisible(Pose3d limelightPose, Pose3d tagPose, int tagId) {
 
-      return true;
-  }
+    Pose3d relativeTagPose = tagPose.relativeTo(limelightPose);
+    Translation3d relativeTagTranslation = relativeTagPose.getTranslation();
 
+    // distance check
+    double distance = relativeTagPose.getTranslation().getNorm();
+    if (distance > SimulationConstants.LIMELIGHT_VIEW_RANGE) return false;
+
+    // fov check
+    double horizontal = Math.atan2(relativeTagTranslation.getY(), relativeTagTranslation.getX());  // all values are in radians!
+    double vertical = Math.atan2(relativeTagTranslation.getZ(), relativeTagTranslation.getX());
+
+    if (Math.abs(horizontal) >= SimulationConstants.LIMELIGHT_HORIZONTAL_FOV / 2 ||
+        Math.abs(vertical) >= SimulationConstants.LIMELIGHT_VERTICAL_FOV / 2) {
+          return false;
+    }
+
+    Rotation3d tagRotation = relativeTagPose.getRotation();
+    Translation3d tagNormal = new Translation3d(1, 0, 0).rotateBy(tagRotation);
+    
+    // Vector from tag to limelight (opposite of relativeTagTranslation)
+    Translation3d tagToLimelight = relativeTagTranslation.unaryMinus().div(distance);
+    
+    // Calculate angle between tag normal and direction to limelight
+    double dotProduct = tagNormal.getX() * tagToLimelight.getX() + 
+                        tagNormal.getY() * tagToLimelight.getY() + 
+                        tagNormal.getZ() * tagToLimelight.getZ();
+    double angle = Math.acos(Math.max(-1.0, Math.min(1.0, dotProduct))); // clamp for numerical stability
+    
+    // Check if angle is within 60 degrees (π/3 radians)
+    if (angle > Math.PI / 3) return false;
+
+    return true;
+  }
 
 }

@@ -48,6 +48,7 @@ public class RobotContainer {
 
   // private final IntakeSubsystem intake;
   // private final IntakeIOReal intakeIOReal;
+  private final Vision vision;
 
   private final Joystick driver;
   private final Joystick operator;
@@ -63,6 +64,7 @@ public class RobotContainer {
 
     //autoHandler = new ModularAutoHandler();
 
+
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
     operator = new Joystick(OperatorConstants.OPERATOR_JOYSTICK_PORT);
 
@@ -74,6 +76,8 @@ public class RobotContainer {
             .withRotationalRate(Math.abs(-driver.getRawAxis(2) * MaxAngularRate) > 0.05 ? -driver.getRawAxis(2) * MaxAngularRate * speed : 0)
             )
         );
+
+    vision = new Vision(drivetrain);
 
     configureBindings();
   }
