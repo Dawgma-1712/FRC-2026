@@ -19,23 +19,50 @@
   ],
   "cameras": [
     {
-      "name": "limelight",
+      "name": "limelight-front",
       "rotations": [
         {
+          "axis": "y",
+          "degrees": -30
+        },
+        {
           "axis": "z",
-          "degrees": 0
+          "degrees": 135
         }
       ],
       "position": [
         0.4,
-        0,
-        0.3
+        0.276,
+        0.1524
       ],
       "resolution": [
         1280,
         960
       ],
-      "fov": 62.5
+      "fov": 80
+    },
+    {
+      "name": "limelight-back",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -30
+        },
+        {
+          "axis": "z",
+          "degrees": -45
+        }
+      ],
+      "position": [
+        0.4,
+        -0.276,
+        0.1524
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 80
     }
   ],
   "components": []

@@ -2,6 +2,9 @@ package frc;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 // Remember to use the correct subclass so our code stays organized please
 public final class Constants {
@@ -41,7 +44,7 @@ public final class Constants {
     
     public static final int HOOD_ENCODER_ID = 3;
 
-    public static final int CLIMBER_MOTOR=1;
+    public static final int CLIMBER_MOTOR = 1;
 
   }
 
@@ -92,6 +95,21 @@ public final class Constants {
   public static class VisionConstants {
 
     public static final AprilTagFieldLayout APRIL_TAG_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
+    
+    public static final String LIMELIGHT_LEFT_ID = "limelight-left";
+    public static final String LIMELIGHT_RIGHT_ID = "limelight-right";
+
+    public static class SimulationConstants {
+
+      public static final double LIMELIGHT_VIEW_RANGE = 5.0; // distance in meters that the limelight can see
+              public static final Transform3d LIMELIGHT_FRONT_TO_ROBOT = new Transform3d(new Translation3d(0.4, 0.276, 0.1524),
+                new Rotation3d(0, Math.toRadians(-30), Math.toRadians(-135)));
+        public static final Transform3d LIMELIGHT_BACK_TO_ROBOT = new Transform3d(new Translation3d(0.4, -0.276, 0.1524), new Rotation3d(0, Math.toRadians(-30), Math.toRadians(45)));
+        public static final double LIMELIGHT_HORIZONTAL_FOV = 82; // in degrees
+        public static final double LIMELIGHT_VERTICAL_FOV = 56.2; // in degrees
+        public static final double INCHES_PER_METER = 39.37;
+
+    }
 
   }
 
