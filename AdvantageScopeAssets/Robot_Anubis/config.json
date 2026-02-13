@@ -9,7 +9,7 @@
     },
     {
       "axis": "z",
-      "degrees": 90
+      "degrees": -90
     }
   ],
   "position": [
@@ -19,7 +19,7 @@
   ],
   "cameras": [
     {
-      "name": "limelight-front",
+      "name": "limelight-left",
       "rotations": [
         {
           "axis": "y",
@@ -31,7 +31,7 @@
         }
       ],
       "position": [
-        0.4,
+        -0.3429,
         0.276,
         0.1524
       ],
@@ -39,10 +39,10 @@
         1280,
         960
       ],
-      "fov": 80
+      "fov": 82
     },
     {
-      "name": "limelight-back",
+      "name": "limelight-right",
       "rotations": [
         {
           "axis": "y",
@@ -50,11 +50,11 @@
         },
         {
           "axis": "z",
-          "degrees": -45
+          "degrees": -135
         }
       ],
       "position": [
-        0.4,
+        -0.3429,
         -0.276,
         0.1524
       ],
@@ -62,7 +62,7 @@
         1280,
         960
       ],
-      "fov": 80
+      "fov": 82
     }
   ],
   "components": []
