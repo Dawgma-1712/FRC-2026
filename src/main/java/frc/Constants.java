@@ -1,7 +1,5 @@
 package frc;
 
-import com.pathplanner.lib.path.PathConstraints;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -9,19 +7,27 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
+import com.pathplanner.lib.path.PathConstraints;
+
 // Remember to use the correct subclass so our code stays organized please
 public final class Constants {
 
   public static class DriveConstants {
         // Auto constants
-        public static final int drive_kP = 20;
+        public static final int drive_kP = 10;
         public static final int drive_kI = 0;
         public static final int drive_kD = 0;
 
         public static final int rotation_kP = 7;
         public static final int rotation_kI = 0;
         public static final int rotation_kD = 0;
-        public static final PathConstraints GAME_CONSTRAINTS = new PathConstraints(0.3, 0.4, Units.degreesToRadians(54), Units.degreesToRadians(72));
+
+        // path to pose constants
+        public static final PathConstraints GAME_CONSTRAINTS = new PathConstraints(3, 4, 
+                                                                                  Units.degreesToRadians(540),
+                                                                                  Units.degreesToRadians(720)
+                                                                                  );
+
     }
 
   public static class OperatorConstants {
@@ -104,18 +110,18 @@ public final class Constants {
     public static final String LIMELIGHT_LEFT_ID = "limelight-left";
     public static final String LIMELIGHT_RIGHT_ID = "limelight-right";
 
-    public static class SimulationConstants {
-
-      public static final double LIMELIGHT_VIEW_RANGE = 5.0; // distance in meters that the limelight can see
-      public static final Transform3d LIMELIGHT_LEFT_TO_ROBOT = new Transform3d(
+    public static final Transform3d LIMELIGHT_LEFT_TO_ROBOT = new Transform3d(
                                                                   new Translation3d(-0, 0.276, 0.1524),
                                                                   new Rotation3d(0, Math.toRadians(-30), Math.toRadians(135)
                                                               ));
-      public static final Transform3d LIMELIGHT_RIGHT_TO_ROBOT = new Transform3d(
+    public static final Transform3d LIMELIGHT_RIGHT_TO_ROBOT = new Transform3d(
                                                                   new Translation3d(-0, -0.276, 0.1524), 
                                                                   new Rotation3d(0, Math.toRadians(-30), Math.toRadians(-135)
                                                               ));
 
+    public static class SimulationConstants {
+
+      public static final double LIMELIGHT_VIEW_RANGE = 5.0; // distance in meters that the limelight can see
       public static final double LIMELIGHT_HORIZONTAL_FOV = Math.toRadians(82); // in radians
       public static final double LIMELIGHT_VERTICAL_FOV = Math.toRadians(56.2); // in radians
       public static final double INCHES_PER_METER = 39.37;
@@ -130,6 +136,7 @@ public final class Constants {
 
 
   public static class ClimberConstants {
+
     public static final double CLIMBER_kP = 0;
     public static final double CLIMBER_kI = 0;
     public static final double CLIMBER_kD = 0;
