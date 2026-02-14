@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.Constants.DriveConstants;
 import frc.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -16,8 +17,11 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 
 import frc.robot.subsystems.Launcher.*;
@@ -40,7 +44,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  //private final ModularAutoHandler autoHandler;
+  private final ModularAutoHandler autoHandler;
 
   // subsystems
   // private final LauncherSubsystem launcher;
@@ -48,7 +52,7 @@ public class RobotContainer {
 
   // private final IntakeSubsystem intake;
   // private final IntakeIOReal intakeIOReal;
-  private final Vision vision;
+  //private final Vision vision;
 
   private final Joystick driver;
   private final Joystick operator;
@@ -62,7 +66,7 @@ public class RobotContainer {
     // intakeIOReal = new IntakeIOReal();
     // intake = new IntakeSubsystem(intakeIOReal);
 
-    //autoHandler = new ModularAutoHandler();
+    autoHandler = new ModularAutoHandler();
 
 
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
@@ -77,7 +81,7 @@ public class RobotContainer {
             )
         );
 
-    vision = new Vision(drivetrain);
+    //vision = new Vision(drivetrain);
 
     configureBindings();
   }
@@ -89,7 +93,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return null;
-    //return autoHandler.getSelectedModularCommand();
+    return autoHandler.getSelectedModularCommand();
   }
 }

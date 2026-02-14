@@ -9,10 +9,7 @@ import frc.Constants.DriveConstants;
 public class PathToPose {
     
     public static Command pathToPose(Pose2d targetPose) {
-
-        return Commands.runOnce(() -> {
-            AutoBuilder.pathfindToPose(targetPose, DriveConstants.GAME_CONSTRAINTS, 0);
-        });
+        return AutoBuilder.pathfindToPose(targetPose, DriveConstants.GAME_CONSTRAINTS, 0);
 
     }
 

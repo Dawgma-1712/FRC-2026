@@ -1,23 +1,27 @@
 package frc;
 
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 // Remember to use the correct subclass so our code stays organized please
 public final class Constants {
 
   public static class DriveConstants {
         // Auto constants
-        public static final int drive_kP = 10;
+        public static final int drive_kP = 20;
         public static final int drive_kI = 0;
         public static final int drive_kD = 0;
 
         public static final int rotation_kP = 7;
         public static final int rotation_kI = 0;
         public static final int rotation_kD = 0;
+        public static final PathConstraints GAME_CONSTRAINTS = new PathConstraints(0.3, 0.4, Units.degreesToRadians(54), Units.degreesToRadians(72));
     }
 
   public static class OperatorConstants {
