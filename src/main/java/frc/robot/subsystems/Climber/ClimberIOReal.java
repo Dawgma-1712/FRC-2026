@@ -1,8 +1,6 @@
 package frc.robot.subsystems.Climber;
-import edu.wpi.first.wpilibj.DigitalInput;
 import frc.Constants;
 import frc.Constants.IdConstants;
-import frc.Constants.IntakeConstants;
 
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -15,12 +13,9 @@ public class ClimberIOReal implements ClimberIO {
     
     private final TalonFX climberMotor = new TalonFX(IdConstants.CLIMBER_MOTOR);
 
-    private final VelocityVoltage climberControl = new VelocityVoltage(0);
-
     public ClimberIOReal(){
 
         TalonFXConfiguration climberConfigs = new TalonFXConfiguration();
-        TalonFXConfiguration angleConfig = new TalonFXConfiguration();
 
         climberConfigs.Slot0.kP = Constants.ClimberConstants.CLIMBER_kP;
         climberConfigs.Slot0.kI = Constants.ClimberConstants.CLIMBER_kI;

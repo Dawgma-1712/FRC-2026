@@ -84,6 +84,8 @@ public class Vision extends SubsystemBase {
      * ADVANTAGESCOPE SIM METHODS
      */
     
+
+    // buffer arrays to avoid using arraylists
     private final Pose3d[] visibleTagBufferLeft = new Pose3d[32];
     private final Pose3d[] visibleTagBufferRight = new Pose3d[32];
 
@@ -139,19 +141,21 @@ public class Vision extends SubsystemBase {
           return false;
     }
 
+    // orientation check
+
     Rotation3d tagRotation = relativeTagPose.getRotation();
     Translation3d tagNormal = new Translation3d(1, 0, 0).rotateBy(tagRotation);
     
-    // Vector from tag to limelight (opposite of relativeTagTranslation)
-    Translation3d tagToLimelight = relativeTagTranslation.unaryMinus().div(distance);
+    // vector from tag to limelight
+    Translation3d tagToLimelight = relativeTagTranslation.unaryMinus().div(distance);  // divided by distance to get a length of 1
     
-    // Calculate angle between tag normal and direction to limelight
+    // calculate angle between tag normal and direction to limelight
     double dotProduct = tagNormal.getX() * tagToLimelight.getX() + 
                         tagNormal.getY() * tagToLimelight.getY() + 
                         tagNormal.getZ() * tagToLimelight.getZ();
-    double angle = Math.acos(Math.max(-1.0, Math.min(1.0, dotProduct))); // clamp for numerical stability
+    double angle = Math.acos(Math.max(-1.0, Math.min(1.0, dotProduct))); // sometimes acos returns values outside of -1, 1
     
-    // Check if angle is within 60 degrees (π/3 radians)
+    // check if angle is within 60 degrees
     if (angle > Math.PI / 3) return false;
 
     return true;
