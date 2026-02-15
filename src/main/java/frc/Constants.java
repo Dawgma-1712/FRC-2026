@@ -2,6 +2,7 @@ package frc;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -120,6 +121,11 @@ public final class Constants {
   public static class VisionConstants {
 
     public static final AprilTagFieldLayout APRIL_TAG_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
+
+    public static final Pose3d BLUE_HUB_POSE = new Pose3d(
+        new Translation3d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Units.feetToMeters(6)),
+        new Rotation3d(0, 0, 0)
+    );
     
     public static final String LIMELIGHT_LEFT_ID = "limelight-left";
     public static final String LIMELIGHT_RIGHT_ID = "limelight-right";

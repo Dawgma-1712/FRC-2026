@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.StructArrayPublisher;
 
 import java.util.Arrays;
@@ -23,6 +24,7 @@ public class VisionSim implements VisionInterface {
 
     StructPublisher<Pose3d> limelightLeftPublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightLeft", Pose3d.struct).publish();
     StructPublisher<Pose3d> limelightRightPublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightRight", Pose3d.struct).publish();
+    StructPublisher<Pose3d> blueHubPublisher = NetworkTableInstance.getDefault().getStructTopic("blueHub", Pose3d.struct).publish();
     StructArrayPublisher<Pose3d> aprilTagLeftPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArrayLeft", Pose3d.struct).publish();
     StructArrayPublisher<Pose3d> aprilTagRightPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArrayRight", Pose3d.struct).publish();
 
@@ -68,6 +70,7 @@ public class VisionSim implements VisionInterface {
         aprilTagLeftPosePublisher.set(Arrays.copyOfRange(visibleTagBufferLeft, 0, visibleCountLeft));
         aprilTagRightPosePublisher.set(Arrays.copyOfRange(visibleTagBufferRight, 0, visibleCountRight));
 
+        blueHubPublisher.set(VisionConstants.BLUE_HUB_POSE);
     }
 
     public boolean isAprilTagVisible(Pose3d limelightPose, Pose3d tagPose, int tagId) {

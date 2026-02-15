@@ -2,19 +2,25 @@ package frc.robot.subsystems.Launcher;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.ShooterConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+
+import frc.Constants.VisionConstants;
 
 public class LauncherSubsystem extends SubsystemBase {
 
     LauncherIO io;
+    CommandSwerveDrivetrain drivetrain;
 
     //private final LauncherIOInputsAutoLogged LauncherInputs = new LauncherIOInputsAutoLogged();
 
-    public LauncherSubsystem(LauncherIO io){
+    public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain){
         this.io = io;
+        this.drivetrain = drivetrain;
     }
 
     public void setKickerVelocity(double velocity){
@@ -52,6 +58,21 @@ public class LauncherSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Has Fuel", hasFuel());
         SmartDashboard.putNumber("Current Hood Angle", getHoodPosition());
         SmartDashboard.putNumber("Current Launcher RPS", getKickerVelocity());
+    }
+
+    @Override
+    public void simulationPeriodic() {
+
+        Pose3d hubPose = VisionConstants.BLUE_HUB_POSE;
+        Pose3d robotPose = new Pose3d(drivetrain.getState().Pose);
+
+        // chained functions of doom and despair
+        double distance = hubPose.toPose2d().getTranslation().getDistance(robotPose.toPose2d().getTranslation());
+        double launchAngle = calculateIdealLaunchAngle(distance);
+        double hoodPos = calculateHoodPosFromDistance(distance);
+        double velocity = calculateVelocityFromDistance(distance, hoodPos);
+        
+
     }
 
     private double calculateIdealLaunchAngle(double distance) {
