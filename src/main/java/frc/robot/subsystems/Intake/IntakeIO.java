@@ -6,19 +6,17 @@ public interface IntakeIO {
         public double angleMotorPosition = 0.0;
     }
 
-    public default void ZeroMotorEncoder(){}
+    public default void setIntakeMotorSpeed(double speed) {}
 
-    public default void setIntakeMotorSpeed(double speed){}
+    public default void setAngleMotorSpeed(double speed) {}
 
-    public default void setAngleMotorSpeed(double speed){}
+    public default void setAngle(double target) {}
 
-    public default boolean setAngleMotorPosition(double target){
-        return false;
-    }
-
-    public default double getAngleMotorPosition(){
+    public default double getAngle() {
         return 0.0;
     }
     
-    public default void updateInputs(IntakeIOInputs inputs) {}    
+    public default void updateInputs(IntakeIOInputs inputs) {} 
+    
+    public default void simPeriodic() {}
 }

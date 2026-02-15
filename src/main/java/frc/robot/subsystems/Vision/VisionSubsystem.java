@@ -10,11 +10,10 @@ public class VisionSubsystem extends SubsystemBase {
     CommandSwerveDrivetrain drivetrain;
     VisionInterface visionInterface;
 
-    public VisionSubsystem(CommandSwerveDrivetrain drivetrain) {
+    public VisionSubsystem(CommandSwerveDrivetrain drivetrain, VisionInterface visionInterface) {
 
         this.drivetrain = drivetrain;
-        if (RobotBase.isReal()) this.visionInterface = new VisionReal(drivetrain);
-        else this.visionInterface = new VisionSim(drivetrain);
+        this.visionInterface = visionInterface;
 
     }
 

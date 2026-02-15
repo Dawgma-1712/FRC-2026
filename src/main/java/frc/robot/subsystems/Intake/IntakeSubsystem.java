@@ -2,7 +2,8 @@ package frc.robot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class IntakeSubsystem extends SubsystemBase{
     
@@ -20,23 +21,27 @@ public class IntakeSubsystem extends SubsystemBase{
         io.setAngleMotorSpeed(speed);
     }
 
-    public boolean setAngleMotorPosition(double target) {
-        return io.setAngleMotorPosition(target);
+    public Command setAngle(double target) {
+        return Commands.runOnce(
+            () -> {
+                io.setAngle(target);
+            }
+        );
     }
 
-    public double getAngleMotorPosition() {
-        return io.getAngleMotorPosition();
-    }
-
-    public void ZeroMotorEncoder() {
-        io.ZeroMotorEncoder();
+    public double getAngle() {
+        return io.getAngle();
     }
 
     @Override
     public void periodic() {
         // io.updateInputs(IntakeIOInputs);
-        SmartDashboard.putNumber("Intake Angle", io.getAngleMotorPosition());
+        SmartDashboard.putNumber("Intake Angle", io.getAngle());
     }
 
+    @Override
+    public void simulationPeriodic() {
+        io.simPeriodic();
+    }
     
 }

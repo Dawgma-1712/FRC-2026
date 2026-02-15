@@ -2,8 +2,6 @@ package frc.robot.subsystems.Intake;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-
 import frc.Constants.IdConstants;
 import frc.Constants.IntakeConstants;
 
@@ -13,17 +11,32 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+
 public class IntakeIOReal implements IntakeIO {
+
+    /*
+     * MOTORS
+     */
 
     private final SparkMax intakeMotor = new SparkMax(IdConstants.INTAKE_MOTOR_ID, MotorType.kBrushed);
     public final TalonFX angleMotor = new TalonFX(IdConstants.ANGLE_MOTOR_ID);
+
+    /*
+     * SENSORS
+     */
+
+    // REV through bore encoder
+    private final DutyCycleEncoder angleEncoder = new DutyCycleEncoder(IdConstants.INTAKE_ANGLE_ENCODER_ID, 
+                                                             360.0, 
+                                                          0.0);
     
+    /*
+     * OTHER
+     */
+
     public double angleMotorPosition = 0;
-
     private final MotionMagicVoltage requestControl = new MotionMagicVoltage(0);
-
-    private final DigitalInput stowedSwitch = new DigitalInput(IdConstants.INTAKE_STOWED_SWITCH_ID);
-    private final DigitalInput extendedSwitch = new DigitalInput(IdConstants.INTAKE_EXTENDED_SWITCH_ID);
 
     public IntakeIOReal(){
         TalonFXConfiguration angleConfig = new TalonFXConfiguration();
@@ -41,13 +54,10 @@ public class IntakeIOReal implements IntakeIO {
         // Setup Motion Magic limits
         angleConfig.MotionMagic.MotionMagicCruiseVelocity = IntakeConstants.ANGLE_CRUISE_VELOCITY; // Rotations per second
         angleConfig.MotionMagic.MotionMagicAcceleration = IntakeConstants.ANGLE_ACCELERATION;   // Rotations per second^2
-        angleConfig.MotionMagic.MotionMagicJerk = IntakeConstants.ANGLE_JERK;         // Smoothing
-
+        // we probably don't need jerk
         angleMotor.getConfigurator().apply(angleConfig);
 
         angleMotor.setNeutralMode(NeutralModeValue.Brake);
-
-        ZeroMotorEncoder();
     }
 
     @Override
@@ -60,40 +70,32 @@ public class IntakeIOReal implements IntakeIO {
         angleMotor.set(speed);
     }
 
-    @Override
-    public boolean setAngleMotorPosition(double target) {
-        double currentPos = getAngleMotorPosition();
-
-        boolean closeEnough = Math.abs(target - currentPos) <= IntakeConstants.POSITION_TOLERANCE;
-        if (!closeEnough) {
-            angleMotor.setControl(requestControl.withPosition(target));
-            return false;
-        } else {
-            angleMotor.stopMotor(); 
-            return true;
-        }
+    // angle is in degrees!
+    // output is in rotations
+    private double calculateRotationsFromAngle(double angle) {
+        return IntakeConstants.ANGLE_REDUCTION * (360 / angle);
     }
 
     @Override
-    public double getAngleMotorPosition() {
-        if(!stowedSwitch.get()){
-            ZeroMotorEncoder();
-        }
-        if(!extendedSwitch.get()){
-            angleMotor.setPosition(IntakeConstants.EXTENDED_INTAKE_ANGLE);
-        }
-        angleMotorPosition=angleMotor.getPosition().getValueAsDouble();
-        return angleMotorPosition;
+    public void setAngle(double target) {
+
+        angleMotor.setControl(
+            requestControl
+            .withPosition(
+                calculateRotationsFromAngle(target)
+            )
+        );
+
     }
 
     @Override
-    public void ZeroMotorEncoder() {
-        angleMotor.setPosition(0);
+    public double getAngle() {
+        return angleEncoder.get();
     }
 
     @Override //literally useless until we set up advantagekit
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.angleMotorPosition = getAngleMotorPosition();
+        inputs.angleMotorPosition = getAngle();
         // inputs.limitSwitchTriggered = limitSwitch.get(); // Ensure this is in your IntakeIOInputs class
     }
     

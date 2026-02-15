@@ -51,6 +51,8 @@ public final class Constants {
     public static final int INTAKE_STOWED_SWITCH_ID = 0;
     public static final int INTAKE_EXTENDED_SWITCH_ID = 1;
     public static final int LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID = 2;
+
+    public static final int INTAKE_ANGLE_ENCODER_ID = 3;
     
     public static final int HOOD_ENCODER_ID = 3;
 
@@ -75,6 +77,18 @@ public final class Constants {
     public static final double ANGLE_JERK = 1600;
 
     public static final double EXTENDED_INTAKE_ANGLE = 90;
+
+    public static final double ANGLE_REDUCTION = 200;  // arbitrary value, PLEASE CHANGE
+
+    public static class SimulationConstants {
+
+      public static final double ARM_LENGTH = Units.inchesToMeters(21);
+      public static final double ARM_MASS = 8;  // in kilograms
+      public static final double MIN_ANGLE = Units.degreesToRadians(0);
+      public static final double MAX_ANGLE = Units.degreesToRadians(90);
+      public static final double ENCODER_DISTANCE_PER_PULSE = 2.0 * Math.PI / 2048;  // in radians, our encoder has 2048 pulses per rotation
+
+    }
 
   }
 

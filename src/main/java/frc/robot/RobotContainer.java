@@ -26,6 +26,10 @@ import edu.wpi.first.wpilibj.Joystick;
 
 import frc.robot.subsystems.Launcher.*;
 import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.subsystems.Vision.VisionReal;
+import frc.robot.subsystems.Vision.VisionSim;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public class RobotContainer {
   public static double speed = 1;
@@ -52,7 +56,7 @@ public class RobotContainer {
 
   // private final IntakeSubsystem intake;
   // private final IntakeIOReal intakeIOReal;
-  //private final Vision vision;
+  private final VisionSubsystem vision;
 
   private final Joystick driver;
   private final Joystick operator;
@@ -79,9 +83,16 @@ public class RobotContainer {
             .withVelocityY(Math.abs(-driver.getRawAxis(0)) > 0.2 ? -driver.getRawAxis(0) * MaxSpeed * speed : 0) // Drive left with negative X (left)
             .withRotationalRate(Math.abs(-driver.getRawAxis(2) * MaxAngularRate) > 0.05 ? -driver.getRawAxis(2) * MaxAngularRate * speed : 0)
             )
-        );
+    );
 
-    //vision = new Vision(drivetrain);
+    if (RobotBase.isReal()) {
+
+      this.vision = new VisionSubsystem(drivetrain, new VisionReal(drivetrain));
+
+    } else {
+
+      this.vision = new VisionSubsystem(drivetrain, new VisionSim(drivetrain));
+    }
 
     configureBindings();
   }
