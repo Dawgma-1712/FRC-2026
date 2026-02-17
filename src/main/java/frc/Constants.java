@@ -1,5 +1,7 @@
 package frc;
 
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -8,34 +10,66 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
-import com.pathplanner.lib.path.PathConstraints;
-
 // Remember to use the correct subclass so our code stays organized please
 public final class Constants {
 
   public static class DriveConstants {
         // Auto constants
-        public static final int drive_kP = 10;
+        public static final int drive_kP = 20;
         public static final int drive_kI = 0;
         public static final int drive_kD = 0;
 
         public static final int rotation_kP = 7;
         public static final int rotation_kI = 0;
         public static final int rotation_kD = 0;
-
-        // path to pose constants
-        public static final PathConstraints GAME_CONSTRAINTS = new PathConstraints(3, 4, 
-                                                                                  Units.degreesToRadians(540),
-                                                                                  Units.degreesToRadians(720)
-                                                                                  );
-
+        public static final PathConstraints GAME_CONSTRAINTS = new PathConstraints(0.3, 0.4, Units.degreesToRadians(54), Units.degreesToRadians(72));
     }
 
   public static class OperatorConstants {
-
     public static final int DRIVER_JOYSTICK_PORT = 0;
     public static final int OPERATOR_JOYSTICK_PORT = 1;
 
+    public static final int DRIVER_LX = 0;
+    public static final int DRIVER_LY = 1;
+    public static final int DRIVER_RX = 2;
+    public static final int DRIVER_RY = 3;
+
+    public static final int DRIVER_X = 1;
+    public static final int DRIVER_Y = 4;
+    public static final int DRIVER_A = 2;
+    public static final int DRIVER_B = 3;
+
+    public static final int DRIVER_LB = 5;
+    public static final int DRIVER_RB = 6;
+    public static final int DRIVER_LT = 7;
+    public static final int DRIVER_RT = 8;
+
+    public static final int DRIVER_BACK = 9;
+    public static final int DRIVER_START = 10;
+
+    public static final int DRIVER_LS = 11;
+    public static final int DRIVER_RS = 12;
+
+    public static final int OPERATOR_LX = 0;
+    public static final int OPERATOR_LY = 1;
+    public static final int OPERATOR_RX = 4;
+    public static final int OPERATOR_RY = 5;
+    public static final int OPERATOR_LT = 2;
+    public static final int OPERATOR_RT = 3;
+
+    public static final int OPERATOR_A = 1;
+    public static final int OPERATOR_B = 2;
+    public static final int OPERATOR_X = 3;
+    public static final int OPERATOR_Y = 4;
+
+    public static final int OPERATOR_LB = 5;
+    public static final int OPERATOR_RB = 6;
+
+    public static final int OPERATOR_BACK = 7;
+    public static final int OPERATOR_START = 8;
+
+    public static final int OPERATOR_LS = 9;
+    public static final int OPERATOR_RS = 10;
   }
 
   public static class IdConstants {
@@ -156,7 +190,6 @@ public final class Constants {
 
 
   public static class ClimberConstants {
-
     public static final double CLIMBER_kP = 0;
     public static final double CLIMBER_kI = 0;
     public static final double CLIMBER_kD = 0;
