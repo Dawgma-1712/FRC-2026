@@ -7,9 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.ShooterConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-
 import frc.Constants.VisionConstants;
+import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
 public class LauncherSubsystem extends SubsystemBase {
 
@@ -71,8 +70,11 @@ public class LauncherSubsystem extends SubsystemBase {
         double launchAngle = calculateIdealLaunchAngle(distance);
         double hoodPos = calculateHoodPosFromDistance(distance);
         double velocity = calculateVelocityFromDistance(distance, hoodPos);
-        
+    }
 
+    public double calculateDistance() {
+        Pose3d robotPose = new Pose3d(drivetrain.getState().Pose);
+        return VisionConstants.BLUE_HUB_POSE.toPose2d().getTranslation().getDistance(robotPose.toPose2d().getTranslation());
     }
 
     private double calculateIdealLaunchAngle(double distance) {

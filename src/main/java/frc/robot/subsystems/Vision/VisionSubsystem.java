@@ -1,9 +1,8 @@
 package frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 import edu.wpi.first.wpilibj.RobotBase;
-
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class VisionSubsystem extends SubsystemBase {
 

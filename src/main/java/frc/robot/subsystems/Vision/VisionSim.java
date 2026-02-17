@@ -12,11 +12,9 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import java.util.Arrays;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-
 import frc.Constants.VisionConstants;
 import frc.Constants.VisionConstants.SimulationConstants;
+import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
 public class VisionSim implements VisionInterface {
     

@@ -4,13 +4,13 @@
 
 package frc.robot;
 
+import frc.Constants;
 import frc.Constants.DriveConstants;
 import frc.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveSlowMode;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.*;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -25,6 +25,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.Launcher.*;
+import frc.robot.subsystems.Swerve.AutoLock;
+import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision.VisionReal;
 import frc.robot.subsystems.Vision.VisionSim;
 import frc.robot.subsystems.Vision.VisionSubsystem;
@@ -98,6 +100,17 @@ public class RobotContainer {
       new JoystickButton(driver, OperatorConstants.DRIVER_X).whileTrue(drivetrain.applyRequest(() -> brake));
 
       new JoystickButton(driver, OperatorConstants.DRIVER_RT).onTrue(new SwerveSlowMode(0.15)).onFalse(new SwerveSlowMode(1));
+
+      new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(
+            new AutoLock(
+                drivetrain,
+                Constants.VisionConstants.BLUE_HUB_POSE2D, // auto lock target set to hub pose2d in actual 2026 robot code
+                () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0), //x supplier
+                () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) //y supplier
+            )
+        );
+
+        new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(launcher.adaptiveShoot(() -> launcher.calculateDistance()));
   }
 
   public Command getAutonomousCommand() {

@@ -4,7 +4,9 @@ import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -160,6 +162,8 @@ public final class Constants {
         new Translation3d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Units.feetToMeters(6)),
         new Rotation3d(0, 0, 0)
     );
+
+    public static final Pose2d BLUE_HUB_POSE2D = new Pose2d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Rotation2d.fromDegrees(0));
     
     public static final String LIMELIGHT_LEFT_ID = "limelight-left";
     public static final String LIMELIGHT_RIGHT_ID = "limelight-right";
