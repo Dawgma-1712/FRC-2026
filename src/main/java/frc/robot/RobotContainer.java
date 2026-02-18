@@ -11,10 +11,14 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveSlowMode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Climber.ClimberIOReal;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import java.nio.ReadOnlyBufferException;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -25,6 +29,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.Launcher.*;
+import frc.robot.subsystems.Revolver.RevolverIO;
+import frc.robot.subsystems.Revolver.RevolverIOReal;
+import frc.robot.subsystems.Revolver.RevolverSubsystem;
 import frc.robot.subsystems.Vision.VisionReal;
 import frc.robot.subsystems.Vision.VisionSim;
 import frc.robot.subsystems.Vision.VisionSubsystem;
@@ -55,7 +62,15 @@ public class RobotContainer {
 
   private final IntakeSubsystem intake;
   private final IntakeIOReal intakeIOReal;
+
+  private final ClimberSubsystem climber;
+  private final ClimberIOReal climberIOReal;
+
+  private final RevolverSubsystem revolver;
+  private final RevolverIOReal revolverIOReal;
+
   private final VisionSubsystem vision;
+
 
   private final Joystick driver;
   private final Joystick operator;
@@ -66,6 +81,13 @@ public class RobotContainer {
     
     intakeIOReal = new IntakeIOReal();
     intake = new IntakeSubsystem(intakeIOReal);
+
+    climberIOReal = new ClimberIOReal();
+    climber = new ClimberSubsystem(climberIOReal);
+
+    revolverIOReal = new RevolverIOReal();
+    revolver = new RevolverSubsystem(revolverIOReal);
+    
 
     autoHandler = new ModularAutoHandler();
 

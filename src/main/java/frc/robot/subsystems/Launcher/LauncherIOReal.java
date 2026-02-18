@@ -3,6 +3,9 @@ package frc.robot.subsystems.Launcher;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.Constants;
 import frc.Constants.IdConstants;
+
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -34,11 +37,13 @@ public class LauncherIOReal implements LauncherIO{
 
         TalonFXConfiguration kickConfigs = new TalonFXConfiguration();
         kickConfigs.Slot0.kP = Constants.ShooterConstants.KICKER_kP;
-        kickConfigs.Slot0.kI = Constants.ShooterConstants.KICKER_kI;
-        kickConfigs.Slot0.kD = Constants.ShooterConstants.KICKER_kD;
+        kickConfigs.TorqueCurrent.PeakForwardTorqueCurrent = Constants.ShooterConstants.KICKER_PEAK_FORWARD_TORQUE_CURRENT;
+        kickConfigs.TorqueCurrent.PeakReverseTorqueCurrent = Constants.ShooterConstants.KICKER_PEAK_REVERSE_TORQUE_CURRENT;
+        kickConfigs.MotorOutput.PeakForwardDutyCycle = Constants.ShooterConstants.KICKER_PEAK_FORWARD_DUTY_CYCLE;
+        kickConfigs.MotorOutput.PeakReverseDutyCycle = Constants.ShooterConstants.KICKER_PEAK_REVERSE_DUTY_CYCLE;
 
         // may have to change whether both motors are spinning clockwise
-        kickConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        // kickConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         kickMotor.getConfigurator().apply(kickConfigs);
 
@@ -52,7 +57,16 @@ public class LauncherIOReal implements LauncherIO{
 
     @Override
     public void setKickerVelocity(double rps) {
-        kickMotor.setControl(kickerControl.withVelocity(rps));
+
+        if(getKickerVelocity()>rps){
+            kickMotor.setControl(new VelocityDutyCycle(0));
+            kickMotor.setControl(new VelocityTorqueCurrentFOC(0));
+        }
+        else if(getKickerVelocity()<rps){
+            kickMotor.setControl(new VelocityDutyCycle(rps));
+            kickMotor.setControl(new VelocityTorqueCurrentFOC(rps));
+        }
+
     }
 
     @Override

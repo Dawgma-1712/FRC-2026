@@ -134,9 +134,11 @@ public final class Constants {
     public static final double LAUNCHER_HEIGHT_METERS = 1; //completely arbitrary
     public static final double WHEEL_DIAMETER = 4; // in inches
 
-    public static final double KICKER_kP = 0.1;
-    public static final double KICKER_kI = 0.0;
-    public static final double KICKER_kD = 0.0;
+    public static final double KICKER_kP = 999999;
+    public static final double KICKER_PEAK_FORWARD_TORQUE_CURRENT = 40.0;
+    public static final double KICKER_PEAK_REVERSE_TORQUE_CURRENT = 0.0;
+    public static final double KICKER_PEAK_FORWARD_DUTY_CYCLE = 1.0;
+    public static final double KICKER_PEAK_REVERSE_DUTY_CYCLE = 0.0;
 
     public static final double FEEDER_kP = 0.1; //These PID values are arbitrary
     public static final double FEEDER_kI = 0.0;
@@ -193,6 +195,10 @@ public final class Constants {
     public static final double CLIMBER_kP = 0;
     public static final double CLIMBER_kI = 0;
     public static final double CLIMBER_kD = 0;
+
+    public static final double CLIMBER_kS = 0.25;
+    public static final double CLIMBER_kV = 0.12;
+    public static final double CLIMBER_kA = 0.01;
 
     public static final double ANGLE_CRUISE_VELOCITY = 40;
     public static final double ANGLE_ACCELERATION = 80;

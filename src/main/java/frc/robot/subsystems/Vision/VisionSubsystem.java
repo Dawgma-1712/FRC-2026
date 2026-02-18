@@ -11,10 +11,8 @@ public class VisionSubsystem extends SubsystemBase {
     VisionInterface visionInterface;
 
     public VisionSubsystem(CommandSwerveDrivetrain drivetrain, VisionInterface visionInterface) {
-
         this.drivetrain = drivetrain;
         this.visionInterface = visionInterface;
-
     }
 
     @Override
