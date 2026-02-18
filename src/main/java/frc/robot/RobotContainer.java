@@ -97,6 +97,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+
       new JoystickButton(driver, OperatorConstants.DRIVER_X).whileTrue(drivetrain.applyRequest(() -> brake));
 
       new JoystickButton(driver, OperatorConstants.DRIVER_RT).onTrue(new SwerveSlowMode(0.15)).onFalse(new SwerveSlowMode(1));
@@ -110,7 +111,7 @@ public class RobotContainer {
             )
         );
 
-        new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(launcher.adaptiveShoot(() -> launcher.calculateDistance()));
+      // new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(launcher.adaptiveShoot(() -> launcher.calculateDistance()));
   }
 
   public Command getAutonomousCommand() {
