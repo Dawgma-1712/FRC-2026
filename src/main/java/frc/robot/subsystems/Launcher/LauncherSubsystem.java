@@ -3,11 +3,12 @@ package frc.robot.subsystems.Launcher;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.ShooterConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
 import frc.Constants.VisionConstants;
 
@@ -60,6 +61,14 @@ public class LauncherSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Current Launcher RPS", getKickerVelocity());
     }
 
+    private double calculateHeightAtTime(double initialVelocity, double angleDegrees, double time) {
+
+        double initialY = initialVelocity * Math.sin(Units.degreesToRadians(angleDegrees));
+        
+        return initialY * time + 0.5 * -9.8 * time * time; 
+
+    }
+
     @Override
     public void simulationPeriodic() {
 
@@ -72,6 +81,7 @@ public class LauncherSubsystem extends SubsystemBase {
         double hoodPos = calculateHoodPosFromDistance(distance);
         double velocity = calculateVelocityFromDistance(distance, hoodPos);
         
+        SmartDashboard.putNumber("Distance to hub", distance);
 
     }
 
