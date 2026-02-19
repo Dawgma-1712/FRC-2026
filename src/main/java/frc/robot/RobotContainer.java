@@ -12,9 +12,15 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveSlowMode;
 import frc.robot.generated.TunerConstants;
 
+import frc.robot.subsystems.*;
+import frc.robot.subsystems.Climber.ClimberIOReal;
+import frc.robot.subsystems.Climber.ClimberSubsystem;
+
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import frc.robot.subsystems.*;
 
 import java.nio.ReadOnlyBufferException;
 
@@ -27,6 +33,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.Launcher.*;
+import frc.robot.subsystems.Revolver.RevolverIOReal;
+import frc.robot.subsystems.Revolver.RevolverSubsystem;
+import frc.robot.subsystems.Swerve.AutoLock;
+import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision.VisionReal;
 import frc.robot.subsystems.Vision.VisionSim;
 import frc.robot.subsystems.Vision.VisionSubsystem;
