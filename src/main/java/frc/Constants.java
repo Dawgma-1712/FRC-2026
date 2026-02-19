@@ -87,11 +87,13 @@ public final class Constants {
 
     public static final int INTAKE_STOWED_SWITCH_ID = 0;
     public static final int INTAKE_EXTENDED_SWITCH_ID = 1;
-    public static final int LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID = 2;
+    public static final int LAUNCHER_FUEL_INCOMING_BEAMBREAK_ID = 2;
+    public static final int LAUNCHER_FUEL_SHOOTING_BEAMBREAK_ID = 3;
 
-    public static final int INTAKE_ANGLE_ENCODER_ID = 3;
-    
-    public static final int HOOD_ENCODER_ID = 3;
+
+    public static final int INTAKE_ANGLE_ENCODER_ID = 4;
+  
+    public static final int HOOD_ENCODER_ID = 5;
 
     public static final int CLIMBER_MOTOR = 1;
 
@@ -137,6 +139,13 @@ public final class Constants {
     public static final double WHEEL_DIAMETER = 4; // in inches
 
     public static final double KICKER_kP = 999999;
+    public static final double KICKER_kI = 0;
+    public static final double KICKER_kD = 0;
+    public static final double KICKER_kV = 0.0;
+    public static final double KICKER_kS = 0.0;
+
+    public static final double AT_SPEED_TOLERANCE_RPS = 2.0;
+
     public static final double KICKER_PEAK_FORWARD_TORQUE_CURRENT = 40.0;
     public static final double KICKER_PEAK_REVERSE_TORQUE_CURRENT = 0.0;
     public static final double KICKER_PEAK_FORWARD_DUTY_CYCLE = 1.0;
@@ -146,10 +155,14 @@ public final class Constants {
     public static final double FEEDER_kI = 0.0;
     public static final double FEEDER_kD = 0.0;
 
+
     public static final double FEEDER_SPEED_MPS = 15; //idk change
 
     public static final double TARGET_VELOCITY_TOLERANCE = 0.95;
     public static final double TARGET_HOOD_TOLERANCE_DEGREES = 1.0;
+
+    private static final double STARTUP_THRESHOLD = 2.0; //RPS tolerance to consider at speed
+    private static final double TORQUE_CURRENT_AMPS = 40.0; //Constant torque for idle and ball phases
 
     public static final double BASE_ANGLE = 9.0;
     public static final double MAX_HOOD_OFFSET = 40.0;

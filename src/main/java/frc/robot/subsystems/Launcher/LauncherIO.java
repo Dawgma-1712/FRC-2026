@@ -7,7 +7,8 @@ public interface LauncherIO {
         public double feedMotorVelocity = 0;
         public double hoodMotorPosition = 0;
 
-        public boolean hasFuel = false;
+        public boolean hasFuelIntaked = false;
+        public boolean fuelShot = false;
     }
 
     public default void setKickerVelocity(double shooterRPS){}
@@ -28,9 +29,15 @@ public interface LauncherIO {
         return 0.0;
     }
 
-    public default boolean hasFuel(){
+    public default boolean hasFuelIntaked(){
         return false;
     }
 
-    public default void updateInputs(LauncherIOInputs inputs) {}    
+    public default boolean hasShotFuel(){
+        return false;
+    }
+
+    public default void updateInputs(LauncherIOInputs inputs) {}
+    
+    public default void periodic() {}
 }

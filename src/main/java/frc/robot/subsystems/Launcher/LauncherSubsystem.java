@@ -40,8 +40,8 @@ public class LauncherSubsystem extends SubsystemBase {
         return io.getFeederVelocity();
     }
 
-    public boolean hasFuel(){
-        return io.hasFuel();
+    public boolean hasFuelIntaked(){
+        return io.hasFuelIntaked();
     }
 
     public void setHoodPosition(double angle){
@@ -52,11 +52,11 @@ public class LauncherSubsystem extends SubsystemBase {
         return io.getHoodPosition();
     }
 
-
     @Override
     public void periodic() {
-        // io.updateInputs(LauncherIOInputs);
-        SmartDashboard.putBoolean("Has Fuel", hasFuel());
+        io.periodic();
+        
+        SmartDashboard.putBoolean("Has Fuel", hasFuelIntaked());
         SmartDashboard.putNumber("Current Hood Angle", getHoodPosition());
         SmartDashboard.putNumber("Current Launcher RPS", getKickerVelocity());
     }
@@ -109,7 +109,7 @@ public class LauncherSubsystem extends SubsystemBase {
     private double calculateVelocityFromDistance(double deltaX, double hoodPos) {
         double g = ShooterConstants.GRAVITY;
         
-        double thetaDegrees = 90.0 - ShooterConstants.BASE_ANGLE - hoodPos; //how we get the projectile angle 90-base-hood pos add on
+        double thetaDegrees = 90.0 - ShooterConstants.BASE_ANGLE - hoodPos;
         double thetaRadians = Math.toRadians(thetaDegrees);
         
         double deltaY = ShooterConstants.HUB_HEIGHT_METERS-ShooterConstants.LAUNCHER_HEIGHT_METERS;
@@ -118,7 +118,7 @@ public class LauncherSubsystem extends SubsystemBase {
         double tanTheta = Math.tan(thetaRadians);
         double denominator = 2 * Math.pow(cosTheta, 2) * (deltaX * tanTheta - deltaY);
 
-        if (denominator <= 0) return 0; // Target is physically unreachable at this angle
+        if (denominator <= 0) return 0;
 
         return Math.sqrt((g * Math.pow(deltaX, 2)) / denominator);
     }
