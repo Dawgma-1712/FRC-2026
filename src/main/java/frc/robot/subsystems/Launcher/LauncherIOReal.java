@@ -3,70 +3,85 @@ package frc.robot.subsystems.Launcher;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.Constants;
 import frc.Constants.IdConstants;
+import frc.Constants.ShooterConstants;
 
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-// import com.revrobotics.spark.SparkLowLevel.MotorType;
-// import com.revrobotics.spark.SparkMax;
-// if add hooded motor then import these
-
 public class LauncherIOReal implements LauncherIO{
 
+    private enum FlywheelPhase{
+        STARTUP, IDLE, BALL, RECOVERY
+    }
+
+    private enum FeederPhase {
+        STARTUP, IDLE
+    }
+
+    private FeederPhase feederPhase = FeederPhase.STARTUP;
+    private double feederTargetRPS = 0.0;
+
+    private FlywheelPhase kickerPhase = FlywheelPhase.STARTUP;
+    private double kickerTargetRPS = 0.0;
+
     private final TalonFX kickMotor = new TalonFX(IdConstants.KICK_MOTOR_ID);
-
     private final TalonFX feedMotor = new TalonFX(IdConstants.FEED_MOTOR_ID);
-    
-    private final VelocityVoltage kickerControl = new VelocityVoltage(0);
-    private final VelocityVoltage feederControl = new VelocityVoltage(0);
 
-    private final DigitalInput fuelBeamBreak = new DigitalInput(IdConstants.LAUNCHER_FUEL_DETECTION_BEAMBREAK_ID);
+    private final DigitalInput intakeSwitch = new DigitalInput(IdConstants.LAUNCHER_FUEL_INCOMING_BEAMBREAK_ID);
+    private final DigitalInput shootingSwitch = new DigitalInput(IdConstants.LAUNCHER_FUEL_SHOOTING_BEAMBREAK_ID);
 
     private final DutyCycleEncoder hoodEncoder = new DutyCycleEncoder(IdConstants.HOOD_ENCODER_ID,40,0);
     //we are saying that the range for this encoder has a maximum of 40 and the zero is at 0
     //We say 40 because that is the max angle of the hood and 0 is the start
     //FOR WIRING USE THE BLACK RED WHITE TRIPLET OF WIRES AND PLUG INTO DIO
 
+    private final VelocityDutyCycle kickerDutyCycle = new VelocityDutyCycle(0).withSlot(0);
+    private final VelocityTorqueCurrentFOC kickerTorqueBangBang = new VelocityTorqueCurrentFOC(0).withSlot(0);
+    private final TorqueCurrentFOC kickerConstantTorque = new TorqueCurrentFOC(0);
+
+    private final VelocityDutyCycle feederDutyCycle = new VelocityDutyCycle(0).withSlot(0);
+    private final VelocityTorqueCurrentFOC feederTorqueBangBang = new VelocityTorqueCurrentFOC(0).withSlot(0);
+
+    private boolean previousFuelBeamBreak = false;
+    private boolean previousShotBeamBreak = false;
+
     public LauncherIOReal() {
 
-        TalonFXConfiguration kickConfigs = new TalonFXConfiguration();
-        kickConfigs.Slot0.kP = Constants.ShooterConstants.KICKER_kP;
-        kickConfigs.TorqueCurrent.PeakForwardTorqueCurrent = Constants.ShooterConstants.KICKER_PEAK_FORWARD_TORQUE_CURRENT;
-        kickConfigs.TorqueCurrent.PeakReverseTorqueCurrent = Constants.ShooterConstants.KICKER_PEAK_REVERSE_TORQUE_CURRENT;
-        kickConfigs.MotorOutput.PeakForwardDutyCycle = Constants.ShooterConstants.KICKER_PEAK_FORWARD_DUTY_CYCLE;
-        kickConfigs.MotorOutput.PeakReverseDutyCycle = Constants.ShooterConstants.KICKER_PEAK_REVERSE_DUTY_CYCLE;
+        TalonFXConfiguration configs = new TalonFXConfiguration();
+        configs.Slot0.kP = Constants.ShooterConstants.KICKER_kP;
+        configs.Slot0.kI = Constants.ShooterConstants.KICKER_kI;
+        configs.Slot0.kD = Constants.ShooterConstants.KICKER_kD;
+        configs.Slot0.kV = Constants.ShooterConstants.KICKER_kV;
+        configs.Slot0.kS = Constants.ShooterConstants.KICKER_kS;
 
-        // may have to change whether both motors are spinning clockwise
-        // kickConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        configs.MotorOutput.PeakForwardDutyCycle = ShooterConstants.KICKER_PEAK_FORWARD_DUTY_CYCLE;
+        configs.MotorOutput.PeakReverseDutyCycle = ShooterConstants.KICKER_PEAK_REVERSE_DUTY_CYCLE;
 
-        kickMotor.getConfigurator().apply(kickConfigs);
+        configs.TorqueCurrent.PeakForwardTorqueCurrent = ShooterConstants.KICKER_PEAK_FORWARD_TORQUE_CURRENT;
+        configs.TorqueCurrent.PeakReverseTorqueCurrent = ShooterConstants.KICKER_PEAK_REVERSE_TORQUE_CURRENT;
 
-        TalonFXConfiguration feederConfigs = new TalonFXConfiguration();
-        feederConfigs.Slot0.kP = Constants.ShooterConstants.FEEDER_kP;
-        feederConfigs.Slot0.kI = Constants.ShooterConstants.FEEDER_kI;
-        feederConfigs.Slot0.kD = Constants.ShooterConstants.FEEDER_kD;
-        
-        feedMotor.getConfigurator().apply(feederConfigs);
+        configs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+
+        configs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+        kickMotor.getConfigurator().apply(configs);
+        feedMotor.getConfigurator().apply(configs);
     }
 
     @Override
     public void setKickerVelocity(double rps) {
-
-        if(getKickerVelocity()>rps){
-            kickMotor.setControl(new VelocityDutyCycle(0));
-            kickMotor.setControl(new VelocityTorqueCurrentFOC(0));
+        if(Math.abs(rps-kickerTargetRPS)>5.0){
+            kickerPhase = FlywheelPhase.STARTUP;
         }
-        else if(getKickerVelocity()<rps){
-            kickMotor.setControl(new VelocityDutyCycle(rps));
-            kickMotor.setControl(new VelocityTorqueCurrentFOC(rps));
-        }
-
+        kickerTargetRPS = rps;
     }
 
     @Override
@@ -81,7 +96,10 @@ public class LauncherIOReal implements LauncherIO{
 
     @Override
     public void setFeederVelocity(double rps) {
-        feedMotor.setControl(feederControl.withVelocity(rps));
+        if(Math.abs(rps-feederTargetRPS)>5.0){
+            feederPhase = FeederPhase.STARTUP;
+        }
+        feederTargetRPS = rps;
     }
 
     @Override
@@ -96,15 +114,79 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     @Override
-    public boolean hasFuel(){
-        return !fuelBeamBreak.get(); 
+    public boolean hasFuelIntaked(){
+        return !intakeSwitch.get(); 
+    }
+
+    @Override
+    public boolean hasShotFuel(){
+        return !shootingSwitch.get();
     }
 
     @Override
     public void updateInputs(LauncherIOInputs inputs) {
         inputs.kickMotorVelocity = kickMotor.getVelocity().getValueAsDouble();
         inputs.feedMotorVelocity = feedMotor.getVelocity().getValueAsDouble();
-        inputs.hasFuel = hasFuel();
+        inputs.hasFuelIntaked = hasFuelIntaked();
+        inputs.fuelShot = hasShotFuel();
     }
 
+    public void periodic(){
+        double kickerVelocity = getKickerVelocity();
+        double kickerError = kickerTargetRPS - kickerVelocity;
+
+        boolean fuelIntakedNow = hasFuelIntaked();
+        boolean fuelShotNow = hasShotFuel();
+
+        if(!previousFuelBeamBreak && fuelIntakedNow && kickerPhase == FlywheelPhase.IDLE){
+            kickerPhase = FlywheelPhase.BALL;
+        }
+
+        if(!previousShotBeamBreak && fuelShotNow && kickerPhase == FlywheelPhase.BALL){
+            kickerPhase = FlywheelPhase.RECOVERY;
+        }
+
+        previousFuelBeamBreak = fuelIntakedNow;
+        previousShotBeamBreak = fuelShotNow;
+
+        switch (kickerPhase){
+            case STARTUP:
+                kickMotor.setControl(kickerDutyCycle.withVelocity(kickerTargetRPS));
+                if(Math.abs(kickerError) < ShooterConstants.AT_SPEED_TOLERANCE_RPS){
+                    kickerPhase = FlywheelPhase.IDLE;
+                }
+                break;
+            
+            case IDLE:
+                kickMotor.setControl(kickerTorqueBangBang.withVelocity(kickerTargetRPS));
+                break;
+            
+            case BALL:
+                kickMotor.setControl(kickerConstantTorque.withOutput(ShooterConstants.KICKER_PEAK_FORWARD_TORQUE_CURRENT));
+                break;
+            
+            case RECOVERY:
+                kickMotor.setControl(kickerDutyCycle.withVelocity(kickerTargetRPS));
+                if(Math.abs(kickerError) < ShooterConstants.AT_SPEED_TOLERANCE_RPS){
+                    kickerPhase = FlywheelPhase.IDLE;
+                }
+                break;
+        }
+
+        double feederVelocity = getFeederVelocity();
+        double feederError = feederTargetRPS - feederVelocity;
+
+        switch (feederPhase){
+            case STARTUP:
+                feedMotor.setControl(feederDutyCycle.withVelocity(feederTargetRPS));
+                if(Math.abs(feederError) < ShooterConstants.AT_SPEED_TOLERANCE_RPS){
+                    feederPhase = FeederPhase.IDLE;
+                }
+                break;
+            
+            case IDLE:
+                feedMotor.setControl(feederTorqueBangBang.withVelocity(feederTargetRPS));
+                break;
+        }
+    }
 }
