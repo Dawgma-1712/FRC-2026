@@ -4,14 +4,12 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-import frc.Constants.VisionConstants;
 import frc.Constants.ShooterConstants;
 import frc.Constants.FieldConstants;
 
