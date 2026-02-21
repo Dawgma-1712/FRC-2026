@@ -2,6 +2,7 @@ package frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -13,7 +14,7 @@ public class AutoLock extends Command {
 
     private final CommandSwerveDrivetrain drivetrain; // Removed static
     private final PIDController rotationController;
-    private final Pose2d autoLockTarget;
+    private final Translation2d autoLockTarget;
     
     // Joystick Suppliers
     private final Supplier<Double> xSupplier;
@@ -22,7 +23,7 @@ public class AutoLock extends Command {
     // Switched to FieldCentric so driving feels natural while spinning
     private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
 
-    public AutoLock(CommandSwerveDrivetrain drivetrain, Pose2d autoLockTarget, Supplier<Double> xSupplier, Supplier<Double> ySupplier) {
+    public AutoLock(CommandSwerveDrivetrain drivetrain, Translation2d autoLockTarget, Supplier<Double> xSupplier, Supplier<Double> ySupplier) {
         this.drivetrain = drivetrain;
         this.autoLockTarget = autoLockTarget;
         this.xSupplier = xSupplier;
@@ -58,7 +59,7 @@ public class AutoLock extends Command {
         drivetrain.setControl(new SwerveRequest.Idle());
     }
 
-    private double findAutoLockAngle(Pose2d lockTarget) {
+    private double findAutoLockAngle(Translation2d lockTarget) {
         Pose2d robotPose = drivetrain.getState().Pose;
 
         double distanceX = lockTarget.getX() - robotPose.getX();

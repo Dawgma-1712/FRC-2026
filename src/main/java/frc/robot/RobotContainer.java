@@ -131,7 +131,7 @@ public class RobotContainer {
       new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(
             new AutoLock(
                 drivetrain,
-                FieldConstants.BLUE_HUB_POSE2D, // auto lock target set to hub pose2d in actual 2026 robot code
+                FieldConstants.BLUE_HUB_POSE2D.getTranslation(), // auto lock target set to hub pose2d in actual 2026 robot code
                 () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0), //x supplier
                 () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) //y supplier
             )
