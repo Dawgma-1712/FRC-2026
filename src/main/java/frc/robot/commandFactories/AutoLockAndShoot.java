@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 public class AutoLockAndShoot {
     
-    public Command autoLockAndShoot(CommandSwerveDrivetrain drivetrain, 
+    public static Command autoLockAndShoot(CommandSwerveDrivetrain drivetrain, 
                                     LauncherSubsystem launcher, 
                                     Supplier<Double> xSupplier, 
                                     Supplier<Double> ySupplier) {
@@ -38,6 +38,5 @@ public class AutoLockAndShoot {
                                         
         return CMDGroup;
     }
-    
 
 }

@@ -13,21 +13,20 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveSlowMode;
 import frc.robot.generated.TunerConstants;
 
-import frc.robot.subsystems.*;
-import frc.robot.subsystems.Climber.ClimberIOReal;
-import frc.robot.subsystems.Climber.ClimberSubsystem;
+import frc.robot.subsystems.Climber.*;
+import frc.robot.subsystems.Launcher.*;
+import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.Revolver.*;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import frc.robot.subsystems.*;
-
-import java.nio.ReadOnlyBufferException;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import frc.robot.commandFactories.AutoLockAndShoot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,11 +35,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.Launcher.*;
 import frc.robot.subsystems.Revolver.RevolverIOReal;
 import frc.robot.subsystems.Revolver.RevolverSubsystem;
-import frc.robot.subsystems.Swerve.AutoLock;
-import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Vision.VisionReal;
-import frc.robot.subsystems.Vision.VisionSim;
-import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.subsystems.Swerve.*;
+import frc.robot.subsystems.Vision.*;
 import frc.robot.subsystems.Intake.*;
 
 public class RobotContainer {
@@ -64,17 +60,18 @@ public class RobotContainer {
 
   // subsystems
   private final LauncherSubsystem launcher;
-  private final LauncherIOReal launcherIOReal;
+  private final LauncherIO launcherIO;
 
   private final IntakeSubsystem intake;
-  private final IntakeIOReal intakeIOReal;
+  private final IntakeIO intakeIO;
 
   private final ClimberSubsystem climber;
-  private final ClimberIOReal climberIOReal;
+  private final ClimberIO climberIO;
 
   private final RevolverSubsystem revolver;
-  private final RevolverIOReal revolverIOReal;
+  private final RevolverIO revolverIO;
 
+  private final VisionInterface visionInterface;
   private final VisionSubsystem vision;
 
 
@@ -82,18 +79,31 @@ public class RobotContainer {
   private final Joystick operator;
 
   public RobotContainer() {
-    launcherIOReal = new LauncherIOReal();
-    launcher = new LauncherSubsystem(launcherIOReal, drivetrain);
-    
-    intakeIOReal = new IntakeIOReal();
-    intake = new IntakeSubsystem(intakeIOReal);
 
-    climberIOReal = new ClimberIOReal();
-    climber = new ClimberSubsystem(climberIOReal);
+    if (RobotBase.isReal()) {
 
-    revolverIOReal = new RevolverIOReal();
-    revolver = new RevolverSubsystem(revolverIOReal);
+      this.launcherIO = new LauncherIOReal();
+      this.intakeIO = new IntakeIOReal();
+      this.climberIO = new ClimberIOReal();
+      this.revolverIO = new RevolverIOReal();
+      this.visionInterface = new VisionReal(this.drivetrain);
+
+    } else {
+
+      this.launcherIO = new LauncherIOSim();
+      this.intakeIO = new IntakeIOSim();
+      this.climberIO = new ClimberIOSim();
+      this.revolverIO = new RevolverIOSim();
+      this.visionInterface = new VisionSim(this.drivetrain);
+
+    }
     
+
+    this.launcher = new LauncherSubsystem(this.launcherIO, this.drivetrain);
+    this.intake = new IntakeSubsystem(this.intakeIO);
+    this.climber = new ClimberSubsystem(this.climberIO);
+    this.revolver = new RevolverSubsystem(this.revolverIO);
+    this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
 
     autoHandler = new ModularAutoHandler();
 
@@ -109,15 +119,6 @@ public class RobotContainer {
             .withRotationalRate(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate) > 0.05 ? -driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate * speed : 0)
             )
     );
-
-    if (RobotBase.isReal()) {
-
-      this.vision = new VisionSubsystem(drivetrain, new VisionReal(drivetrain));
-
-    } else {
-
-      this.vision = new VisionSubsystem(drivetrain, new VisionSim(drivetrain));
-    }
 
     configureBindings();
   }
@@ -136,6 +137,13 @@ public class RobotContainer {
                 () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) //y supplier
             )
         );
+
+      new JoystickButton(driver, OperatorConstants.DRIVER_LB).whileTrue(AutoLockAndShoot.autoLockAndShoot(
+                                                                     this.drivetrain, 
+                                                                     this.launcher,
+                                                                    () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0), //x supplier
+                                                                    () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) //y supplier
+                                                              ));
 
       // new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(launcher.adaptiveShoot(() -> launcher.calculateDistance()));
   }

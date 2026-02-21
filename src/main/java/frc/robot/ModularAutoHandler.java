@@ -40,7 +40,7 @@ public class ModularAutoHandler {
         action2 = new SendableChooser<PathPlannerAuto>();
         action2.addOption("Gather Depot", new PathPlannerAuto("Gather Depot"));
         action2.addOption("Gather Human", new PathPlannerAuto("Gather Human"));
-        action2.addOption("Gather Neutral", new PathPlannerAuto("Gather Neutral"));
+        // action2.addOption("Gather Neutral", new PathPlannerAuto("Gather Neutral"));
         action2.addOption("Shoot Q1", new PathPlannerAuto("S1"));
         action2.addOption("Shoot Q2", new PathPlannerAuto("S2"));
         action2.addOption("Shoot Q3", new PathPlannerAuto("S3"));
