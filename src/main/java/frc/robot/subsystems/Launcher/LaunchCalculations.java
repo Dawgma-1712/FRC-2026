@@ -87,6 +87,7 @@ public class LaunchCalculations {
     }
     
     public static ShotData iterativeMovingShotFromFunnelClearance(Pose2d robot, ChassisSpeeds fieldSpeeds, Translation3d target, int iterations) {
+        System.out.println("calculation called");
         ShotData shot = calculateShotFromFunnelClearance(robot, target, target);
         Distance distance = getDistanceToTarget(robot, target);
         Time timeOfFlight = calculateTimeOfFlight(shot.getExitVelocity(), shot.getHoodAngle(), distance);

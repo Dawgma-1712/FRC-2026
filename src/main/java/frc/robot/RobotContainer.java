@@ -9,6 +9,7 @@ import frc.Constants.DriveConstants;
 import frc.Constants.FieldConstants;
 import frc.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveSlowMode;
 import frc.robot.generated.TunerConstants;
@@ -114,8 +115,9 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-            drive.withVelocityX(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0) // Drive forward with negative Y (forward)
-            .withVelocityY(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) // Drive left with negative X (left)
+            drive.withVelocityX(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) // Drive forward with negative Y (forward)
+            .withVelocityY(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0) // Drive left with negative X (left)
+            // Field perspective is 90 degrees from driver perspective
             .withRotationalRate(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate) > 0.05 ? -driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate * speed : 0)
             )
     );
@@ -129,21 +131,13 @@ public class RobotContainer {
 
       new JoystickButton(driver, OperatorConstants.DRIVER_RT).onTrue(new SwerveSlowMode(0.15)).onFalse(new SwerveSlowMode(1));
 
-      new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(
-            new AutoLock(
-                drivetrain,
-                FieldConstants.BLUE_HUB_POSE2D.getTranslation(), // auto lock target set to hub pose2d in actual 2026 robot code
-                () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0), //x supplier
-                () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) //y supplier
-            )
-        );
-
-      new JoystickButton(driver, OperatorConstants.DRIVER_LB).whileTrue(AutoLockAndShoot.autoLockAndShoot(
+      new JoystickButton(driver, OperatorConstants.DRIVER_LB).whileTrue(new RepeatCommand(AutoLockAndShoot.autoLockAndShoot(
                                                                      this.drivetrain, 
                                                                      this.launcher,
-                                                                    () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0), //x supplier
-                                                                    () -> Math.abs(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) //y supplier
+                                                                    () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0), //x supplier
+                                                                    () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)) //y supplier
                                                               ));
+
 
       // new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(launcher.adaptiveShoot(() -> launcher.calculateDistance()));
   }
