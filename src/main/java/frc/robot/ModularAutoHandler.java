@@ -31,30 +31,30 @@ public class ModularAutoHandler {
         action1.addOption("Gather Depot", new PathPlannerAuto("Gather Depot"));
         action1.addOption("Gather Human", new PathPlannerAuto("Gather Human"));
         // action1.addOption("Gather Neutral", new PathPlannerAuto("Gather Neutral"));
-        // action1.addOption("Shoot Q1", new PathPlannerAuto("S1"));
-        // action1.addOption("Shoot Q2", new PathPlannerAuto("S2"));
-        // action1.addOption("Shoot Q3", new PathPlannerAuto("S3"));
-        // action1.addOption("Shoot Q4", new PathPlannerAuto("S4"));
+        action1.addOption("Shoot Q1", new PathPlannerAuto("S1"));
+        action1.addOption("Shoot Q2", new PathPlannerAuto("S2"));
+        action1.addOption("Shoot Q3", new PathPlannerAuto("S3"));
+        action1.addOption("Shoot Q4", new PathPlannerAuto("S4"));
         SmartDashboard.putData("Action 1", action1);
 
         action2 = new SendableChooser<PathPlannerAuto>();
         action2.addOption("Gather Depot", new PathPlannerAuto("Gather Depot"));
         action2.addOption("Gather Human", new PathPlannerAuto("Gather Human"));
-        // action2.addOption("Gather Neutral", new PathPlannerAuto("Gather Neutral"));
-        // action2.addOption("Shoot Q1", new PathPlannerAuto("S1"));
-        // action2.addOption("Shoot Q2", new PathPlannerAuto("S2"));
-        // action2.addOption("Shoot Q3", new PathPlannerAuto("S3"));
-        // action2.addOption("Shoot Q4", new PathPlannerAuto("S4"));
+        action2.addOption("Gather Neutral", new PathPlannerAuto("Gather Neutral"));
+        action2.addOption("Shoot Q1", new PathPlannerAuto("S1"));
+        action2.addOption("Shoot Q2", new PathPlannerAuto("S2"));
+        action2.addOption("Shoot Q3", new PathPlannerAuto("S3"));
+        action2.addOption("Shoot Q4", new PathPlannerAuto("S4"));
         SmartDashboard.putData("Action 2", action2);
 
         action3 = new SendableChooser<PathPlannerAuto>();
         action3.addOption("Gather Depot", new PathPlannerAuto("Gather Depot"));
         action3.addOption("Gather Human", new PathPlannerAuto("Gather Human"));
         // action3.addOption("Gather Neutral", new PathPlannerAuto("Gather Neutral"));
-        // action3.addOption("Shoot Q1", new PathPlannerAuto("S1"));
-        // action3.addOption("Shoot Q2", new PathPlannerAuto("S2"));
-        // action3.addOption("Shoot Q3", new PathPlannerAuto("S3"));
-        // action3.addOption("Shoot Q4", new PathPlannerAuto("S4"));
+        action3.addOption("Shoot Q1", new PathPlannerAuto("S1"));
+        action3.addOption("Shoot Q2", new PathPlannerAuto("S2"));
+        action3.addOption("Shoot Q3", new PathPlannerAuto("S3"));
+        action3.addOption("Shoot Q4", new PathPlannerAuto("S4"));
         SmartDashboard.putData("Action 3", action3);
 
     }
