@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 
 // Remember to use the correct subclass so our code stays organized please
 public final class Constants {
@@ -28,6 +29,7 @@ public final class Constants {
     }
 
   public static class OperatorConstants {
+
     public static final int DRIVER_JOYSTICK_PORT = 0;
     public static final int OPERATOR_JOYSTICK_PORT = 1;
 
@@ -72,6 +74,7 @@ public final class Constants {
 
     public static final int OPERATOR_LS = 9;
     public static final int OPERATOR_RS = 10;
+
   }
 
   public static class IdConstants {
@@ -136,7 +139,7 @@ public final class Constants {
     public static final double GRAVITY = 9.8;    
     public static final double HUB_HEIGHT_METERS = 1.8288;
     public static final double LAUNCHER_HEIGHT_METERS = 1; //completely arbitrary
-    public static final double WHEEL_DIAMETER = 4; // in inches
+    public static final double FLYWHEEL_WHEEL_DIAMETER = 4; // in inches
 
     public static final double KICKER_kP = 999999;
     public static final double KICKER_kI = 0;
@@ -167,18 +170,13 @@ public final class Constants {
     public static final double BASE_ANGLE = 9.0;
     public static final double MAX_HOOD_OFFSET = 40.0;
 
+    public static final Transform3d ROBOT_TO_LAUNCHER_TRANSFORM = new Transform3d();  // CHANGE
+
   }
 
   public static class VisionConstants {
 
     public static final AprilTagFieldLayout APRIL_TAG_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
-
-    public static final Pose3d BLUE_HUB_POSE = new Pose3d(
-        new Translation3d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Units.feetToMeters(6)),
-        new Rotation3d(0, 0, 0)
-    );
-
-    public static final Pose2d BLUE_HUB_POSE2D = new Pose2d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Rotation2d.fromDegrees(0));
     
     public static final String LIMELIGHT_LEFT_ID = "limelight-left";
     public static final String LIMELIGHT_RIGHT_ID = "limelight-right";
@@ -207,7 +205,6 @@ public final class Constants {
     
   }
 
-
   public static class ClimberConstants {
     public static final double CLIMBER_kP = 0;
     public static final double CLIMBER_kI = 0;
@@ -223,6 +220,15 @@ public final class Constants {
 
   }
 
+  public static class FieldConstants {
 
+      public static final Pose3d BLUE_HUB_POSE = new Pose3d(
+          new Translation3d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Units.feetToMeters(6)),
+          new Rotation3d(0, 0, 0)
+      );
+      public static final Pose2d BLUE_HUB_POSE2D = new Pose2d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Rotation2d.fromDegrees(0));
+      public static final Distance FUNNEL_RADIUS = edu.wpi.first.units.Units.Inches.of(24);
+      public static final Distance FUNNEL_HEIGHT = edu.wpi.first.units.Units.Inches.of(72 - 56.4);
+  }
 
 }

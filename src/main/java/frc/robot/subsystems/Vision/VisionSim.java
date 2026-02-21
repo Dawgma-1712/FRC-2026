@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import java.util.Arrays;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import frc.Constants.FieldConstants;
 import frc.Constants.VisionConstants;
 import frc.Constants.VisionConstants.SimulationConstants;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
@@ -68,7 +69,7 @@ public class VisionSim implements VisionInterface {
         aprilTagLeftPosePublisher.set(Arrays.copyOfRange(visibleTagBufferLeft, 0, visibleCountLeft));
         aprilTagRightPosePublisher.set(Arrays.copyOfRange(visibleTagBufferRight, 0, visibleCountRight));
 
-        blueHubPublisher.set(VisionConstants.BLUE_HUB_POSE);
+        blueHubPublisher.set(FieldConstants.BLUE_HUB_POSE);
     }
 
     public boolean isAprilTagVisible(Pose3d limelightPose, Pose3d tagPose, int tagId) {

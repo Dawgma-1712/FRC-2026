@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.ShooterConstants;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
-import frc.Constants.VisionConstants;
+import frc.Constants.FieldConstants;
 
 public class LauncherSubsystem extends SubsystemBase {
 
@@ -72,7 +72,7 @@ public class LauncherSubsystem extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
 
-        Pose3d hubPose = VisionConstants.BLUE_HUB_POSE;
+        Pose3d hubPose = FieldConstants.BLUE_HUB_POSE;
         Pose3d robotPose = new Pose3d(drivetrain.getState().Pose);
 
         // chained functions of doom and despair
@@ -124,7 +124,7 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     private double mpsToRps(double mps) {
-        double circumferenceMeters = ShooterConstants.WHEEL_DIAMETER * 0.0254 * Math.PI;
+        double circumferenceMeters = ShooterConstants.FLYWHEEL_WHEEL_DIAMETER * 0.0254 * Math.PI;
         return mps / circumferenceMeters;
     }
 
