@@ -44,7 +44,7 @@ public class LauncherIOSim implements LauncherIO {
         Translation3d target = FieldConstants.BLUE_HUB_POSE.getTranslation();
 
         ShotData shot = LaunchCalculations.iterativeMovingShotFromFunnelClearance(robotPose, fieldSpeeds, target, 3);
-        List<Translation3d> points = LaunchCalculations.generateTrajectoryPoints(robotPose, shot, 50);
+        List<Translation3d> points = LaunchCalculations.generateTrajectoryPoints(robotPose, shot, 50, fieldSpeeds);
 
         trajectoryPublisher.set(points.toArray(new Translation3d[0]));
 
