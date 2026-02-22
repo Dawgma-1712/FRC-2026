@@ -4,6 +4,10 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.Units;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
@@ -22,7 +26,7 @@ public class LaunchCalculations {
     public static Time calculateTimeOfFlight(LinearVelocity exitVelocity, Angle hoodAngle, Distance distance) {
 
         double velocity = exitVelocity.in(Units.MetersPerSecond);
-        double angle = Math.PI / 2 - hoodAngle.in(Units.Radians);
+        double angle = hoodAngle.in(Units.Radians);
         double distanceMeters = distance.in(Units.Meters);
 
         return Units.Seconds.of(distanceMeters / (velocity * Math.cos(angle)));
@@ -48,7 +52,7 @@ public class LaunchCalculations {
 
     public static ShotData calculateShotFromFunnelClearance(Pose2d robot, Translation3d actualTarget, Translation3d predictedTarget) {
 
-        Distance DISTANCE_ABOVE_FUNNEL = Units.Inches.of(20);
+        Distance DISTANCE_ABOVE_FUNNEL = Units.Inches.of(0);
 
         double x_dist = getDistanceToTarget(robot, predictedTarget).in(Units.Inches);
         double y_dist = predictedTarget
@@ -87,7 +91,6 @@ public class LaunchCalculations {
     }
     
     public static ShotData iterativeMovingShotFromFunnelClearance(Pose2d robot, ChassisSpeeds fieldSpeeds, Translation3d target, int iterations) {
-        System.out.println("calculation called");
         ShotData shot = calculateShotFromFunnelClearance(robot, target, target);
         Distance distance = getDistanceToTarget(robot, target);
         Time timeOfFlight = calculateTimeOfFlight(shot.getExitVelocity(), shot.getHoodAngle(), distance);
@@ -102,6 +105,46 @@ public class LaunchCalculations {
         }
 
         return shot;
+    }
+
+    // simulation trajectory calculations
+    public static List<Translation3d> generateTrajectoryPoints(Pose2d robot, ShotData shot, int numPoints) {
+
+        double v0 = shot.getExitVelocity().in(Units.MetersPerSecond);
+        double theta = shot.getHoodAngle().in(Units.Radians);
+
+        double vx = v0 * Math.cos(theta);
+        double vy = v0 * Math.sin(theta);
+        double g  = 9.81;
+
+        double tof = calculateTimeOfFlight(
+            shot.getExitVelocity(), shot.getHoodAngle(),
+            getDistanceToTarget(robot, shot.getTarget())
+        ).in(Units.Seconds);
+
+        Translation3d origin = new Translation3d(
+            robot.getX() + ShooterConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getX(),
+            robot.getY() + ShooterConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getY(),
+            ShooterConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getZ()
+        );
+
+        double dx = shot.getTarget().getX() - robot.getX();
+        double dy = shot.getTarget().getY() - robot.getY();
+        double norm = Math.hypot(dx, dy);
+        double ux = dx / norm, uy = dy / norm;
+
+        List<Translation3d> points = new ArrayList<>();
+        for (int i = 0; i <= numPoints; i++) {
+            double t = tof * i / numPoints;
+            double horiz = vx * t;
+            double vert  = vy * t - 0.5 * g * t * t;
+            points.add(new Translation3d(
+                origin.getX() + ux * horiz,
+                origin.getY() + uy * horiz,
+                origin.getZ() + vert
+            ));
+        }
+        return points;
     }
     
     // exit velocity is in radians per second, hood angle is in radians

@@ -5,13 +5,13 @@ import edu.wpi.first.units.Units;
 
 public interface RevolverIO {
 
-    public static class RevolverIOInputs{
+    public static class RevolverIOInputs {
         public double revolverVelocity = 0;
     }
 
-    public default void setRevolverVelocity(AngularVelocity velocity){}
+    public default void setRevolverPercentOutput(double percentOutput) {}
 
-    public default AngularVelocity getRevolverVelocity(){
+    public default AngularVelocity getRevolverVelocity() {
         return Units.RadiansPerSecond.of(0);
     }
 

@@ -83,7 +83,7 @@ public class RobotContainer {
 
     } else {
 
-      this.launcherIO = new LauncherIOSim();
+      this.launcherIO = new LauncherIOSim(this.drivetrain);
       this.intakeIO = new IntakeIOSim();
       this.climberIO = new ClimberIOSim();
       this.revolverIO = new RevolverIOSim();
