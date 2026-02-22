@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Revolver;
 
-import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
-
 public interface RevolverIO {
 
     public static class RevolverIOInputs{

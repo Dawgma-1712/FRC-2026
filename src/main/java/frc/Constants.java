@@ -25,7 +25,7 @@ public final class Constants {
         public static final int rotation_kP = 7;
         public static final int rotation_kI = 0;
         public static final int rotation_kD = 0;
-        public static final PathConstraints GAME_CONSTRAINTS = new PathConstraints(0.3, 0.4, Units.degreesToRadians(54), Units.degreesToRadians(72));
+        public static final PathConstraints GAME_CONSTRAINTS = new PathConstraints(4, 4, Units.degreesToRadians(540), Units.degreesToRadians(720));
     }
 
   public static class OperatorConstants {
@@ -106,13 +106,13 @@ public final class Constants {
 
     public static final double POSITION_TOLERANCE = 2.0;  // in degrees
 
-    public static final double ANGLE_kP = 2.4;
+    public static final double ANGLE_kP = 0.1;
     public static final double ANGLE_kI = 0.0;
     public static final double ANGLE_kD = 0.0;
 
-    public static final double ANGLE_kS = 0.25;
-    public static final double ANGLE_kV = 0.12;
-    public static final double ANGLE_kA = 0.01;
+    public static final double ANGLE_kS = 0.0;
+    public static final double ANGLE_kV = 0.0;
+    public static final double ANGLE_kA = 0.0;
 
     public static final double ANGLE_CRUISE_VELOCITY = 40;
     public static final double ANGLE_ACCELERATION = 80;

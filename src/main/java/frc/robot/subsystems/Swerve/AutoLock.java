@@ -10,8 +10,6 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import java.util.function.Supplier;
-
 public class AutoLock extends Command {
 
     private final CommandSwerveDrivetrain drivetrain; // Removed static

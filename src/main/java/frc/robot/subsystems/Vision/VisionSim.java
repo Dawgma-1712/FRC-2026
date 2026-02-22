@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.StructArrayPublisher;
 
 import java.util.Arrays;

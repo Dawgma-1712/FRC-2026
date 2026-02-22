@@ -3,10 +3,6 @@ package frc.robot.subsystems.Revolver;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.Constants.IdConstants;
-import frc.Constants.RevolverConstants;
-import frc.robot.subsystems.Intake.IntakeIO.IntakeIOInputs;
-
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 
 public class RevolverIOReal implements RevolverIO{
