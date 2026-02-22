@@ -17,36 +17,36 @@ public class LauncherSubsystem extends SubsystemBase {
 
     //private final LauncherIOInputsAutoLogged LauncherInputs = new LauncherIOInputsAutoLogged();
 
-    public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain){
+    public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
         this.io = io;
         this.drivetrain = drivetrain;
     }
 
-    public void setKickerVelocity(AngularVelocity velocity){
+    public void setKickerVelocity(AngularVelocity velocity) {
         io.setKickerVelocity(velocity);
     }
 
-    public AngularVelocity getKickerVelocity(){
+    public AngularVelocity getKickerVelocity() {
         return io.getKickerVelocity();
     }
 
-    public void setFeederVelocity(double velocity){
+    public void setFeederVelocity(double velocity) {
         io.setFeederVelocity(velocity);
     }
 
-    public AngularVelocity getFeederVelocity(){
+    public AngularVelocity getFeederVelocity() {
         return io.getFeederVelocity();
     }
 
-    public boolean hasFuelIntaked(){
+    public boolean hasFuelIntaked() {
         return io.hasFuelIntaked();
     }
 
-    public void setHoodPosition(Angle angle){
+    public void setHoodPosition(Angle angle) {
         io.setHoodPosition(angle);
     }
 
-    public Angle getHoodPosition(){
+    public Angle getHoodPosition() {
         return io.getHoodPosition();
     }
 

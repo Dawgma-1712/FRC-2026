@@ -11,6 +11,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class IntakeIOReal implements IntakeIO {
@@ -61,41 +64,30 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
-    public void setIntakeMotorSpeed(double speed) {
-        intakeMotor.set(speed);
+    public void setIntakeMotorSpeed(double percentOutput) {
+        intakeMotor.set(percentOutput);
     }
 
     @Override
-    public void setAngleMotorSpeed(double speed) {
-        angleMotor.set(speed);
-    }
-
-    // angle is in degrees!
-    // output is in rotations
-    private double calculateRotationsFromAngle(double angle) {
-        return IntakeConstants.ANGLE_REDUCTION * (360 / angle);
-    }
-
-    @Override
-    public void setAngle(double target) {
+    public void setAngle(Angle target) {
 
         angleMotor.setControl(
             requestControl
             .withPosition(
-                calculateRotationsFromAngle(target)
+                target.in(Units.Rotations)
             )
         );
 
     }
 
     @Override
-    public double getAngle() {
-        return angleEncoder.get();
+    public Angle getAngle() {
+        return Units.Degrees.of(angleEncoder.get());
     }
 
     @Override //literally useless until we set up advantagekit
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.angleMotorPosition = getAngle();
+        inputs.angleMotorPosition = getAngle().in(Units.Degrees);
         // inputs.limitSwitchTriggered = limitSwitch.get(); // Ensure this is in your IntakeIOInputs class
     }
     

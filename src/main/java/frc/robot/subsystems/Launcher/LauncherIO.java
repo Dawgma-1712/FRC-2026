@@ -6,7 +6,7 @@ import edu.wpi.first.units.Units;
 
 public interface LauncherIO {
 
-    public static class LauncherIOInputs{
+    public static class LauncherIOInputs {
         public double kickMotorVelocity = 0;
         public double feedMotorVelocity = 0;
         public double hoodMotorPosition = 0;
@@ -15,29 +15,29 @@ public interface LauncherIO {
         public boolean fuelShot = false;
     }
 
-    public default void setKickerVelocity(AngularVelocity shooterRPS){}
+    public default void setKickerVelocity(AngularVelocity shooterRPS) {}
 
-    public default AngularVelocity getKickerVelocity(){
+    public default AngularVelocity getKickerVelocity() {
         return Units.RadiansPerSecond.of(0);
     }
     
-    public default void setFeederVelocity(double feederRPS){}
+    public default void setFeederVelocity(double feederRPS) {}
 
-    public default AngularVelocity getFeederVelocity(){
+    public default AngularVelocity getFeederVelocity() {
         return Units.RadiansPerSecond.of(0);
     }
 
-    public default void setHoodPosition(double position){}
+    public default void setHoodPosition(Angle position) {}
 
-    public default Angle getHoodPosition(){
+    public default Angle getHoodPosition() {
         return Units.Degrees.of(0);
     }
 
-    public default boolean hasFuelIntaked(){
+    public default boolean hasFuelIntaked() {
         return false;
     }
 
-    public default boolean hasShotFuel(){
+    public default boolean hasShotFuel() {
         return false;
     }
 

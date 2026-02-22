@@ -22,7 +22,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class LauncherIOReal implements LauncherIO{
 
-    private enum FlywheelPhase{
+    private enum FlywheelPhase {
         STARTUP, IDLE, BALL, RECOVERY
     }
 
@@ -92,12 +92,12 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     @Override
-    public AngularVelocity getKickerVelocity(){
+    public AngularVelocity getKickerVelocity() {
         return kickMotor.getVelocity().getValue();
     }
 
     @Override
-    public AngularVelocity getFeederVelocity(){
+    public AngularVelocity getFeederVelocity() {
         return feedMotor.getVelocity().getValue();
     }
 
@@ -110,23 +110,23 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     @Override
-    public Angle getHoodPosition(){
+    public Angle getHoodPosition() {
         return Units.Rotations.of(hoodEncoder.get());
     }
 
     @Override
-    public void setHoodPosition(Angle angle){
+    public void setHoodPosition(Angle angle) {
         //write logic here depending on if you use a servo or something else
         //1 rotation of the motor equals 17/360 degree change physically
     }
 
     @Override
-    public boolean hasFuelIntaked(){
+    public boolean hasFuelIntaked() {
         return !intakeSwitch.get(); 
     }
 
     @Override
-    public boolean hasShotFuel(){
+    public boolean hasShotFuel() {
         return !shootingSwitch.get();
     }
 
@@ -138,7 +138,7 @@ public class LauncherIOReal implements LauncherIO{
         inputs.fuelShot = hasShotFuel();
     }
 
-    public void periodic(){
+    public void periodic() {
 
         AngularVelocity kickerVelocity = getKickerVelocity();
         double kickerRotationsPerSecond = kickerVelocity.in(Units.RotationsPerSecond);
@@ -147,18 +147,18 @@ public class LauncherIOReal implements LauncherIO{
         boolean fuelIntakedNow = hasFuelIntaked();
         boolean fuelShotNow = hasShotFuel();
 
-        if(!previousFuelBeamBreak && fuelIntakedNow && kickerPhase == FlywheelPhase.IDLE){
+        if(!previousFuelBeamBreak && fuelIntakedNow && kickerPhase == FlywheelPhase.IDLE) {
             kickerPhase = FlywheelPhase.BALL;
         }
 
-        if(!previousShotBeamBreak && fuelShotNow && kickerPhase == FlywheelPhase.BALL){
+        if(!previousShotBeamBreak && fuelShotNow && kickerPhase == FlywheelPhase.BALL) {
             kickerPhase = FlywheelPhase.RECOVERY;
         }
 
         previousFuelBeamBreak = fuelIntakedNow;
         previousShotBeamBreak = fuelShotNow;
 
-        switch (kickerPhase){
+        switch (kickerPhase) {
             case STARTUP:
                 kickMotor.setControl(kickerDutyCycle.withVelocity(kickerTargetRPS));
                 if(Math.abs(kickerError) < ShooterConstants.AT_SPEED_TOLERANCE_RPS){
@@ -186,7 +186,7 @@ public class LauncherIOReal implements LauncherIO{
         double feederRotationsPerSecond = feederVelocity.in(Units.RotationsPerSecond);
         double feederError = feederTargetRPS - feederRotationsPerSecond;
 
-        switch (feederPhase){
+        switch (feederPhase) {
             case STARTUP:
                 feedMotor.setControl(feederDutyCycle.withVelocity(feederTargetRPS));
                 if(Math.abs(feederError) < ShooterConstants.AT_SPEED_TOLERANCE_RPS){
