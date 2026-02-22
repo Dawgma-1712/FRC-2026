@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.FieldConstants;
-import frc.Constants.ShooterConstants;
 import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 

@@ -10,22 +10,26 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import java.util.function.Supplier;
+
 public class AutoLock extends Command {
 
     private final CommandSwerveDrivetrain drivetrain; // Removed static
     private final PIDController rotationController;
-    private final Translation2d autoLockTarget;
     
     // Joystick Suppliers
     private final Supplier<Double> xSupplier;
     private final Supplier<Double> ySupplier;
 
+    // target supplier
+    private final Supplier<Translation2d> targetSupplier;  // the target is constantly changing as the robot moves at different velocities
+
     // Switched to FieldCentric so driving feels natural while spinning
     private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
 
-    public AutoLock(CommandSwerveDrivetrain drivetrain, Translation2d autoLockTarget, Supplier<Double> xSupplier, Supplier<Double> ySupplier) {
+    public AutoLock(CommandSwerveDrivetrain drivetrain, Supplier<Translation2d> targetSupplier, Supplier<Double> xSupplier, Supplier<Double> ySupplier) {
         this.drivetrain = drivetrain;
-        this.autoLockTarget = autoLockTarget;
+        this.targetSupplier = targetSupplier;
         this.xSupplier = xSupplier;
         this.ySupplier = ySupplier;
 
@@ -38,7 +42,7 @@ public class AutoLock extends Command {
 
     @Override
     public void execute() {
-        double goalAngle = findAutoLockAngle(autoLockTarget);
+        double goalAngle = findAutoLockAngle(targetSupplier.get());
 
         double rotateSpeed = rotationController.calculate(drivetrain.getState().Pose.getRotation().getDegrees(), goalAngle);
 

@@ -29,20 +29,12 @@ public class AutoLockAndShoot {
                                     Supplier<Double> xSupplier, 
                                     Supplier<Double> ySupplier) {
 
-        ShotData shotData = launcher.getShotData();
-        Translation3d goalTarget = shotData.getTarget();
-
+                                        
+        Supplier<ShotData> shotSupplier = () -> launcher.getShotData();
         SequentialCommandGroup CMDGroup = new SequentialCommandGroup(
-
-            new AutoLock(drivetrain, goalTarget.toTranslation2d(), xSupplier, ySupplier),
-
-            Commands.runOnce(() -> {
-                launcher.setKickerVelocity(shotData.exitVelocity() / (Math.PI * 2));  // exit velocity is in radians per second, and setKickerVelocity takes rotations per second
-            })
+            new AutoLock(drivetrain, () -> shotSupplier.get().getTarget().toTranslation2d(), xSupplier, ySupplier)
         );
 
-        targetPosePublisher.set(new Pose3d(goalTarget, new Rotation3d()));
-                                        
         return CMDGroup;
     }
 
