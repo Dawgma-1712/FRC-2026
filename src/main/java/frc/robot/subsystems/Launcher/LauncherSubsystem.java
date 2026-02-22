@@ -2,6 +2,8 @@ package frc.robot.subsystems.Launcher;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.FieldConstants;
 import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
@@ -20,11 +22,11 @@ public class LauncherSubsystem extends SubsystemBase {
         this.drivetrain = drivetrain;
     }
 
-    public void setKickerVelocity(double velocity){
+    public void setKickerVelocity(AngularVelocity velocity){
         io.setKickerVelocity(velocity);
     }
 
-    public double getKickerVelocity(){
+    public AngularVelocity getKickerVelocity(){
         return io.getKickerVelocity();
     }
 
@@ -32,7 +34,7 @@ public class LauncherSubsystem extends SubsystemBase {
         io.setFeederVelocity(velocity);
     }
 
-    public double getFeederVelocity(){
+    public AngularVelocity getFeederVelocity(){
         return io.getFeederVelocity();
     }
 
@@ -40,11 +42,11 @@ public class LauncherSubsystem extends SubsystemBase {
         return io.hasFuelIntaked();
     }
 
-    public void setHoodPosition(double angle){
+    public void setHoodPosition(Angle angle){
         io.setHoodPosition(angle);
     }
 
-    public double getHoodPosition(){
+    public Angle getHoodPosition(){
         return io.getHoodPosition();
     }
 

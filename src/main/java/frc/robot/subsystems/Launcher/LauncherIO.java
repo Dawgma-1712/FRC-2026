@@ -1,5 +1,9 @@
 package frc.robot.subsystems.Launcher;
 
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.Units;
+
 public interface LauncherIO {
 
     public static class LauncherIOInputs{
@@ -11,22 +15,22 @@ public interface LauncherIO {
         public boolean fuelShot = false;
     }
 
-    public default void setKickerVelocity(double shooterRPS){}
+    public default void setKickerVelocity(AngularVelocity shooterRPS){}
 
-    public default double getKickerVelocity(){
-        return 0.0;
+    public default AngularVelocity getKickerVelocity(){
+        return Units.RadiansPerSecond.of(0);
     }
     
     public default void setFeederVelocity(double feederRPS){}
 
-    public default double getFeederVelocity(){
-        return 0.0;
+    public default AngularVelocity getFeederVelocity(){
+        return Units.RadiansPerSecond.of(0);
     }
 
     public default void setHoodPosition(double position){}
 
-    public default double getHoodPosition(){
-        return 0.0;
+    public default Angle getHoodPosition(){
+        return Units.Degrees.of(0);
     }
 
     public default boolean hasFuelIntaked(){

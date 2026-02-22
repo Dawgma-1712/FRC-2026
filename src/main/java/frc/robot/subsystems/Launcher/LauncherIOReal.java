@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Launcher;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.Constants;
 import frc.Constants.IdConstants;
@@ -11,6 +13,8 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.Units;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
@@ -77,7 +81,10 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     @Override
-    public void setKickerVelocity(double rps) {
+    public void setKickerVelocity(AngularVelocity wheelVelocity) {
+
+        double rps = wheelVelocity.in(Units.RotationsPerSecond);
+
         if(Math.abs(rps-kickerTargetRPS)>5.0){
             kickerPhase = FlywheelPhase.STARTUP;
         }
@@ -85,13 +92,13 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     @Override
-    public double getKickerVelocity(){
-        return kickMotor.getVelocity().getValueAsDouble();
+    public AngularVelocity getKickerVelocity(){
+        return kickMotor.getVelocity().getValue();
     }
 
     @Override
-    public double getFeederVelocity(){
-        return feedMotor.getVelocity().getValueAsDouble();
+    public AngularVelocity getFeederVelocity(){
+        return feedMotor.getVelocity().getValue();
     }
 
     @Override
@@ -103,12 +110,12 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     @Override
-    public double getHoodPosition(){
-        return hoodEncoder.get();
+    public Angle getHoodPosition(){
+        return Units.Rotations.of(hoodEncoder.get());
     }
 
     @Override
-    public void setHoodPosition(double angle){
+    public void setHoodPosition(Angle angle){
         //write logic here depending on if you use a servo or something else
         //1 rotation of the motor equals 17/360 degree change physically
     }
@@ -132,8 +139,10 @@ public class LauncherIOReal implements LauncherIO{
     }
 
     public void periodic(){
-        double kickerVelocity = getKickerVelocity();
-        double kickerError = kickerTargetRPS - kickerVelocity;
+
+        AngularVelocity kickerVelocity = getKickerVelocity();
+        double kickerRotationsPerSecond = kickerVelocity.in(Units.RotationsPerSecond);
+        double kickerError = kickerTargetRPS - kickerRotationsPerSecond;
 
         boolean fuelIntakedNow = hasFuelIntaked();
         boolean fuelShotNow = hasShotFuel();
@@ -173,8 +182,9 @@ public class LauncherIOReal implements LauncherIO{
                 break;
         }
 
-        double feederVelocity = getFeederVelocity();
-        double feederError = feederTargetRPS - feederVelocity;
+        AngularVelocity feederVelocity = getFeederVelocity();
+        double feederRotationsPerSecond = feederVelocity.in(Units.RotationsPerSecond);
+        double feederError = feederTargetRPS - feederRotationsPerSecond;
 
         switch (feederPhase){
             case STARTUP:

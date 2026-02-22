@@ -104,6 +104,7 @@ public class LaunchCalculations {
         return shot;
     }
     
+    // exit velocity is in radians per second, hood angle is in radians
     public record ShotData(double exitVelocity, double hoodAngle, Translation3d target) {
 
         public ShotData(AngularVelocity exitVelocity, Angle hoodAngle, Translation3d target) {
