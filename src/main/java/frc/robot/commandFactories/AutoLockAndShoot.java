@@ -30,7 +30,7 @@ public class AutoLockAndShoot {
         SequentialCommandGroup CMDGroup = new SequentialCommandGroup(
             new AutoLock(drivetrain, () -> shotSupplier.get().getTarget().toTranslation2d(), xSupplier, ySupplier),
             Commands.runOnce(() -> {
-                launcher.setKickerVelocity(Units.RadiansPerSecond.of(shotSupplier.get().exitVelocity()));
+                launcher.setLauncherVelocity(Units.RadiansPerSecond.of(shotSupplier.get().exitVelocity()));
             })
         );
         targetPosePublisher.set(new Pose3d(shotSupplier.get().getTarget(), new Rotation3d()));

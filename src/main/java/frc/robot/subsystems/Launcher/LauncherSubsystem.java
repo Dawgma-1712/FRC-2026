@@ -14,6 +14,9 @@ public class LauncherSubsystem extends SubsystemBase {
 
     LauncherIO io;
     CommandSwerveDrivetrain drivetrain;
+    private double launcherTargetRps = 0.0;
+    private double kickerTargetRps = 0.0;
+
 
     //private final LauncherIOInputsAutoLogged LauncherInputs = new LauncherIOInputsAutoLogged();
 
@@ -22,20 +25,20 @@ public class LauncherSubsystem extends SubsystemBase {
         this.drivetrain = drivetrain;
     }
 
+    public void setLauncherVelocity(AngularVelocity velocity) {
+        io.setLauncherVelocity(velocity);
+    }
+
+    public AngularVelocity getLauncherVelocity() {
+        return io.getLauncherVelocity();
+    }
+
     public void setKickerVelocity(AngularVelocity velocity) {
         io.setKickerVelocity(velocity);
     }
 
     public AngularVelocity getKickerVelocity() {
         return io.getKickerVelocity();
-    }
-
-    public void setFeederVelocity(double velocity) {
-        io.setFeederVelocity(velocity);
-    }
-
-    public AngularVelocity getFeederVelocity() {
-        return io.getFeederVelocity();
     }
 
     public boolean hasFuelIntaked() {
@@ -63,8 +66,12 @@ public class LauncherSubsystem extends SubsystemBase {
             drivetrain.getState().Pose, 
             fieldSpeedsFromRelativeSpeeds(drivetrain.getState().Speeds),  // make sure this is field relative
             FieldConstants.BLUE_HUB_POSE.getTranslation(),
-             3
+             1
         );
+
+    }
+
+    public void shoot(ShotData shot) {
 
     }
 

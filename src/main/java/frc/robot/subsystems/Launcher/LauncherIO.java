@@ -15,15 +15,15 @@ public interface LauncherIO {
         public boolean fuelShot = false;
     }
 
-    public default void setKickerVelocity(AngularVelocity shooterRPS) {}
+    public default void setLauncherVelocity(AngularVelocity shooterRPS) {}
 
-    public default AngularVelocity getKickerVelocity() {
+    public default AngularVelocity getLauncherVelocity() {
         return Units.RadiansPerSecond.of(0);
     }
     
-    public default void setFeederVelocity(double feederRPS) {}
+    public default void setKickerVelocity(AngularVelocity feederRPS) {}
 
-    public default AngularVelocity getFeederVelocity() {
+    public default AngularVelocity getKickerVelocity() {
         return Units.RadiansPerSecond.of(0);
     }
 
@@ -34,6 +34,10 @@ public interface LauncherIO {
     }
 
     public default boolean hasFuelIntaked() {
+        return false;
+    }
+
+    public default boolean getFeedSensor() {
         return false;
     }
 

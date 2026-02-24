@@ -1,5 +1,6 @@
 package frc;
 
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -79,8 +80,9 @@ public final class Constants {
 
   public static class IdConstants {
 
-    public static final int KICK_MOTOR_ID = 3;//arbitrary all
-    public static final int FEED_MOTOR_ID = 5;
+    public static final int LAUNCH_MOTOR_ID = 3;//arbitrary all
+    public static final int LAUNCH_FOLLOWER_ID = 4;
+    public static final int KICK_MOTOR_ID = 5;
     public static final int HOOD_MOTOR_ID = 6;
 
     public static final int REVOLVER_MOTOR_ID = 7;
@@ -90,7 +92,7 @@ public final class Constants {
 
     public static final int INTAKE_STOWED_SWITCH_ID = 0;
     public static final int INTAKE_EXTENDED_SWITCH_ID = 1;
-    public static final int LAUNCHER_FUEL_INCOMING_BEAMBREAK_ID = 2;
+    public static final int FUEL_FEED_SENSOR_ID = 2;
     public static final int LAUNCHER_FUEL_SHOOTING_BEAMBREAK_ID = 3;
 
 
@@ -138,40 +140,56 @@ public final class Constants {
 
     public static final double GRAVITY = 9.8;    
     public static final double HUB_HEIGHT_METERS = 1.8288;
-    public static final double LAUNCHER_HEIGHT_METERS = 1; //completely arbitrary
-    public static final double FLYWHEEL_WHEEL_DIAMETER = 4; // in inches
+    public static final double LAUNCHER_HEIGHT_METERS = 1;  // completely arbitrary
+    public static final double FLYWHEEL_WHEEL_DIAMETER = 4;  // in inches
 
-    public static final double KICKER_kP = 999999;
-    public static final double KICKER_kI = 0;
-    public static final double KICKER_kD = 0;
-    public static final double KICKER_kV = 0.0;
-    public static final double KICKER_kS = 0.0;
+    // Bang bang stuff??
+
+    public static final double BANG_BANG_LAUNCHER_kP = 999999;
+    public static final double BANG_BANG_LAUNCHER_kI = 0;
+    public static final double BANG_BANG_LAUNCHER_kD = 0;
+    public static final double BANG_BANG_LAUNCHER_kV = 0.0;
+    public static final double BANG_BANG_LAUNCHER_kS = 0.0;
 
     public static final double AT_SPEED_TOLERANCE_RPS = 2.0;
 
-    public static final double KICKER_PEAK_FORWARD_TORQUE_CURRENT = 40.0;
-    public static final double KICKER_PEAK_REVERSE_TORQUE_CURRENT = 0.0;
-    public static final double KICKER_PEAK_FORWARD_DUTY_CYCLE = 1.0;
-    public static final double KICKER_PEAK_REVERSE_DUTY_CYCLE = 0.0;
+    public static final double LAUNCHER_PEAK_FORWARD_TORQUE_CURRENT = 40.0;
+    public static final double LAUNCHER_PEAK_REVERSE_TORQUE_CURRENT = 0.0;
+    public static final double LAUNCHER_PEAK_FORWARD_DUTY_CYCLE = 1.0;
+    public static final double LAUNCHER_PEAK_REVERSE_DUTY_CYCLE = 0.0;
 
-    public static final double FEEDER_kP = 0.1; //These PID values are arbitrary
-    public static final double FEEDER_kI = 0.0;
-    public static final double FEEDER_kD = 0.0;
+    // end bang bang stuff
+
+    public static final double LAUNCH_kP = 0.0;
+    public static final double LAUNCH_kI = 0.0;
+    public static final double LAUNCH_kD = 0.0;
+    public static final double LAUNCH_kV = 0.0;
+    public static final double LAUNCH_kS = 0.0;
+
+    public static final MotorAlignmentValue isFollowerAligned = MotorAlignmentValue.Opposed;
+
+    public static final double KICKER_kP = 0.0;
+    public static final double KICKER_kI = 0.0;
+    public static final double KICKER_kD = 0.0;
+    public static final double KICKER_kV = 0.0;
+    public static final double KICKER_kS = 0.0;
 
 
-    public static final double FEEDER_SPEED_MPS = 15; //idk change
+    public static final double FEEDER_SPEED_MPS = 15;  // idk change
 
     public static final double TARGET_VELOCITY_TOLERANCE = 0.95;
     public static final double TARGET_HOOD_TOLERANCE_DEGREES = 1.0;
 
-    private static final double STARTUP_THRESHOLD = 2.0; //RPS tolerance to consider at speed
-    private static final double TORQUE_CURRENT_AMPS = 40.0; //Constant torque for idle and ball phases
+    private static final double STARTUP_THRESHOLD = 2.0;  // RPS tolerance to consider at speed
+    private static final double TORQUE_CURRENT_AMPS = 40.0;  // Constant torque for idle and ball phases
 
     public static final double BASE_ANGLE = 9.0;
     public static final double MAX_HOOD_OFFSET = 40.0;
 
-    public static final Transform3d ROBOT_TO_LAUNCHER_TRANSFORM = new Transform3d();  // CHANGE
-
+    public static final Transform3d ROBOT_TO_LAUNCHER_TRANSFORM = new Transform3d(
+                                                                      new Translation3d(0.2, 0.08, 0.5524),
+                                                                      new Rotation3d()
+                                                                  );
   }
 
   public static class VisionConstants {
@@ -192,9 +210,9 @@ public final class Constants {
 
     public static class SimulationConstants {
 
-      public static final double LIMELIGHT_VIEW_RANGE = 5.0; // distance in meters that the limelight can see
-      public static final double LIMELIGHT_HORIZONTAL_FOV = Math.toRadians(82); // in radians
-      public static final double LIMELIGHT_VERTICAL_FOV = Math.toRadians(56.2); // in radians
+      public static final double LIMELIGHT_VIEW_RANGE = 5.0;  // distance in meters that the limelight can see
+      public static final double LIMELIGHT_HORIZONTAL_FOV = Math.toRadians(82);  // in radians
+      public static final double LIMELIGHT_VERTICAL_FOV = Math.toRadians(56.2);  // in radians
       public static final double INCHES_PER_METER = 39.37;
 
     }

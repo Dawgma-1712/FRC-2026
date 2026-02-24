@@ -13,7 +13,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class IntakeIOReal implements IntakeIO {
@@ -41,7 +40,7 @@ public class IntakeIOReal implements IntakeIO {
     public double angleMotorPosition = 0;
     private final MotionMagicVoltage requestControl = new MotionMagicVoltage(0);
 
-    public IntakeIOReal(){
+    public IntakeIOReal() {
         TalonFXConfiguration angleConfig = new TalonFXConfiguration();
 
         // pid constants - NOT TUNED
