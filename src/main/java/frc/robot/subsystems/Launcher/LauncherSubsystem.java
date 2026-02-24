@@ -2,10 +2,12 @@ package frc.robot.subsystems.Launcher;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.FieldConstants;
+import frc.Constants.ShooterConstants;
 import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
@@ -71,14 +73,13 @@ public class LauncherSubsystem extends SubsystemBase {
 
     }
 
-    public void shoot(ShotData shot) {
+    public boolean readyToShoot(AngularVelocity desiredVelocity) {
+
+        boolean isLauncherReady = Math.abs(desiredVelocity.in(Units.RotationsPerSecond) - getLauncherVelocity().in(Units.RotationsPerSecond)) < ShooterConstants.TARGET_VELOCITY_TOLERANCE_RPS;
+        boolean isKickerReady = Math.abs(desiredVelocity.in(Units.RotationsPerSecond) * ShooterConstants.KICKER_SPEED_PROPORTION - getKickerVelocity().in(Units.RotationsPerSecond)) < ShooterConstants.TARGET_VELOCITY_TOLERANCE_RPS;
+
+        return isLauncherReady && isKickerReady;
 
     }
 
-    @Override
-    public void periodic() {
-        io.periodic();
-    }
-
-    
 }

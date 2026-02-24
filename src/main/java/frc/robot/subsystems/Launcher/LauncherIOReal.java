@@ -48,8 +48,8 @@ public class LauncherIOReal implements LauncherIO {
         kickerConfigs.Slot0.kP = ShooterConstants.KICKER_kP;
         kickerConfigs.Slot0.kI = ShooterConstants.KICKER_kI;
         kickerConfigs.Slot0.kD = ShooterConstants.KICKER_kD;
-        kickerConfigs.Slot0.kV = Constants.ShooterConstants.KICKER_kV;
-        kickerConfigs.Slot0.kS = Constants.ShooterConstants.KICKER_kS;
+        kickerConfigs.Slot0.kV = ShooterConstants.KICKER_kV;
+        kickerConfigs.Slot0.kS = ShooterConstants.KICKER_kS;
 
         kickerConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         kickerConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

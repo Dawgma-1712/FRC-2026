@@ -176,9 +176,11 @@ public final class Constants {
 
 
     public static final double FEEDER_SPEED_MPS = 15;  // idk change
+    public static final double KICKER_SPEED_PROPORTION = 0.75;
 
-    public static final double TARGET_VELOCITY_TOLERANCE = 0.95;
+    public static final double BANG_BANG_TARGET_VELOCITY_TOLERANCE = 0.95;
     public static final double TARGET_HOOD_TOLERANCE_DEGREES = 1.0;
+    public static final double TARGET_VELOCITY_TOLERANCE_RPS = 10;
 
     private static final double STARTUP_THRESHOLD = 2.0;  // RPS tolerance to consider at speed
     private static final double TORQUE_CURRENT_AMPS = 40.0;  // Constant torque for idle and ball phases

@@ -126,6 +126,7 @@ public class RobotContainer {
       new JoystickButton(driver, OperatorConstants.DRIVER_LB).whileTrue(new RepeatCommand(AutoLockAndShoot.autoLockAndShoot(
                                                                      this.drivetrain, 
                                                                      this.launcher,
+                                                                     this.revolver,
                                                                     () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0), //x supplier
                                                                     () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)) //y supplier
                                                               ));
