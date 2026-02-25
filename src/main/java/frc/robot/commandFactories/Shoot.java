@@ -23,7 +23,9 @@ public class Shoot {
             launcher.setKickerVelocity(desiredKickerVelocity);
         })).raceWith(
             new SequentialCommandGroup(
-                Commands.waitUntil(() -> launcher.readyToShoot(desiredLauncherVelocity, desiredKickerVelocity)),
+                Commands.waitUntil(() -> {
+                    return launcher.readyToShoot(desiredLauncherVelocity, desiredKickerVelocity);
+                }),
                 Commands.runOnce(() -> {
                     revolver.setRevolverPercentOutput(0.6);
                 })

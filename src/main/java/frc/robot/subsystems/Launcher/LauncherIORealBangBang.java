@@ -137,9 +137,10 @@ public class LauncherIORealBangBang implements LauncherIO{
     public void updateInputs(LauncherIOInputs inputs) {
         inputs.kickMotorVelocity = kickMotor.getVelocity().getValueAsDouble();
         inputs.feedMotorVelocity = feedMotor.getVelocity().getValueAsDouble();
-        inputs.hasFuelIntaked = hasFuelIntaked();
-        inputs.fuelShot = hasShotFuel();
-    }
+        inputs.hoodMotorPosition = hoodEncoder.get();
+        inputs.hasFuelIntaked = !intakeSwitch.get();    // beam breaks are typically inverted
+        inputs.fuelShot = !shootingSwitch.get();
+    }  
 
     public void periodic() {
 

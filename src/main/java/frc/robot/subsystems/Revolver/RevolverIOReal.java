@@ -23,7 +23,9 @@ public class RevolverIOReal implements RevolverIO {
     }
 
     @Override
-    public void updateInputs(RevolverIOInputs inputs) {}
+    public void updateInputs(RevolverIOInputs inputs) {
+        // inputs.revolverVelocity = getRevolverVelocity();
+    }
 
 
 }

@@ -2,10 +2,14 @@ package frc.robot.subsystems.Launcher;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Angle;
+
+import org.littletonrobotics.junction.AutoLog;
+
 import edu.wpi.first.units.Units;
 
 public interface LauncherIO {
 
+    @AutoLog
     public static class LauncherIOInputs {
         public double kickMotorVelocity = 0;
         public double feedMotorVelocity = 0;

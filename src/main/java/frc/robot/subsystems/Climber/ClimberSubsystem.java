@@ -3,8 +3,13 @@ package frc.robot.subsystems.Climber;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import org.littletonrobotics.junction.Logger;
+
+
 
 public class ClimberSubsystem extends SubsystemBase{
+    private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
+
     
     ClimberIO io;
     
@@ -26,8 +31,11 @@ public class ClimberSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        // io.updateInputs(IntakeIOInputs);
-        SmartDashboard.putNumber("Intake Angle", io.getClimberPosition());
+        io.updateInputs(inputs);
+        Logger.processInputs("Climber", inputs);        // Log to AdvantageKit
+        Logger.recordOutput("Climber Position", io.getClimberPosition());
+
+        // SmartDashboard.putNumber("Intake Angle", io.getClimberPosition());
     }
 
     @Override

@@ -87,7 +87,6 @@ public class IntakeIOReal implements IntakeIO {
     @Override //literally useless until we set up advantagekit
     public void updateInputs(IntakeIOInputs inputs) {
         inputs.angleMotorPosition = getAngle().in(Units.Degrees);
-        // inputs.limitSwitchTriggered = limitSwitch.get(); // Ensure this is in your IntakeIOInputs class
     }
     
 }

@@ -109,4 +109,13 @@ public class VisionSim implements VisionInterface {
         return true;
     }
 
+    @Override
+    public void updateInputs(VisionIOInputs inputs) {
+        // During replay, AdvantageKit will override these values with real data
+        // from the log. For non-replay simulation, you could add simulated
+        // vision data here if you want.
+        inputs.leftHasTarget = false;
+        inputs.rightHasTarget = false;
+    }
+
 }

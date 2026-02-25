@@ -7,26 +7,45 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.LogFileUtil;
 
-/**
- * The methods in this class are called automatically corresponding to each mode, as described in
- * the TimedRobot documentation. If you change the name of this class or the package after creating
- * this project, you must also update the Main.java file in the project.
- */
-public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
+import edu.wpi.first.wpilibj.RobotBase;
 
-  private final RobotContainer m_robotContainer;
+public class Robot extends LoggedRobot {
+    private Command m_autonomousCommand;
+    private final RobotContainer m_robotContainer;
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
-  }
+    public Robot() {
+        // ====== ADVANTAGEKIT LOGGING SETUP (must come BEFORE RobotContainer) ======
+
+        // Set metadata about this build
+        Logger.recordMetadata("ProjectName", "FRC2026Robot");
+        Logger.recordMetadata("Team", "1712");
+
+        if (RobotBase.isReal()) {
+            // REAL ROBOT: log to USB stick + publish to NetworkTables for live viewing
+            Logger.addDataReceiver(new WPILOGWriter());   // Saves to /U/logs on USB stick
+            Logger.addDataReceiver(new NT4Publisher());    // Publishes to NetworkTables (for AdvantageScope live view)
+        } else {
+            // SIMULATION: replay mode
+            setUseTiming(false); // Run as fast as possible during replay
+            String logPath = LogFileUtil.findReplayLog();
+            Logger.setReplaySource(new WPILOGReader(logPath));
+            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        }
+
+        // Start the logger — no more receivers or metadata after this!
+        Logger.start();
+
+        // ====== Now create RobotContainer (all subsystem initialization) ======
+        m_robotContainer = new RobotContainer();
+    }
+
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics

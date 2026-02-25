@@ -66,6 +66,7 @@ public class LauncherIOReal implements LauncherIO {
 
     }
 
+    
     @Override
     public AngularVelocity getLauncherVelocity() {
         return launchLeaderKraken.getVelocity().getValue();

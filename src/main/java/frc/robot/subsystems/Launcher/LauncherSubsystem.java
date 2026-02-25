@@ -10,6 +10,8 @@ import frc.Constants.FieldConstants;
 import frc.Constants.ShooterConstants;
 import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
+import org.littletonrobotics.junction.Logger;
+
 
 
 public class LauncherSubsystem extends SubsystemBase {
@@ -20,7 +22,7 @@ public class LauncherSubsystem extends SubsystemBase {
     private double kickerTargetRps = 0.0;
 
 
-    //private final LauncherIOInputsAutoLogged LauncherInputs = new LauncherIOInputsAutoLogged();
+    private final LauncherIOInputsAutoLogged inputs = new LauncherIOInputsAutoLogged();
 
     public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
         this.io = io;
@@ -79,6 +81,13 @@ public class LauncherSubsystem extends SubsystemBase {
         boolean isKickerReady = Math.abs(desiredVelocity.in(Units.RotationsPerSecond) * ShooterConstants.KICKER_SPEED_PROPORTION - getKickerVelocity().in(Units.RotationsPerSecond)) < ShooterConstants.TARGET_VELOCITY_TOLERANCE_RPS;
 
         return isLauncherReady && isKickerReady;
+
+    }
+
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("Launcher", inputs);
 
     }
 
