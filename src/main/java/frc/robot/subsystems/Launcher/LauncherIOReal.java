@@ -3,6 +3,7 @@ package frc.robot.subsystems.Launcher;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANrange;
@@ -28,6 +29,10 @@ public class LauncherIOReal implements LauncherIO {
     // CONTROL MODES
     private final VelocityTorqueCurrentFOC launcherControlMode = new VelocityTorqueCurrentFOC(0).withSlot(0);
     private final VelocityTorqueCurrentFOC kickerControlMode = new VelocityTorqueCurrentFOC(0).withSlot(0);
+
+    // STATUS SIGNALS
+    private final StatusSignal<AngularVelocity> launcherVelocitySignal = launchLeaderKraken.getVelocity();
+    private final StatusSignal<AngularVelocity> kickerVelocitySignal = kickerKraken.getVelocity();
     
     public LauncherIOReal() {
 
@@ -69,7 +74,7 @@ public class LauncherIOReal implements LauncherIO {
     
     @Override
     public AngularVelocity getLauncherVelocity() {
-        return launchLeaderKraken.getVelocity().getValue();
+        return launcherVelocitySignal.refresh().getValue();
     }
 
     @Override
@@ -79,7 +84,7 @@ public class LauncherIOReal implements LauncherIO {
 
     @Override
     public AngularVelocity getKickerVelocity() {
-        return kickerKraken.getVelocity().getValue();
+        return kickerVelocitySignal.refresh().getValue();
     }
 
     @Override

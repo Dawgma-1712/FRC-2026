@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 // Remember to use the correct subclass so our code stays organized please
 public final class Constants {
@@ -180,7 +181,7 @@ public final class Constants {
 
     public static final double BANG_BANG_TARGET_VELOCITY_TOLERANCE = 0.95;
     public static final double TARGET_HOOD_TOLERANCE_DEGREES = 1.0;
-    public static final double TARGET_VELOCITY_TOLERANCE_RPS = 10;
+    public static final AngularVelocity TARGET_VELOCITY_TOLERANCE = edu.wpi.first.units.Units.RotationsPerSecond.of(10);
 
     private static final double STARTUP_THRESHOLD = 2.0;  // RPS tolerance to consider at speed
     private static final double TORQUE_CURRENT_AMPS = 40.0;  // Constant torque for idle and ball phases
@@ -223,6 +224,8 @@ public final class Constants {
 
   public static class RevolverConstants {
     
+    public static final double SHOOTING_PERCENTAGE_OUTPUT = 0.6;
+
   }
 
   public static class ClimberConstants {

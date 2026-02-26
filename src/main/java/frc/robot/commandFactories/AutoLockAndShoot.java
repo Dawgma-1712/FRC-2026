@@ -32,7 +32,7 @@ public class AutoLockAndShoot {
         Supplier<ShotData> shotSupplier = () -> launcher.getShotData();
         SequentialCommandGroup CMDGroup = new SequentialCommandGroup(
             new AutoLock(drivetrain, () -> shotSupplier.get().getTarget().toTranslation2d(), xSupplier, ySupplier),
-            Shoot.shoot(launcher, revolver, shotSupplier.get())
+            Shoot.shoot(launcher, revolver, () -> shotSupplier.get())
         );
         targetPosePublisher.set(new Pose3d(shotSupplier.get().getTarget(), new Rotation3d()));
         return CMDGroup;

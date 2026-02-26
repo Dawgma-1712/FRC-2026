@@ -57,6 +57,11 @@ public class LauncherSubsystem extends SubsystemBase {
         return io.getHoodPosition();
     }
 
+    public void stop() {
+        setLauncherVelocity(Units.RotationsPerSecond.of(0));
+        setKickerVelocity(Units.RotationsPerSecond.of(0));
+    }
+
     public ChassisSpeeds fieldSpeedsFromRelativeSpeeds(ChassisSpeeds relativeSpeeds) {
         
         Rotation2d rotation = drivetrain.getState().Pose.getRotation();
@@ -75,12 +80,17 @@ public class LauncherSubsystem extends SubsystemBase {
 
     }
 
-    public boolean readyToShoot(AngularVelocity desiredVelocity) {
+    public boolean readyToShoot(AngularVelocity desiredLauncherVelocity, AngularVelocity desiredKickerVelocity) {
 
-        boolean isLauncherReady = Math.abs(desiredVelocity.in(Units.RotationsPerSecond) - getLauncherVelocity().in(Units.RotationsPerSecond)) < ShooterConstants.TARGET_VELOCITY_TOLERANCE_RPS;
-        boolean isKickerReady = Math.abs(desiredVelocity.in(Units.RotationsPerSecond) * ShooterConstants.KICKER_SPEED_PROPORTION - getKickerVelocity().in(Units.RotationsPerSecond)) < ShooterConstants.TARGET_VELOCITY_TOLERANCE_RPS;
+        AngularVelocity launcherVelocity = getLauncherVelocity();
+        AngularVelocity kickerVelocity = getKickerVelocity();
 
-        return isLauncherReady && isKickerReady;
+        AngularVelocity tolerance = ShooterConstants.TARGET_VELOCITY_TOLERANCE;
+
+        boolean isLauncherReady = Math.abs(launcherVelocity.minus(desiredLauncherVelocity).magnitude()) < tolerance.magnitude();
+        boolean isKickerReady = Math.abs(kickerVelocity.minus(desiredKickerVelocity).magnitude()) < tolerance.magnitude();
+
+        return (isLauncherReady && isKickerReady);
 
     }
 

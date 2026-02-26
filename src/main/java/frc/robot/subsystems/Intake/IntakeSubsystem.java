@@ -39,8 +39,7 @@ public class IntakeSubsystem extends SubsystemBase{
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
-        Logger.recordOutput("Intake Angle", io.getAngle().in(Units.Degrees))
-        // SmartDashboard.putNumber("Intake Angle", io.getAngle().in(Units.Degrees));
+        Logger.recordOutput("Intake Angle", io.getAngle().in(Units.Degrees));
     }
 
     @Override

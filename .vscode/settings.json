@@ -57,5 +57,7 @@
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
   ],
-  "java.dependency.enableDependencyCheckup": false
+  "java.dependency.enableDependencyCheckup": false,
+  "java.project.sourcePaths": ["src/main/java", "build/generated/sources/annotationProcessor/java/main"],
+  "java.autobuild.enabled": false
 }

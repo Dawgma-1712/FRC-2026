@@ -25,6 +25,10 @@ public class RevolverSubsystem extends SubsystemBase{
         return io.getRevolverVelocity();
     }
 
+    public void stop() {
+        setRevolverPercentOutput(0);
+    }
+
     @Override
     public void periodic() {
         io.updateInputs(inputs);
