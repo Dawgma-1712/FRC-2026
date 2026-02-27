@@ -26,7 +26,7 @@ public class Shoot {
             return Commands.sequence(
                 Commands.waitUntil(() -> launcher.readyToShoot(desiredLauncherVelocity, desiredKickerVelocity)),
                 Commands.runOnce(() -> revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT)),
-                Commands.waitSeconds(0.5)
+                Commands.waitSeconds(0.5)  // not enough time for the fuel to reach the flywheels after revolver reaches output
             ).deadlineFor(
                 Commands.run(() -> {
                     launcher.setLauncherVelocity(desiredLauncherVelocity);

@@ -193,6 +193,7 @@ public final class Constants {
                                                                       new Translation3d(0.2, 0.08, 0.5524),
                                                                       new Rotation3d()
                                                                   );
+    public static final double DEBOUNCE_LENGTH = 0.1; //in seconds how long the change must be real until you idk just search ts up
   }
 
   public static class VisionConstants {

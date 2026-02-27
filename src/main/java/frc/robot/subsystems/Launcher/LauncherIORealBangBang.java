@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.Constants;
 import frc.Constants.IdConstants;
 import frc.Constants.ShooterConstants;
+import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
 
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
@@ -14,13 +15,17 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.Units;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class LauncherIORealBangBang implements LauncherIO{
+
 
     private enum FlywheelPhase {
         STARTUP, IDLE, BALL, RECOVERY
@@ -32,6 +37,9 @@ public class LauncherIORealBangBang implements LauncherIO{
 
     private FeederPhase feederPhase = FeederPhase.STARTUP;
     private double feederTargetRPS = 0.0;
+
+    private AngularVelocity prevLauncherVelocity;
+    private boolean isBeginning = true;
 
     private FlywheelPhase kickerPhase = FlywheelPhase.STARTUP;
     private double kickerTargetRPS = 0.0;
@@ -53,6 +61,8 @@ public class LauncherIORealBangBang implements LauncherIO{
 
     private final VelocityDutyCycle feederDutyCycle = new VelocityDutyCycle(0).withSlot(0);
     private final VelocityTorqueCurrentFOC feederTorqueBangBang = new VelocityTorqueCurrentFOC(0).withSlot(0);
+
+    Debouncer launcherDebouncer = new Debouncer(ShooterConstants.DEBOUNCE_LENGTH, Debouncer.DebounceType.kBoth);
 
     private boolean previousFuelBeamBreak = false;
     private boolean previousShotBeamBreak = false;
@@ -141,6 +151,39 @@ public class LauncherIORealBangBang implements LauncherIO{
         inputs.hasFuelIntaked = !intakeSwitch.get();    // beam breaks are typically inverted
         inputs.fuelShot = !shootingSwitch.get();
     }  
+
+
+    public Command actuallySetLauncherVelocity(AngularVelocity launcherTargetVelocity) {
+
+        return Commands.runOnce(() -> {
+
+            AngularVelocity launcherVelocity = getKickerVelocity();
+
+            if(isBeginning) {
+                prevLauncherVelocity = getLauncherVelocity();
+                isBeginning = false;
+            }      
+
+            boolean velocityDecreasing = launcherVelocity.minus(prevLauncherVelocity).magnitude() < 0;
+            boolean decreasedThreshold = launcherDebouncer.calculate(velocityDecreasing);
+
+            //if decreased we are in the constant mode
+            if(decreasedThreshold){
+                kickMotor.setControl(kickerConstantTorque.withOutput(ShooterConstants.LAUNCHER_PEAK_FORWARD_TORQUE_CURRENT));
+            }
+            else{
+                kickMotor.setControl(kickerTorqueBangBang.withVelocity(launcherTargetVelocity));
+            }
+
+            prevLauncherVelocity = launcherVelocity;
+            
+        });
+        
+
+    }
+
+
+
 
     public void periodic() {
 
