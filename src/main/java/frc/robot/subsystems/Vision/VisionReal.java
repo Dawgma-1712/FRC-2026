@@ -17,8 +17,8 @@ import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
 public class VisionReal implements VisionInterface {
     
-    Limelight limelightLeft = new Limelight(VisionConstants.LIMELIGHT_LEFT_ID);
-    Limelight limelightRight = new Limelight(VisionConstants.LIMELIGHT_RIGHT_ID);
+    Limelight limelightBack = new Limelight(VisionConstants.LIMELIGHT_BACK_ID);
+    Limelight limelightFront = new Limelight(VisionConstants.LIMELIGHT_FRONT_ID);
 
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon;
@@ -38,8 +38,8 @@ public class VisionReal implements VisionInterface {
         this.drivetrain = drivetrain;
         this.pigeon = drivetrain.getPigeon2();
 
-        configureLimelight(limelightLeft, new Pose3d().transformBy(VisionConstants.LIMELIGHT_LEFT_TO_ROBOT));
-        configureLimelight(limelightRight, new Pose3d().transformBy(VisionConstants.LIMELIGHT_RIGHT_TO_ROBOT));
+        configureLimelight(limelightBack, new Pose3d().transformBy(VisionConstants.LIMELIGHT_BACK_TO_ROBOT));
+        configureLimelight(limelightFront, new Pose3d().transformBy(VisionConstants.LIMELIGHT_FRONT_TO_ROBOT));
     }
 
     // configures the target limelight for MegaTag2 detection, needed before fetching pose in periodic
@@ -63,15 +63,15 @@ public class VisionReal implements VisionInterface {
     @Override
     public void addVisionMeasurements() {
 
-        configureLimelightMegatag(limelightLeft);
-        configureLimelightMegatag(limelightRight);
+        configureLimelightMegatag(limelightBack);
+        configureLimelightMegatag(limelightFront);
 
-        Optional<PoseEstimate> visionEstimateLeft = limelightLeft.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
+        Optional<PoseEstimate> visionEstimateLeft = limelightBack.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
         visionEstimateLeft.ifPresent((PoseEstimate poseEstimate) -> {
             drivetrain.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
         });
 
-        Optional<PoseEstimate> visionEstimateRight = limelightRight.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
+        Optional<PoseEstimate> visionEstimateRight = limelightFront.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
         visionEstimateRight.ifPresent((PoseEstimate poseEstimate) -> {
             drivetrain.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
         });
@@ -80,10 +80,10 @@ public class VisionReal implements VisionInterface {
 
     @Override
     public void updateInputs(VisionIOInputs inputs) {
-        configureLimelightMegatag(limelightLeft);
-        configureLimelightMegatag(limelightRight);
+        configureLimelightMegatag(limelightBack);
+        configureLimelightMegatag(limelightFront);
 
-        Optional<PoseEstimate> visionEstimateLeft = limelightLeft.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
+        Optional<PoseEstimate> visionEstimateLeft = limelightBack.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
 
         inputs.leftHasTarget = visionEstimateLeft.isPresent();
         visionEstimateLeft.ifPresent(est -> {
@@ -91,7 +91,7 @@ public class VisionReal implements VisionInterface {
             inputs.leftTimestamp = est.timestampSeconds;
         });
 
-        Optional<PoseEstimate> visionEstimateRight = limelightRight.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
+        Optional<PoseEstimate> visionEstimateRight = limelightFront.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
 
         inputs.rightHasTarget = visionEstimateRight.isPresent();
         visionEstimateRight.ifPresent(est -> {

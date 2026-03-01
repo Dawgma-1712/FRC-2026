@@ -17,9 +17,10 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        /*
         // Step 1: Pull latest data from hardware into the inputs object
         visionIO.updateInputs(inputs);
-
+    
         // Step 2: Send inputs to AdvantageKit for logging (and replay injection)
         Logger.processInputs("Vision", inputs);
 
@@ -36,5 +37,7 @@ public class VisionSubsystem extends SubsystemBase {
         Logger.recordOutput("Vision/RightHasTarget", inputs.rightHasTarget);
         Logger.recordOutput("Vision/LeftPose", inputs.leftEstimatedPose);
         Logger.recordOutput("Vision/RightPose", inputs.rightEstimatedPose);
+        */
+        visionIO.addVisionMeasurements();
     }
 }

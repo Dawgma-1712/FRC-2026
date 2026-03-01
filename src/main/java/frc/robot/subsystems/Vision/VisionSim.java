@@ -20,11 +20,11 @@ public class VisionSim implements VisionInterface {
     
     CommandSwerveDrivetrain drivetrain;
 
-    StructPublisher<Pose3d> limelightLeftPublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightLeft", Pose3d.struct).publish();
-    StructPublisher<Pose3d> limelightRightPublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightRight", Pose3d.struct).publish();
+    StructPublisher<Pose3d> limelightBackPublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightBack", Pose3d.struct).publish();
+    StructPublisher<Pose3d> limelightFrontPublisher = NetworkTableInstance.getDefault().getStructTopic("LimelightFront", Pose3d.struct).publish();
     StructPublisher<Pose3d> blueHubPublisher = NetworkTableInstance.getDefault().getStructTopic("blueHub", Pose3d.struct).publish();
-    StructArrayPublisher<Pose3d> aprilTagLeftPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArrayLeft", Pose3d.struct).publish();
-    StructArrayPublisher<Pose3d> aprilTagRightPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArrayRight", Pose3d.struct).publish();
+    StructArrayPublisher<Pose3d> aprilTagBackPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArrayBack", Pose3d.struct).publish();
+    StructArrayPublisher<Pose3d> aprilTagFrontPosePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("ApriltagPoseArrayFront", Pose3d.struct).publish();
 
     public VisionSim(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -40,14 +40,14 @@ public class VisionSim implements VisionInterface {
         Pose3d drivetrainPose = new Pose3d(drivetrain.getState().Pose);
 
         // field relative limelight positions based on the transforms in Constants
-        Pose3d limelightLeftPose = drivetrainPose.transformBy(VisionConstants.LIMELIGHT_LEFT_TO_ROBOT);
-        Pose3d limelightRightPose = drivetrainPose.transformBy(VisionConstants.LIMELIGHT_RIGHT_TO_ROBOT);
+        Pose3d limelightBackPose = drivetrainPose.transformBy(VisionConstants.LIMELIGHT_BACK_TO_ROBOT);
+        Pose3d limelightRightPose = drivetrainPose.transformBy(VisionConstants.LIMELIGHT_FRONT_TO_ROBOT);
 
         AprilTagFieldLayout aprilTagPoses = VisionConstants.APRIL_TAG_POSES;
 
         // this stuff is just so I can see where it thinks the limelights are
-        limelightLeftPublisher.set(limelightLeftPose);
-        limelightRightPublisher.set(limelightRightPose);
+        limelightBackPublisher.set(limelightBackPose);
+        limelightFrontPublisher.set(limelightRightPose);
 
         int visibleCountLeft = 0;
         int visibleCountRight = 0;
@@ -56,7 +56,7 @@ public class VisionSim implements VisionInterface {
         Pose3d tagPose = aprilTagPoses.getTagPose(i).orElse(new Pose3d());  // the orElse is because getTagPoses returns an optional, and should never be called if the tagIds are correct
         
         // sets the pose in the buffer array to the tag's position
-        if (isAprilTagVisible(limelightLeftPose, tagPose, i)) {
+        if (isAprilTagVisible(limelightBackPose, tagPose, i)) {
             visibleTagBufferLeft[visibleCountLeft] = tagPose;
             visibleCountLeft++;
         }
@@ -65,8 +65,8 @@ public class VisionSim implements VisionInterface {
             visibleCountRight++;
         }
         }
-        aprilTagLeftPosePublisher.set(Arrays.copyOfRange(visibleTagBufferLeft, 0, visibleCountLeft));
-        aprilTagRightPosePublisher.set(Arrays.copyOfRange(visibleTagBufferRight, 0, visibleCountRight));
+        aprilTagBackPosePublisher.set(Arrays.copyOfRange(visibleTagBufferLeft, 0, visibleCountLeft));
+        aprilTagFrontPosePublisher.set(Arrays.copyOfRange(visibleTagBufferRight, 0, visibleCountRight));
 
         blueHubPublisher.set(FieldConstants.BLUE_HUB_POSE);
     }

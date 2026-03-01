@@ -200,16 +200,16 @@ public final class Constants {
 
     public static final AprilTagFieldLayout APRIL_TAG_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
     
-    public static final String LIMELIGHT_LEFT_ID = "limelight-left";
-    public static final String LIMELIGHT_RIGHT_ID = "limelight-right";
+    public static final String LIMELIGHT_BACK_ID = "limelight-back";
+    public static final String LIMELIGHT_FRONT_ID = "limelight-front";
 
-    public static final Transform3d LIMELIGHT_LEFT_TO_ROBOT = new Transform3d(
-                                                                  new Translation3d(-0, 0.276, 0.1524),
-                                                                  new Rotation3d(0, Math.toRadians(-30), Math.toRadians(135)
+    public static final Transform3d LIMELIGHT_BACK_TO_ROBOT = new Transform3d(
+                                                                  new Translation3d(Units.inchesToMeters(-12.121), Units.inchesToMeters(3.125), Units.inchesToMeters(5.646) + 0.0508),  // the 0.0508 is the offset for advantagescope, remove
+                                                                  new Rotation3d(0, Math.toRadians(-30), Math.toRadians(180)
                                                               ));
-    public static final Transform3d LIMELIGHT_RIGHT_TO_ROBOT = new Transform3d(
-                                                                  new Translation3d(-0, -0.276, 0.1524), 
-                                                                  new Rotation3d(0, Math.toRadians(-30), Math.toRadians(-135)
+    public static final Transform3d LIMELIGHT_FRONT_TO_ROBOT = new Transform3d(
+                                                                  new Translation3d(-0, -0.0, 0.254 + 0.0508), 
+                                                                  new Rotation3d(0, Math.toRadians(-30), Math.toRadians(0)
                                                               ));
 
     public static class SimulationConstants {
