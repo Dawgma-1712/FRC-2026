@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveSlowMode;
@@ -24,32 +25,40 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import frc.robot.commandFactories.AutoLockAndShoot;
-
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.subsystems.Revolver.RevolverIOReal;
-import frc.robot.subsystems.Revolver.RevolverSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.subsystems.Swerve.*;
 import frc.robot.subsystems.Vision.*;
+import frc.robot.utils.FuelSim;
+
+import java.util.function.Supplier;
 
 public class RobotContainer {
+
   public static double speed = 1;
 
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+  private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+  private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+          .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+  private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   private final ModularAutoHandler autoHandler;
+
+  public final FuelSim fuelSim;
 
   // subsystems
   private final LauncherSubsystem launcher;
@@ -73,6 +82,8 @@ public class RobotContainer {
 
   public RobotContainer() {
 
+    fuelSim = new FuelSim();
+
     if (RobotBase.isReal()) {
 
       this.launcherIO = new LauncherIOReal();
@@ -83,13 +94,49 @@ public class RobotContainer {
 
     } else {
 
-      this.launcherIO = new LauncherIOSim(this.drivetrain);
+      this.launcherIO = new LauncherIOSim(this.drivetrain, this.fuelSim);
       this.intakeIO = new IntakeIOSim();
       this.climberIO = new ClimberIOSim();
       this.revolverIO = new RevolverIOSim();
       this.visionInterface = new VisionSim(this.drivetrain);
 
+      // FuelSim stuff
+
+      fuelSim.spawnStartingFuel();
+      Distance robotLength = Units.Inches.of(27);
+      Distance bumperHeight = Units.Inches.of(5);
+      Supplier<Pose2d> poseSupplier = () -> drivetrain.getState().Pose;
+      Supplier<ChassisSpeeds> speedSupplier = () -> ChassisSpeeds.fromRobotRelativeSpeeds(
+                                                                    drivetrain.getState().Speeds, 
+                                                                    drivetrain.getState().Pose.getRotation()
+                                                                  );
+      fuelSim.registerRobot(
+        robotLength.in(Units.Meters), 
+        robotLength.in(Units.Meters), 
+        bumperHeight.in(Units.Meters), 
+        poseSupplier, 
+        speedSupplier
+      );
+
+      Distance intakeXMin = Units.Inches.of(16.724);
+      Distance intakeYMin = Units.Inches.of(-17.024);
+      Distance intakeXMax = Units.Inches.of(25.14);
+      Distance intakeYMax = Units.Inches.of(17.024);
+
+      fuelSim.registerIntake(intakeXMin, intakeXMax, intakeYMin, intakeYMax, () -> true, () -> { launcherIO.intakeFuel(); });
+
+      fuelSim.start();
+      fuelSim.enableAirResistance();
+
+      SmartDashboard.putData(Commands.runOnce(() -> {
+            fuelSim.clearFuel();
+            fuelSim.spawnStartingFuel();
+        })
+        .withName("Reset Fuel")
+        .ignoringDisable(true));
     }
+
+
     
 
     this.launcher = new LauncherSubsystem(this.launcherIO, this.drivetrain);

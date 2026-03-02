@@ -143,15 +143,6 @@ public class LauncherIORealBangBang implements LauncherIO{
         return !shootingSwitch.get();
     }
 
-    @Override
-    public void updateInputs(LauncherIOInputs inputs) {
-        inputs.kickMotorVelocity = kickMotor.getVelocity().getValueAsDouble();
-        inputs.feedMotorVelocity = feedMotor.getVelocity().getValueAsDouble();
-        inputs.hoodMotorPosition = hoodEncoder.get();
-        inputs.hasFuelIntaked = !intakeSwitch.get();    // beam breaks are typically inverted
-        inputs.fuelShot = !shootingSwitch.get();
-    }  
-
 
     public Command actuallySetLauncherVelocity(AngularVelocity launcherTargetVelocity) {
 

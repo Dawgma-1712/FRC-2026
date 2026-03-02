@@ -9,15 +9,6 @@ import edu.wpi.first.units.Units;
 
 public interface LauncherIO {
 
-    @AutoLog
-    public static class LauncherIOInputs {
-        public double kickMotorVelocity = 0;
-        public double feedMotorVelocity = 0;
-        public double hoodMotorPosition = 0;
-
-        public boolean hasFuelIntaked = false;
-        public boolean fuelShot = false;
-    }
 
     public default void setLauncherVelocity(AngularVelocity shooterRPS) {}
 
@@ -49,7 +40,7 @@ public interface LauncherIO {
         return false;
     }
 
-    public default void updateInputs(LauncherIOInputs inputs) {}
+    public default void intakeFuel() {}
     
     public default void periodic() {}
 }

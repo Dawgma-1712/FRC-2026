@@ -5,6 +5,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.FieldConstants;
 import frc.Constants.ShooterConstants;
@@ -20,9 +21,6 @@ public class LauncherSubsystem extends SubsystemBase {
     CommandSwerveDrivetrain drivetrain;
     private double launcherTargetRps = 0.0;
     private double kickerTargetRps = 0.0;
-
-
-    private final LauncherIOInputsAutoLogged inputs = new LauncherIOInputsAutoLogged();
 
     public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
         this.io = io;
@@ -95,10 +93,8 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     @Override
-    public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Launcher", inputs);
-
+    public void simulationPeriodic() {
+        io.periodic();
     }
 
 }
