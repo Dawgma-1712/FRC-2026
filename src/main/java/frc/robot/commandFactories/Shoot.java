@@ -32,10 +32,7 @@ public class Shoot {
                     launcher.setLauncherVelocity(desiredLauncherVelocity);
                     launcher.setKickerVelocity(desiredKickerVelocity);
                 }, launcher)
-            ).finallyDo(() -> {
-                launcher.stop();
-                revolver.stop();
-            });
+            );
         }, Set.of(launcher, revolver));
 
 
