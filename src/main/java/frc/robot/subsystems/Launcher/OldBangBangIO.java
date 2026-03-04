@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-public class LauncherIORealBangBang implements LauncherIO{
+public class OldBangBangIO implements LauncherIO{
 
 
     private enum FlywheelPhase {
@@ -67,7 +67,7 @@ public class LauncherIORealBangBang implements LauncherIO{
     private boolean previousFuelBeamBreak = false;
     private boolean previousShotBeamBreak = false;
 
-    public LauncherIORealBangBang() {
+    public OldBangBangIO() {
 
         TalonFXConfiguration configs = new TalonFXConfiguration();
         configs.Slot0.kP = Constants.ShooterConstants.BANG_BANG_LAUNCHER_kP;

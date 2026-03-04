@@ -83,27 +83,30 @@ public final class Constants {
 
   public static class IdConstants {
 
-    public static final int LAUNCH_MOTOR_ID = 3;//arbitrary all
-    public static final int LAUNCH_FOLLOWER_ID = 4;
-    public static final int KICK_MOTOR_ID = 5;
-    public static final int HOOD_MOTOR_ID = 6;
+    // INTAKE
+    public static final int ANGLE_MOTOR_ID = 13;
+    public static final int ANGLE_FOLLOWER_MOTOR_ID = 14;
+    public static final int INTAKE_MOTOR_ID = 15;
+    public static final int INTAKE_ANGLE_ENCODER_ID = 4;  // TEMP
 
-    public static final int REVOLVER_MOTOR_ID = 7;
+    // REVOLVER
+    public static final int REVOLVER_MOTOR_ID = 16;
 
-    public static final int ANGLE_MOTOR_ID = 1; //arbitrary value
-    public static final int INTAKE_MOTOR_ID = 2;// arbitrary value
-
-    public static final int INTAKE_STOWED_SWITCH_ID = 0;
-    public static final int INTAKE_EXTENDED_SWITCH_ID = 1;
-    public static final int FUEL_FEED_SENSOR_ID = 2;
-    public static final int LAUNCHER_FUEL_SHOOTING_BEAMBREAK_ID = 3;
-
-
-    public static final int INTAKE_ANGLE_ENCODER_ID = 4;
-  
+    // LAUNCHER
+    public static final int LAUNCH_MOTOR_ID = 17;
+    public static final int LAUNCH_FOLLOWER_ID = 18;
+    public static final int KICK_MOTOR_ID = 19;
+    public static final int HOOD_MOTOR_ID = 20;
+    public static final int FUEL_FEED_SENSOR_ID = 21;  // CANRange
     public static final int HOOD_ENCODER_ID = 5;
+  
+    // CLIMBER
+    public static final int CLIMBER_MOTOR_ID = 22;
+    public static final int CLIMBER_FOLLOWER_ID = 23;
 
-    public static final int CLIMBER_MOTOR = 1;
+    // VISION
+    public static final String LIMELIGHT_BACK_ID = "limelight-back";
+    public static final String LIMELIGHT_FRONT_ID = "limelight-front";
 
   }
 
@@ -118,25 +121,19 @@ public final class Constants {
     public static final double ANGLE_kS = 0.0;
     public static final double ANGLE_kV = 0.0;
     public static final double ANGLE_kA = 0.0;
+    public static final double ANGLE_kG = 0.0;
 
     public static final double ANGLE_CRUISE_VELOCITY = 40;
     public static final double ANGLE_ACCELERATION = 80;
     public static final double ANGLE_JERK = 1600;
 
     public static final double EXTENDED_INTAKE_ANGLE = 90;
+    public static final double ENCODER_OFFSET = 0;
 
-    public static final double ANGLE_REDUCTION = 200;  // arbitrary value, PLEASE CHANGE
+    public static final double ANGLE_REDUCTION = 99;
 
-    public static class SimulationConstants {
-
-      public static final double ARM_LENGTH = Units.inchesToMeters(21);
-      public static final double ARM_MASS = 8;  // in kilograms
-      public static final double MIN_ANGLE = Units.degreesToRadians(0);
-      public static final double MAX_ANGLE = Units.degreesToRadians(90);
-      public static final double ENCODER_DISTANCE_PER_PULSE = 2.0 * Math.PI / 2048;  // in radians, our encoder has 2048 pulses per rotation
-
-    }
-
+    public static final double MIN_ANGLE = Units.degreesToRadians(0);
+    public static final double MAX_ANGLE = Units.degreesToRadians(90);
   }
 
   public static class ShooterConstants {
@@ -185,9 +182,6 @@ public final class Constants {
     public static final double TARGET_HOOD_TOLERANCE_DEGREES = 1.0;
     public static final AngularVelocity TARGET_VELOCITY_TOLERANCE = edu.wpi.first.units.Units.RotationsPerSecond.of(10);
 
-    private static final double STARTUP_THRESHOLD = 2.0;  // RPS tolerance to consider at speed
-    private static final double TORQUE_CURRENT_AMPS = 40.0;  // Constant torque for idle and ball phases
-
     public static final double BASE_ANGLE = 9.0;
     public static final double MAX_HOOD_OFFSET = 40.0;
 
@@ -202,9 +196,6 @@ public final class Constants {
   public static class VisionConstants {
 
     public static final AprilTagFieldLayout APRIL_TAG_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
-    
-    public static final String LIMELIGHT_BACK_ID = "limelight-back";
-    public static final String LIMELIGHT_FRONT_ID = "limelight-front";
 
     public static final Transform3d LIMELIGHT_BACK_TO_ROBOT = new Transform3d(
                                                                   new Translation3d(Units.inchesToMeters(-12.121), Units.inchesToMeters(3.125), Units.inchesToMeters(5.646) + 0.0508),  // the 0.0508 is the offset for advantagescope, remove

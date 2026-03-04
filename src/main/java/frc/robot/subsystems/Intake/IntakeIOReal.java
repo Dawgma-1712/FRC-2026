@@ -9,8 +9,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.controls.Follower;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -22,7 +26,9 @@ public class IntakeIOReal implements IntakeIO {
      */
 
     private final SparkMax intakeMotor = new SparkMax(IdConstants.INTAKE_MOTOR_ID, MotorType.kBrushed);
-    public final TalonFX angleMotor = new TalonFX(IdConstants.ANGLE_MOTOR_ID);
+
+    private final TalonFX angleMotor = new TalonFX(IdConstants.ANGLE_MOTOR_ID);
+    private final TalonFX angleFollowerMotor = new TalonFX(IdConstants.ANGLE_FOLLOWER_MOTOR_ID);
 
     /*
      * SENSORS
@@ -31,7 +37,7 @@ public class IntakeIOReal implements IntakeIO {
     // REV through bore encoder
     private final DutyCycleEncoder angleEncoder = new DutyCycleEncoder(IdConstants.INTAKE_ANGLE_ENCODER_ID, 
                                                              360.0, 
-                                                          0.0);
+                                                                       IntakeConstants.ENCODER_OFFSET);  // encoder offset is just the value that the encoder first reads at our desired zero position
     
     /*
      * OTHER
@@ -56,8 +62,9 @@ public class IntakeIOReal implements IntakeIO {
         // Setup Motion Magic limits
         angleConfig.MotionMagic.MotionMagicCruiseVelocity = IntakeConstants.ANGLE_CRUISE_VELOCITY; // Rotations per second
         angleConfig.MotionMagic.MotionMagicAcceleration = IntakeConstants.ANGLE_ACCELERATION;   // Rotations per second^2
-        // we probably don't need jerk
+
         angleMotor.getConfigurator().apply(angleConfig);
+        angleFollowerMotor.getConfigurator().apply(angleConfig);
 
         angleMotor.setNeutralMode(NeutralModeValue.Brake);
     }
@@ -76,6 +83,7 @@ public class IntakeIOReal implements IntakeIO {
                 target.in(Units.Rotations)
             )
         );
+        angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
     }
 

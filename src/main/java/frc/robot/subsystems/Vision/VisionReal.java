@@ -12,13 +12,14 @@ import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
 import limelight.networktables.AngularVelocity3d;
 import limelight.networktables.LimelightPoseEstimator.EstimationMode;
+import frc.Constants.IdConstants;
 import frc.Constants.VisionConstants;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
 public class VisionReal implements VisionInterface {
     
-    Limelight limelightBack = new Limelight(VisionConstants.LIMELIGHT_BACK_ID);
-    Limelight limelightFront = new Limelight(VisionConstants.LIMELIGHT_FRONT_ID);
+    Limelight limelightBack = new Limelight(IdConstants.LIMELIGHT_BACK_ID);
+    Limelight limelightFront = new Limelight(IdConstants.LIMELIGHT_FRONT_ID);
 
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon;

@@ -9,10 +9,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 
-import frc.Constants;
 import frc.Constants.IdConstants;
 import frc.Constants.ShooterConstants;
 import edu.wpi.first.units.Units;
@@ -50,6 +48,7 @@ public class LauncherIORealBangBang implements LauncherIO {
         config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
         config.MotorOutput.PeakForwardDutyCycle = 1.0;
         config.MotorOutput.PeakReverseDutyCycle = 0.0;  // it should never go backwards anyways
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         launchLeaderKraken.getConfigurator().apply(config);
         launchFollowerKraken.getConfigurator().apply(config);
