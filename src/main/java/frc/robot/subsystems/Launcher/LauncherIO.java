@@ -16,13 +16,15 @@ public interface LauncherIO {
         return Units.RadiansPerSecond.of(0);
     }
     
-    public default void setKickerVelocity(AngularVelocity feederRPS) {}
+    public default void setKickerPercentOutput(double PercentOutput) {}
 
     public default AngularVelocity getKickerVelocity() {
         return Units.RadiansPerSecond.of(0);
     }
 
-    public default void setHoodPosition(Angle position) {}
+    public default void hoodControlLoop() {}
+
+    public default void setHoodAngle(Angle goalAngle) {}
 
     public default Angle getHoodPosition() {
         return Units.Degrees.of(0);

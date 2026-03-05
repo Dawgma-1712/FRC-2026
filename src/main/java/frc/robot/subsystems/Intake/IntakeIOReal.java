@@ -142,6 +142,11 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
+    public void setAngleMotorPercentOutput(double percentOutput) {
+        angleMotor.set(percentOutput);
+    }
+
+    @Override
     public void setAngle(Angle target) {
         double angleClamped = Math.max(IntakeConstants.MIN_ANGLE, Math.min(IntakeConstants.MAX_ANGLE, target.in(Units.Degrees)));
         currentState = new TrapezoidProfile.State(getAngle().in(Units.Degrees), currentVelocity);
@@ -151,6 +156,7 @@ public class IntakeIOReal implements IntakeIO {
         isProfileRunning = true;
     }
 
+    @Override
     public void holdPosition() {
         setAngle(getAngle());
     }

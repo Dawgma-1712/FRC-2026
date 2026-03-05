@@ -5,22 +5,28 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.Units;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-import frc.Constants.ShooterConstants;
+import frc.Constants.LauncherConstants;
 import frc.Constants.FieldConstants;
+import frc.Constants.LauncherConstants;
 
 public class LaunchCalculations {
 
+    public static Translation2d getLauncherPosition(Pose2d robot) {
+        return robot.getTranslation().plus(
+            LauncherConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getTranslation().toTranslation2d()
+        );
+    }
+
     public static Distance getDistanceToTarget(Pose2d robot, Translation3d target) {
-        return Units.Meters.of(robot.getTranslation().getDistance(target.toTranslation2d()));
+        Translation2d launcher = getLauncherPosition(robot);
+        return Units.Meters.of(launcher.getDistance(target.toTranslation2d()));
     }
 
     public static Time calculateTimeOfFlight(LinearVelocity exitVelocity, Angle hoodAngle, Distance distance) {
@@ -57,7 +63,7 @@ public class LaunchCalculations {
         double x_dist = getDistanceToTarget(robot, predictedTarget).in(Units.Inches);
         double y_dist = predictedTarget
                 .getMeasureZ()
-                .minus(ShooterConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getMeasureZ())
+                .minus(LauncherConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getMeasureZ())
                 .in(Units.Inches);
         double g = 386;
         double r = FieldConstants.FUNNEL_RADIUS.in(Units.Inches)
@@ -84,7 +90,7 @@ public class LaunchCalculations {
         }
 
         return new ShotData(
-            linearToAngularVelocity(Units.InchesPerSecond.of(v0), Units.Inches.of(ShooterConstants.FLYWHEEL_WHEEL_DIAMETER / 2)),
+            linearToAngularVelocity(Units.InchesPerSecond.of(v0), Units.Inches.of(LauncherConstants.FLYWHEEL_WHEEL_DIAMETER / 2)),
             Units.Radians.of(theta), 
             predictedTarget
         );
@@ -106,66 +112,6 @@ public class LaunchCalculations {
 
         return shot;
     }
-
-    // simulation trajectory calculations
-    public static List<Translation3d> generateTrajectoryPoints(Pose2d robot, ShotData shot, int numPoints, ChassisSpeeds fieldSpeeds) {
-        
-        // shot data
-        double v0 = shot.getExitVelocity().in(Units.MetersPerSecond);
-        double theta = shot.getHoodAngle().in(Units.Radians);
-        
-        // breaking down exit velocity into vertical and horizontal components
-        double vHoriz = v0 * Math.cos(theta);
-        double vVert  = v0 * Math.sin(theta);
-        double g = 9.81;
-
-        /// time of flight calculation to calculate how often points should be plotted
-        double tof = calculateTimeOfFlight(
-            shot.getExitVelocity(), shot.getHoodAngle(),
-            getDistanceToTarget(robot, shot.getTarget())
-        ).in(Units.Seconds);
-
-        // where the fuel starts
-        Translation3d origin = new Translation3d(
-            robot.getX() + ShooterConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getX(),
-            robot.getY() + ShooterConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getY(),
-            ShooterConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getZ()
-        );
-
-        double dx = shot.getTarget().getX() - robot.getX();  // x distance from target 
-        double dy = shot.getTarget().getY() - robot.getY();  // y distance from target
-        double norm = Math.hypot(dx, dy);  // 2d distance from target
-        double ux = dx / norm;  // x unit vector
-        double uy = dy / norm;  // y unit vector
-
-        double px = -uy;  // perpendicular unit vectors
-        double py = ux;
-
-
-        double vRobotAlong = fieldSpeeds.vxMetersPerSecond * ux  // velocity of the robot along the shot axis
-                            + fieldSpeeds.vyMetersPerSecond * uy;
-        double vRobotPerp  = fieldSpeeds.vxMetersPerSecond * px  // velocity of the robot perpendicular to the shot axis
-                            + fieldSpeeds.vyMetersPerSecond * py;
-
-        double vAlong = vHoriz + vRobotAlong;  // final velocity of the shot along its axis, accounting for robot speed
-        double vPerp  = vRobotPerp;  // final velocity of the shot along the perpendicular axis will always be the robot perpendicular speed because the shot only travels on its axis
-
-        // using these speeds, calculate where the fuel will be at a set number of points
-        List<Translation3d> points = new ArrayList<>();
-        for (int i = 0; i <= numPoints; i++) {
-            double t = tof * i / numPoints;
-            double alongDist = vAlong * t;
-            double perpDist = vPerp * t;
-            double height = vVert * t - 0.5 * g * t * t;
-
-            points.add(new Translation3d(
-                origin.getX() + ux * alongDist + px * perpDist,
-                origin.getY() + uy * alongDist + py * perpDist,
-                origin.getZ() + height
-            ));
-        }
-        return points;
-    }
     
     // exit velocity is in radians per second, hood angle is in radians
     public record ShotData(double exitVelocity, double hoodAngle, Translation3d target) {
@@ -183,7 +129,7 @@ public class LaunchCalculations {
         }
 
         public LinearVelocity getExitVelocity() {
-            return angularToLinearVelocity(Units.RadiansPerSecond.of(this.exitVelocity), Units.Inches.of(ShooterConstants.FLYWHEEL_WHEEL_DIAMETER / 2));
+            return angularToLinearVelocity(Units.RadiansPerSecond.of(this.exitVelocity), Units.Inches.of(LauncherConstants.FLYWHEEL_WHEEL_DIAMETER / 2));
         }
 
         public Angle getHoodAngle() {

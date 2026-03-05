@@ -14,8 +14,16 @@ public class IntakeSubsystem extends SubsystemBase{
         this.io = io;
     }
 
-     public void setIntakeMotorSpeed(double speed) {
+    public void setIntakeMotorSpeed(double speed) {
         io.setIntakeMotorSpeed(speed);
+    }
+
+    public void setAngleMotorSpeed(double percentOutput) {
+        io.setAngleMotorPercentOutput(percentOutput);
+    }
+
+    public void holdPosition() {
+        io.holdPosition();
     }
 
     public Command setAngle(Angle target) {

@@ -5,13 +5,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.FieldConstants;
-import frc.Constants.ShooterConstants;
+import frc.Constants.LauncherConstants;
 import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
-import org.littletonrobotics.junction.Logger;
 
 
 
@@ -19,8 +17,6 @@ public class LauncherSubsystem extends SubsystemBase {
 
     LauncherIO io;
     CommandSwerveDrivetrain drivetrain;
-    private double launcherTargetRps = 0.0;
-    private double kickerTargetRps = 0.0;
 
     public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
         this.io = io;
@@ -35,8 +31,8 @@ public class LauncherSubsystem extends SubsystemBase {
         return io.getLauncherVelocity();
     }
 
-    public void setKickerVelocity(AngularVelocity velocity) {
-        io.setKickerVelocity(velocity);
+    public void setKickerPercentOutput(double percentOutput) {
+        io.setKickerPercentOutput(percentOutput);
     }
 
     public AngularVelocity getKickerVelocity() {
@@ -48,16 +44,15 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public void setHoodPosition(Angle angle) {
-        io.setHoodPosition(angle);
+        io.setHoodAngle(angle);
     }
 
     public Angle getHoodPosition() {
         return io.getHoodPosition();
     }
-
     public void stop() {
         setLauncherVelocity(Units.RotationsPerSecond.of(0));
-        setKickerVelocity(Units.RotationsPerSecond.of(0));
+        setKickerPercentOutput(0);
     }
 
     public ChassisSpeeds fieldSpeedsFromRelativeSpeeds(ChassisSpeeds relativeSpeeds) {
@@ -78,23 +73,26 @@ public class LauncherSubsystem extends SubsystemBase {
 
     }
 
-    public boolean readyToShoot(AngularVelocity desiredLauncherVelocity, AngularVelocity desiredKickerVelocity) {
+    public boolean readyToShoot(AngularVelocity desiredLauncherVelocity) {
 
         AngularVelocity launcherVelocity = getLauncherVelocity();
-        AngularVelocity kickerVelocity = getKickerVelocity();
 
-        AngularVelocity tolerance = ShooterConstants.TARGET_VELOCITY_TOLERANCE;
+        AngularVelocity tolerance = LauncherConstants.TARGET_VELOCITY_TOLERANCE;
 
         boolean isLauncherReady = Math.abs(launcherVelocity.minus(desiredLauncherVelocity).magnitude()) < tolerance.magnitude();
-        boolean isKickerReady = Math.abs(kickerVelocity.minus(desiredKickerVelocity).magnitude()) < tolerance.magnitude();
 
-        return (isLauncherReady && isKickerReady);
+        return isLauncherReady;
 
     }
 
     @Override
     public void simulationPeriodic() {
         io.periodic();
+    }
+
+    @Override
+    public void periodic() {
+        io.hoodControlLoop();
     }
 
 }

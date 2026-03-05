@@ -136,7 +136,7 @@ public final class Constants {
     public static final double MAX_ANGLE = Units.degreesToRadians(90);
   }
 
-  public static class ShooterConstants {
+  public static class LauncherConstants {
 
     public static final double GRAVITY = 9.8;    
     public static final double HUB_HEIGHT_METERS = 1.8288;
@@ -174,9 +174,15 @@ public final class Constants {
     public static final double KICKER_kV = 0.0;
     public static final double KICKER_kS = 0.0;
 
+    public static final double HOOD_kP = 0.0;
+    public static final double HOOD_kI = 0.0;
+    public static final double HOOD_kD = 0.0;
 
-    public static final double FEEDER_SPEED_MPS = 15;  // idk change
-    public static final double KICKER_SPEED_PROPORTION = 0.75;
+    public static final double HOOD_kS = 0.0;
+    public static final double HOOD_kG = 0.0;
+    public static final double HOOD_kV = 0.0;
+
+    public static final double KICKER_PERCENT_OUTPUT = 0.6;
 
     public static final double BANG_BANG_TARGET_VELOCITY_TOLERANCE = 0.95;
     public static final double TARGET_HOOD_TOLERANCE_DEGREES = 1.0;
@@ -184,9 +190,10 @@ public final class Constants {
 
     public static final double BASE_ANGLE = 9.0;
     public static final double MAX_HOOD_OFFSET = 40.0;
+    public static final double HOOD_ENCODER_OFFSET = 0.0;
 
     public static final Transform3d ROBOT_TO_LAUNCHER_TRANSFORM = new Transform3d(
-                                                                      new Translation3d(0.2, 0.08, 0.5524),
+                                                                      new Translation3d(Units.inchesToMeters(-6.279 + 2.95), Units.inchesToMeters(2.35), Units.inchesToMeters(18.113)),
                                                                       new Rotation3d()
                                                                   );
     public static final double DEBOUNCE_LENGTH = 0.025; //in seconds how long the change must be real until you idk just search ts up

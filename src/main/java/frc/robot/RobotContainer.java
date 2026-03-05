@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.Constants.IntakeConstants;
 import frc.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,6 +31,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.subsystems.Swerve.*;
@@ -86,7 +88,7 @@ public class RobotContainer {
 
     if (RobotBase.isReal()) {
 
-      this.launcherIO = new LauncherIOReal();
+      this.launcherIO = new LauncherIORealBangBang();
       this.intakeIO = new IntakeIOReal();
       this.climberIO = new ClimberIOReal();
       this.revolverIO = new RevolverIOReal();
@@ -160,6 +162,20 @@ public class RobotContainer {
             .withRotationalRate(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate) > 0.05 ? -driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate * speed : 0)
             )
     );
+
+    intake.setDefaultCommand(intake.run(() -> {
+      double joystickY = operator.getRawAxis(OperatorConstants.OPERATOR_RY);
+      if (Math.abs(joystickY) > 0.1) { // deadband
+          double targetAngle = MathUtil.interpolate(
+              IntakeConstants.MIN_ANGLE,
+              IntakeConstants.MAX_ANGLE,
+              (joystickY + 1.0) / 2.0 // map -1 to 1 → 0 to 1
+          );
+          intake.setAngle(Units.Degrees.of(targetAngle));
+      } else {
+          intake.holdPosition();
+      }
+    }));
 
     configureBindings();
   }

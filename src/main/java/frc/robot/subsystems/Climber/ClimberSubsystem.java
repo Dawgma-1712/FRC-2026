@@ -8,9 +8,6 @@ import org.littletonrobotics.junction.Logger;
 
 
 public class ClimberSubsystem extends SubsystemBase{
-    
-    private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
-
 
     ClimberIO io;
     
@@ -32,11 +29,7 @@ public class ClimberSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Climber", inputs);        // Log to AdvantageKit
-        Logger.recordOutput("Climber Position", io.getClimberPosition());
-
-        // SmartDashboard.putNumber("Intake Angle", io.getClimberPosition());
+        
     }
 
     @Override

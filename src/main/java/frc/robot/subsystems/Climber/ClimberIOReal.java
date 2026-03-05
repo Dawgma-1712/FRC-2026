@@ -5,13 +5,16 @@ import frc.Constants.IdConstants;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 
 
 public class ClimberIOReal implements ClimberIO {
     
-    private final TalonFX climberMotor = new TalonFX(IdConstants.CLIMBER_MOTOR);
+    private final TalonFX climberMotor = new TalonFX(IdConstants.CLIMBER_MOTOR_ID);
+    private final TalonFX climberFollowerMotor = new TalonFX(IdConstants.CLIMBER_FOLLOWER_ID);
 
     private double climberPos = 0.0;
 
@@ -38,8 +41,12 @@ public class ClimberIOReal implements ClimberIO {
         climberConfigs.MotionMagic.MotionMagicJerk = Constants.ClimberConstants.ANGLE_JERK;         // Smoothing
 
         climberMotor.getConfigurator().apply(climberConfigs);
+        climberFollowerMotor.getConfigurator().apply(climberConfigs);
 
         climberMotor.setNeutralMode(NeutralModeValue.Brake);
+        climberFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        climberFollowerMotor.setControl(new Follower(climberMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
         ZeroMotorEncoder();
     }
@@ -58,12 +65,6 @@ public class ClimberIOReal implements ClimberIO {
     @Override
     public void setClimberPosition(double position) {
         climberMotor.setControl(requestControl.withPosition(position));
-    }
-
-
-    @Override //literally useless until we set up advantagekit
-    public void updateInputs(ClimberIOInputs inputs) {
-        inputs.climberPos = getClimberPosition();
     }
 
 }

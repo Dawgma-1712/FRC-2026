@@ -12,7 +12,8 @@ import com.ctre.phoenix6.controls.Follower;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.Constants;
 import frc.Constants.IdConstants;
-import frc.Constants.ShooterConstants;
+import frc.Constants.LauncherConstants;
+import frc.Constants.LauncherConstants;
 
 public class LauncherIOReal implements LauncherIO {
 
@@ -37,11 +38,11 @@ public class LauncherIOReal implements LauncherIO {
     public LauncherIOReal() {
 
         TalonFXConfiguration launcherConfigs = new TalonFXConfiguration();
-        launcherConfigs.Slot0.kP = ShooterConstants.LAUNCH_kP;
-        launcherConfigs.Slot0.kI = ShooterConstants.LAUNCH_kI;
-        launcherConfigs.Slot0.kD = ShooterConstants.LAUNCH_kD;
-        launcherConfigs.Slot0.kV = Constants.ShooterConstants.LAUNCH_kV;
-        launcherConfigs.Slot0.kS = Constants.ShooterConstants.LAUNCH_kS;
+        launcherConfigs.Slot0.kP = LauncherConstants.LAUNCH_kP;
+        launcherConfigs.Slot0.kI = LauncherConstants.LAUNCH_kI;
+        launcherConfigs.Slot0.kD = LauncherConstants.LAUNCH_kD;
+        launcherConfigs.Slot0.kV = Constants.LauncherConstants.LAUNCH_kV;
+        launcherConfigs.Slot0.kS = Constants.LauncherConstants.LAUNCH_kS;
 
         launcherConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         launcherConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -50,11 +51,11 @@ public class LauncherIOReal implements LauncherIO {
         launchFollowerKraken.getConfigurator().apply(launcherConfigs);
 
         TalonFXConfiguration kickerConfigs = new TalonFXConfiguration();
-        kickerConfigs.Slot0.kP = ShooterConstants.KICKER_kP;
-        kickerConfigs.Slot0.kI = ShooterConstants.KICKER_kI;
-        kickerConfigs.Slot0.kD = ShooterConstants.KICKER_kD;
-        kickerConfigs.Slot0.kV = ShooterConstants.KICKER_kV;
-        kickerConfigs.Slot0.kS = ShooterConstants.KICKER_kS;
+        kickerConfigs.Slot0.kP = LauncherConstants.KICKER_kP;
+        kickerConfigs.Slot0.kI = LauncherConstants.KICKER_kI;
+        kickerConfigs.Slot0.kD = LauncherConstants.KICKER_kD;
+        kickerConfigs.Slot0.kV = LauncherConstants.KICKER_kV;
+        kickerConfigs.Slot0.kS = LauncherConstants.KICKER_kS;
 
         kickerConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         kickerConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -67,7 +68,7 @@ public class LauncherIOReal implements LauncherIO {
     public void setLauncherVelocity(AngularVelocity shooterRps) {
         
         launchLeaderKraken.setControl(launcherControlMode.withVelocity(shooterRps));
-        launchFollowerKraken.setControl(new Follower(launchLeaderKraken.getDeviceID(), ShooterConstants.isFollowerAligned));
+        launchFollowerKraken.setControl(new Follower(launchLeaderKraken.getDeviceID(), LauncherConstants.isFollowerAligned));
 
     }
 
