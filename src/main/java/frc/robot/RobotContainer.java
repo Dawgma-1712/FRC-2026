@@ -62,6 +62,11 @@ public class RobotContainer {
 
   public final FuelSim fuelSim;
 
+
+  //other
+  // private boolean intakeDeployed = false;
+
+
   // subsystems
   private final LauncherSubsystem launcher;
   private final LauncherIO launcherIO;
@@ -159,8 +164,8 @@ public class RobotContainer {
             drive.withVelocityX(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0) // Drive forward with negative Y (forward)
             .withVelocityY(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0) // Drive left with negative X (left)
             // Field perspective is 90 degrees from driver perspective
-            .withRotationalRate(Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate) > 0.05 ? -driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate * speed : 0)
-            )
+            .withRotationalRate(Math.abs(driver.getRawAxis(OperatorConstants.DRIVER_RX)) > 0.1 ? -driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate * speed : 0)
+          )
     );
 
     intake.setDefaultCommand(intake.run(() -> {
@@ -171,7 +176,7 @@ public class RobotContainer {
               IntakeConstants.MAX_ANGLE,
               (joystickY + 1.0) / 2.0 // map -1 to 1 → 0 to 1
           );
-          intake.setAngle(Units.Degrees.of(targetAngle));
+          intake.setAngleDirect(Units.Degrees.of(targetAngle));
       } else {
           intake.holdPosition();
       }
@@ -186,17 +191,35 @@ public class RobotContainer {
 
       new JoystickButton(driver, OperatorConstants.DRIVER_RT).onTrue(new SwerveSlowMode(0.15)).onFalse(new SwerveSlowMode(1));
 
-      new JoystickButton(driver, OperatorConstants.DRIVER_LB).whileTrue(new RepeatCommand(AutoLockAndShoot.autoLockAndShoot(
-                                                                     this.drivetrain, 
-                                                                     this.launcher,
-                                                                     this.revolver,
-                                                                    () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0), //x supplier
-                                                                    () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2 ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)) //y supplier
-                                                              ));
+      new JoystickButton(driver, OperatorConstants.DRIVER_LB).whileTrue(AutoLockAndShoot.autoLockAndShoot(
+                                                                                          this.drivetrain,
+                                                                                          this.launcher,
+                                                                                          this.revolver,
+                                                                                          () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2
+                                                                                              ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0),
+                                                                                          () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2
+                                                                                              ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)
+                                                                                      ));
+
+
+      // // In configureBindings():
+      // new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(
+      //     Commands.runOnce(() -> {
+      //         intakeDeployed = !intakeDeployed;
+      //         if (intakeDeployed) {
+      //             intake.setAngleDirect(Units.Degrees.of(IntakeConstants.EXTENDED_INTAKE_ANGLE));
+      //             intake.setIntakeMotorSpeed(0.8);  // spin intake roller when deployed
+      //         } else {
+      //             intake.setAngleDirect(Units.Degrees.of(0));  // stow
+      //             intake.setIntakeMotorSpeed(0);  // stop roller when stowed
+      //         }
+      //     })
+      // );
 
 
       // new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(launcher.adaptiveShoot(() -> launcher.calculateDistance()));
   }
+
 
   public Command getAutonomousCommand() {
     return autoHandler.getSelectedModularCommand();

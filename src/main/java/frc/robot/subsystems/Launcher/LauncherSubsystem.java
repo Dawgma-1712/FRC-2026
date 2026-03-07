@@ -1,10 +1,13 @@
 package frc.robot.subsystems.Launcher;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.FieldConstants;
 import frc.Constants.LauncherConstants;
@@ -63,14 +66,17 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public ShotData getShotData() {
-        
-        return LaunchCalculations.iterativeMovingShotFromFunnelClearance(
-            drivetrain.getState().Pose, 
-            fieldSpeedsFromRelativeSpeeds(drivetrain.getState().Speeds),  // make sure this is field relative
-            FieldConstants.BLUE_HUB_POSE.getTranslation(),
-             1
-        );
+        var alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+        Translation3d target = (alliance == Alliance.Red)
+            ? FieldConstants.RED_HUB_POSE.getTranslation()
+            : FieldConstants.BLUE_HUB_POSE.getTranslation();
 
+        return LaunchCalculations.iterativeMovingShotFromFunnelClearance(
+            drivetrain.getState().Pose,
+            fieldSpeedsFromRelativeSpeeds(drivetrain.getState().Speeds),
+            target,
+            1
+        );
     }
 
     public boolean readyToShoot(AngularVelocity desiredLauncherVelocity) {

@@ -25,6 +25,7 @@ public class ModularAutoHandler {
         startingSide.addOption("Left", new PathPlannerAuto("Left"));
         // startingSide.addOption("Mid", new PathPlannerAuto("Mid"));
         // startingSide.addOption("Right", new PathPlannerAuto("Right"));
+        
         SmartDashboard.putData("Starting Side", startingSide);
 
         action1 = new SendableChooser<PathPlannerAuto>();

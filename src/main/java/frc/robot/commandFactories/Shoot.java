@@ -18,21 +18,25 @@ public class Shoot {
     public static Command shoot(LauncherSubsystem launcher, RevolverSubsystem revolver, Supplier<ShotData> shotSupplier) {
 
         return Commands.defer(() -> {
-            ShotData shot = shotSupplier.get();
+        ShotData shot = shotSupplier.get();
+        AngularVelocity desiredLauncherVelocity = Units.RotationsPerSecond.of(shot.exitVelocity());
 
-            AngularVelocity desiredLauncherVelocity = Units.RotationsPerSecond.of(shot.exitVelocity());
-
-            return Commands.sequence(
-                Commands.waitUntil(() -> launcher.readyToShoot(desiredLauncherVelocity)),
-                Commands.runOnce(() -> revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT)),
-                Commands.waitSeconds(0.5)  // not enough time for the fuel to reach the flywheels after revolver reaches output
-            ).deadlineFor(
-                Commands.run(() -> {
-                    launcher.setLauncherVelocity(desiredLauncherVelocity);
-                    launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
-                }, launcher)
-            );
-        }, Set.of(launcher, revolver));
+        return Commands.sequence(
+            Commands.waitUntil(() -> launcher.readyToShoot(desiredLauncherVelocity)),
+            Commands.runOnce(() -> revolver.setRevolverPercentOutput(
+                RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT)),
+            Commands.waitSeconds(0.5)
+        ).deadlineFor(
+            Commands.run(() -> {
+        launcher.setLauncherVelocity(desiredLauncherVelocity);
+        launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
+        launcher.setHoodPosition(shot.getHoodAngle());  // ADD THIS
+    }, launcher)
+        ).finallyDo(() -> {
+            revolver.stop();
+            launcher.stop();
+        });
+    }, Set.of(launcher, revolver));
 
 
     }

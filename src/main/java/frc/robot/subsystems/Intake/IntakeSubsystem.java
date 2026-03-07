@@ -34,6 +34,11 @@ public class IntakeSubsystem extends SubsystemBase{
         );
     }
 
+    public void setAngleDirect(Angle target) {
+        io.setAngle(target);
+    }
+
+
     public Angle getAngle() {
         return io.getAngle();
     }

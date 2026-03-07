@@ -132,8 +132,8 @@ public final class Constants {
 
     public static final double ANGLE_REDUCTION = 99;
 
-    public static final double MIN_ANGLE = Units.degreesToRadians(0);
-    public static final double MAX_ANGLE = Units.degreesToRadians(90);
+    public static final double MIN_ANGLE = 0.0;
+    public static final double MAX_ANGLE = 90.0;
   }
 
   public static class LauncherConstants {
@@ -245,15 +245,42 @@ public final class Constants {
 
   }
 
-  public static class FieldConstants {
+public static class FieldConstants {
 
-      public static final Pose3d BLUE_HUB_POSE = new Pose3d(
-          new Translation3d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Units.feetToMeters(6)),
-          new Rotation3d(0, 0, 0)
-      );
-      public static final Pose2d BLUE_HUB_POSE2D = new Pose2d(Units.feetToMeters(15.4825), Units.feetToMeters(13.48), Rotation2d.fromDegrees(0));
-      public static final Distance FUNNEL_RADIUS = edu.wpi.first.units.Units.Inches.of(24);
-      public static final Distance FUNNEL_HEIGHT = edu.wpi.first.units.Units.Inches.of(72 - 56.4);
-  }
+    // 2026 Rebuilt field (Andymark perimeter) — hub center derived from AprilTag positions
+    // Red Hub: average of tag IDs 2,3,4,5. Blue Hub: average of tag IDs 18,19,20,21.
+    // Z-height is the funnel top, NOT the tag height.
+
+    public static final Pose3d BLUE_HUB_POSE = new Pose3d(
+        new Translation3d(
+            Units.inchesToMeters(193.44),   // avg X of blue hub tags 18-21
+            Units.inchesToMeters(154.82),   // avg Y of blue hub tags 18-21
+            Units.inchesToMeters(72)        // funnel top height
+        ),
+        new Rotation3d(0, 0, 0)
+    );
+    public static final Pose2d BLUE_HUB_POSE2D = new Pose2d(
+        Units.inchesToMeters(193.44),
+        Units.inchesToMeters(154.82),
+        Rotation2d.fromDegrees(0)
+    );
+
+    public static final Pose3d RED_HUB_POSE = new Pose3d(
+        new Translation3d(
+            Units.inchesToMeters(456.68),   // avg X of red hub tags 2-5
+            Units.inchesToMeters(161.82),   // avg Y of red hub tags 2-5
+            Units.inchesToMeters(72)        // funnel top height
+        ),
+        new Rotation3d(0, 0, 0)
+    );
+    public static final Pose2d RED_HUB_POSE2D = new Pose2d(
+        Units.inchesToMeters(456.68),
+        Units.inchesToMeters(161.82),
+        Rotation2d.fromDegrees(0)
+    );
+
+    public static final Distance FUNNEL_RADIUS = edu.wpi.first.units.Units.Inches.of(24);
+    public static final Distance FUNNEL_HEIGHT = edu.wpi.first.units.Units.Inches.of(72 - 56.4);
+}
 
 }
