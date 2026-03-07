@@ -59,18 +59,6 @@ public class LauncherIOSim implements LauncherIO {
     @Override
     public void periodic() {
 
-        SwerveDriveState drivetrainState = drivetrain.getState();
-        Pose2d robotPose = drivetrainState.Pose;
-        ChassisSpeeds relativeSpeeds = drivetrainState.Speeds;
-        Rotation2d rotation = robotPose.getRotation();
-
-        launchPosePublisher.set(new Pose3d(robotPose).plus(LauncherConstants.ROBOT_TO_LAUNCHER_TRANSFORM));
-        
-        ChassisSpeeds fieldSpeeds = fieldSpeedsFromRelativeSpeeds(relativeSpeeds, rotation);
-        Translation3d target = FieldConstants.BLUE_HUB_POSE.getTranslation();
-
-        ShotData shot = LaunchCalculations.iterativeMovingShotFromFunnelClearance(robotPose, fieldSpeeds, target, 3);
-        launchFuel(shot);
         
     }
 }

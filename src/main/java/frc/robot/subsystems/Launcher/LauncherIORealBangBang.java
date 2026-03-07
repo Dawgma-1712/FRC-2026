@@ -111,7 +111,6 @@ public class LauncherIORealBangBang implements LauncherIO {
     public Angle getHoodPosition() {
         return Units.Degrees.of(hoodEncoder.get());
     }
-
     
     @Override
     public AngularVelocity getLauncherVelocity() {

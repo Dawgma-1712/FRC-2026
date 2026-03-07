@@ -20,6 +20,7 @@ public class LauncherSubsystem extends SubsystemBase {
 
     LauncherIO io;
     CommandSwerveDrivetrain drivetrain;
+    private Angle hoodTarget = Units.Degrees.of(LauncherConstants.BASE_ANGLE);
 
     public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
         this.io = io;
@@ -47,15 +48,23 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public void setHoodPosition(Angle angle) {
+        hoodTarget = angle;
         io.setHoodAngle(angle);
     }
 
     public Angle getHoodPosition() {
         return io.getHoodPosition();
     }
+
     public void stop() {
         setLauncherVelocity(Units.RotationsPerSecond.of(0));
         setKickerPercentOutput(0);
+    }
+
+    public boolean hoodAtPosition() {
+        double targetDegrees = hoodTarget.in(Units.Degrees);
+        double currentDegrees = getHoodPosition().in(Units.Degrees);
+        return Math.abs(targetDegrees - currentDegrees) < LauncherConstants.TARGET_HOOD_TOLERANCE_DEGREES;
     }
 
     public ChassisSpeeds fieldSpeedsFromRelativeSpeeds(ChassisSpeeds relativeSpeeds) {
@@ -82,9 +91,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public boolean readyToShoot(AngularVelocity desiredLauncherVelocity) {
 
         AngularVelocity launcherVelocity = getLauncherVelocity();
-
         AngularVelocity tolerance = LauncherConstants.TARGET_VELOCITY_TOLERANCE;
-
         boolean isLauncherReady = Math.abs(launcherVelocity.minus(desiredLauncherVelocity).magnitude()) < tolerance.magnitude();
 
         return isLauncherReady;

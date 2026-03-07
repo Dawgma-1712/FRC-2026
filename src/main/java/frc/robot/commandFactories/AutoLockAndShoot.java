@@ -14,7 +14,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
-import frc.Constants.LauncherConstants;
 import frc.Constants.RevolverConstants;
 
 import java.util.function.Supplier;
@@ -41,13 +40,16 @@ public class AutoLockAndShoot {
         );
 
         Command spinUpAndShoot = Commands.sequence(
-            Commands.waitUntil(() -> {
-                ShotData shot = shotSupplier.get();
-                AngularVelocity desiredVelocity = Units.RotationsPerSecond.of(shot.exitVelocity());
-                return launcher.readyToShoot(desiredVelocity);
+            Commands.waitUntil(() -> { 
+                ShotData shot = launcher.getShotData();
+                return launcher.readyToShoot(Units.RotationsPerSecond.of(shot.exitVelocity()))
+                    && launcher.hoodAtPosition();
             }),
-            Commands.runOnce(() -> revolver.setRevolverPercentOutput(
-                RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT), revolver),
+            Commands.runOnce(() -> {
+                revolver.setRevolverPercentOutput(
+                    RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT
+                );
+            }, revolver),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> revolver.stop(), revolver)
         ).deadlineFor(
@@ -55,11 +57,8 @@ public class AutoLockAndShoot {
                 ShotData shot = shotSupplier.get();
                 AngularVelocity desiredVelocity = Units.RotationsPerSecond.of(shot.exitVelocity());
                 launcher.setLauncherVelocity(desiredVelocity);
-                launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
                 launcher.setHoodPosition(shot.getHoodAngle());
-
-                targetPosePublisher.set(
-                    new Pose3d(shot.getTarget(), new Rotation3d()));
+                targetPosePublisher.set(new Pose3d(shot.getTarget(), new Rotation3d()));
             }, launcher)
         ).finallyDo(() -> {
             launcher.stop();
@@ -67,6 +66,6 @@ public class AutoLockAndShoot {
         });
 
 
-        return autoAim.alongWith(spinUpAndShoot);
+        return spinUpAndShoot.deadlineFor(autoAim);
     }
 }

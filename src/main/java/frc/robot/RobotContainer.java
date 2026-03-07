@@ -5,7 +5,9 @@
 package frc.robot;
 
 import frc.Constants.IntakeConstants;
+import frc.Constants.LauncherConstants;
 import frc.Constants.OperatorConstants;
+import frc.Constants.RevolverConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
@@ -38,6 +40,7 @@ import frc.robot.subsystems.Swerve.*;
 import frc.robot.subsystems.Vision.*;
 import frc.robot.utils.FuelSim;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class RobotContainer {
@@ -63,10 +66,6 @@ public class RobotContainer {
   public final FuelSim fuelSim;
 
 
-  //other
-  // private boolean intakeDeployed = false;
-
-
   // subsystems
   private final LauncherSubsystem launcher;
   private final LauncherIO launcherIO;
@@ -86,6 +85,9 @@ public class RobotContainer {
 
   private final Joystick driver;
   private final Joystick operator;
+
+  // robot state
+  private boolean intakeDeployed = false;
 
   public RobotContainer() {
 
@@ -144,8 +146,6 @@ public class RobotContainer {
     }
 
 
-    
-
     this.launcher = new LauncherSubsystem(this.launcherIO, this.drivetrain);
     this.intake = new IntakeSubsystem(this.intakeIO);
     this.climber = new ClimberSubsystem(this.climberIO);
@@ -153,7 +153,6 @@ public class RobotContainer {
     this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
 
     autoHandler = new ModularAutoHandler();
-
 
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
     operator = new Joystick(OperatorConstants.OPERATOR_JOYSTICK_PORT);
@@ -199,22 +198,39 @@ public class RobotContainer {
                                                                                               ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0),
                                                                                           () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2
                                                                                               ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)
-                                                                                      ));
+                                                                                      ).repeatedly());
 
 
-      // // In configureBindings():
-      // new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(
-      //     Commands.runOnce(() -> {
-      //         intakeDeployed = !intakeDeployed;
-      //         if (intakeDeployed) {
-      //             intake.setAngleDirect(Units.Degrees.of(IntakeConstants.EXTENDED_INTAKE_ANGLE));
-      //             intake.setIntakeMotorSpeed(0.8);  // spin intake roller when deployed
-      //         } else {
-      //             intake.setAngleDirect(Units.Degrees.of(0));  // stow
-      //             intake.setIntakeMotorSpeed(0);  // stop roller when stowed
-      //         }
-      //     })
-      // );
+      new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(
+          Commands.runOnce(() -> {
+              intakeDeployed = !intakeDeployed;
+              if (intakeDeployed) {
+                  intake.setAngleDirect(Units.Degrees.of(IntakeConstants.EXTENDED_INTAKE_ANGLE));
+                  intake.setIntakeMotorSpeed(0.8);  // spin intake roller when deployed
+              } else {
+                  intake.setAngleDirect(Units.Degrees.of(0));  // stow
+                  intake.setIntakeMotorSpeed(0);  // stop roller when stowed
+              }
+          }, intake)
+      );
+
+      new JoystickButton(operator, OperatorConstants.OPERATOR_A).whileTrue(
+        Commands.run(() -> {
+          revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+        }, revolver)
+      );
+
+      new JoystickButton(operator, OperatorConstants.OPERATOR_RT).whileTrue(
+        Commands.run(() -> {
+          launcher.setLauncherVelocity(Units.RotationsPerSecond.of(10));
+        })
+      );
+
+      new JoystickButton(operator, OperatorConstants.OPERATOR_RB).whileTrue(
+        Commands.run(() -> {
+          launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
+        })
+      );
 
 
       // new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(launcher.adaptiveShoot(() -> launcher.calculateDistance()));

@@ -79,11 +79,6 @@ public class LauncherIOReal implements LauncherIO {
     }
 
     @Override
-    public void setKickerVelocity(AngularVelocity kickerRps) {
-        kickerKraken.setControl(kickerControlMode.withVelocity(kickerRps));
-    }
-
-    @Override
     public AngularVelocity getKickerVelocity() {
         return kickerVelocitySignal.refresh().getValue();
     }
