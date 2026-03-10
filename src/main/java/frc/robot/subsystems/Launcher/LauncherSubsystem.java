@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.FieldConstants;
 import frc.Constants.LauncherConstants;
@@ -54,6 +55,10 @@ public class LauncherSubsystem extends SubsystemBase {
 
     public Angle getHoodPosition() {
         return io.getHoodPosition();
+    }
+
+    public void setLauncherPercentOutput(double goalOutput) {
+        io.setLauncherPercentOutput(goalOutput);
     }
 
     public void stop() {
@@ -105,6 +110,8 @@ public class LauncherSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("Hood angle", getHoodPosition().in(Units.Degrees));
+        SmartDashboard.putNumber("Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
         io.hoodControlLoop();
     }
 

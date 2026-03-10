@@ -8,10 +8,13 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.CoastOut;
 
+import frc.Constants;
 import frc.Constants.IdConstants;
 import frc.Constants.LauncherConstants;
 import edu.wpi.first.units.Units;
@@ -43,7 +46,8 @@ public class LauncherIORealBangBang implements LauncherIO {
 
     // CONTROL MODES
     private final VelocityDutyCycle dutyCycleBangBang = new VelocityDutyCycle(0).withSlot(0);
-    private final VelocityTorqueCurrentFOC torqueCurrentBangBang = new VelocityTorqueCurrentFOC(0).withSlot(0);
+    //private final VelocityTorqueCurrentFOC torqueCurrentBangBang = new VelocityTorqueCurrentFOC(0).withSlot(0);
+    private final VelocityVoltage launcherControlMode = new VelocityVoltage(0);
 
     // STATUS SIGNALS
     private final StatusSignal<AngularVelocity> launcherVelocitySignal = launchLeaderKraken.getVelocity();
@@ -55,18 +59,14 @@ public class LauncherIORealBangBang implements LauncherIO {
 
         var config = new TalonFXConfiguration();
 
-        config.Slot0.kP = 999999.0;
-        config.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
-        config.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
-        config.MotorOutput.PeakForwardDutyCycle = 1.0;
-        config.MotorOutput.PeakReverseDutyCycle = 0.0;  // it should never go backwards anyways
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.Slot0.kP = LauncherConstants.LAUNCH_kP;
+        config.Slot0.kI = LauncherConstants.LAUNCH_kI;
+        config.Slot0.kD = LauncherConstants.LAUNCH_kD;
+        config.Slot0.kV = Constants.LauncherConstants.LAUNCH_kV;
+        config.Slot0.kS = Constants.LauncherConstants.LAUNCH_kS;
 
         launchLeaderKraken.getConfigurator().apply(config);
         launchFollowerKraken.getConfigurator().apply(config);
-
-        launchFollowerKraken.setControl(new Follower(launchLeaderKraken.getDeviceID(), MotorAlignmentValue.Opposed));
-
     }
 
     @Override
@@ -74,13 +74,11 @@ public class LauncherIORealBangBang implements LauncherIO {
         
         // if the velocity is under tolerance, use a duty cycle bang bang and try to get up to speed
         // this will be the same regardless of whether it's trying to get up to speed from rest or recovering from a shot
-        if (fuelShot(shooterRps)) {
-            launchLeaderKraken.setControl(dutyCycleBangBang.withVelocity(shooterRps));
+        launchLeaderKraken.setControl(launcherControlMode.withVelocity(shooterRps));
         // if it's up to speed, then use torque current control in preparation for a shot
         // the fuel's only in contact for like 4ms, so by the time we detect that the velocity dropped, the fuel will have already left
-        } else {
-            launchLeaderKraken.setControl(torqueCurrentBangBang.withVelocity(shooterRps));
-        }
+        launchFollowerKraken.setControl(new Follower(launchLeaderKraken.getDeviceID(), MotorAlignmentValue.Opposed));
+
 
     }
 
@@ -114,7 +112,13 @@ public class LauncherIORealBangBang implements LauncherIO {
     
     @Override
     public AngularVelocity getLauncherVelocity() {
-        return launcherVelocitySignal.refresh().getValue();
+        AngularVelocity vel = launcherVelocitySignal.refresh().getValue();
+        return vel;
+    }
+
+    @Override
+    public void setLauncherPercentOutput(double goalOutput) {
+        launchLeaderKraken.set(goalOutput);
     }
 
     @Override
@@ -135,8 +139,10 @@ public class LauncherIORealBangBang implements LauncherIO {
     private boolean fuelShot(AngularVelocity goalVelocity) {
         // Because the command scheduler is so long (20 ms) when compared to the time the fuel is in contact with the flywheel (like 4 ms?),
         // I think it's reasonable to assume that any drop in velocity will be detected after the shot has already.
+        double difference = goalVelocity.in(Units.RotationsPerSecond) - (-getLauncherVelocity().in(Units.RotationsPerSecond));
+        System.out.println(difference);
         return launcherDebouncer.calculate(
-            goalVelocity.in(Units.RotationsPerSecond) - getLauncherVelocity().in(Units.RotationsPerSecond) > LauncherConstants.AT_SPEED_TOLERANCE_RPS
+            difference > 0
         );
     }
 

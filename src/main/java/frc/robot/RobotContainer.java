@@ -61,7 +61,7 @@ public class RobotContainer {
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  private final ModularAutoHandler autoHandler;
+  // private final ModularAutoHandler autoHandler;
 
   public final FuelSim fuelSim;
 
@@ -79,8 +79,8 @@ public class RobotContainer {
   private final RevolverSubsystem revolver;
   private final RevolverIO revolverIO;
 
-  private final VisionInterface visionInterface;
-  private final VisionSubsystem vision;
+ // private final VisionInterface visionInterface;
+  //private final VisionSubsystem vision;
 
 
   private final Joystick driver;
@@ -99,7 +99,7 @@ public class RobotContainer {
       this.intakeIO = new IntakeIOReal();
       this.climberIO = new ClimberIOReal();
       this.revolverIO = new RevolverIOReal();
-      this.visionInterface = new VisionReal(this.drivetrain);
+      //this.visionInterface = new VisionReal(this.drivetrain);
 
     } else {
 
@@ -107,7 +107,7 @@ public class RobotContainer {
       this.intakeIO = new IntakeIOSim();
       this.climberIO = new ClimberIOSim();
       this.revolverIO = new RevolverIOSim();
-      this.visionInterface = new VisionSim(this.drivetrain);
+      //this.visionInterface = new VisionSim(this.drivetrain);
 
       // FuelSim stuff
 
@@ -150,9 +150,9 @@ public class RobotContainer {
     this.intake = new IntakeSubsystem(this.intakeIO);
     this.climber = new ClimberSubsystem(this.climberIO);
     this.revolver = new RevolverSubsystem(this.revolverIO);
-    this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
+    //this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
 
-    autoHandler = new ModularAutoHandler();
+    // autoHandler = new ModularAutoHandler();
 
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
     operator = new Joystick(OperatorConstants.OPERATOR_JOYSTICK_PORT);
@@ -166,7 +166,8 @@ public class RobotContainer {
             .withRotationalRate(Math.abs(driver.getRawAxis(OperatorConstants.DRIVER_RX)) > 0.1 ? -driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate * speed : 0)
           )
     );
-
+    
+/* 
     intake.setDefaultCommand(intake.run(() -> {
       double joystickY = operator.getRawAxis(OperatorConstants.OPERATOR_RY);
       if (Math.abs(joystickY) > 0.1) { // deadband
@@ -180,7 +181,7 @@ public class RobotContainer {
           intake.holdPosition();
       }
     }));
-
+*/
     configureBindings();
   }
 
@@ -220,15 +221,22 @@ public class RobotContainer {
         }, revolver)
       );
 
-      new JoystickButton(operator, OperatorConstants.OPERATOR_RT).whileTrue(
+      new JoystickButton(operator, OperatorConstants.OPERATOR_LB).whileTrue(
         Commands.run(() -> {
-          launcher.setLauncherVelocity(Units.RotationsPerSecond.of(10));
+          launcher.setLauncherVelocity(Units.RotationsPerSecond.of(-50));
+        })).whileFalse(
+        Commands.runOnce(() -> {
+          launcher.setLauncherPercentOutput(0);;
         })
       );
 
       new JoystickButton(operator, OperatorConstants.OPERATOR_RB).whileTrue(
         Commands.run(() -> {
           launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
+        })
+      ).onFalse(
+        Commands.runOnce(() -> {
+          launcher.setKickerPercentOutput(0);
         })
       );
 
@@ -238,6 +246,8 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    return autoHandler.getSelectedModularCommand();
+    return Commands.run(() -> {
+
+    });
   }
 }

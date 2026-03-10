@@ -42,6 +42,10 @@ public interface LauncherIO {
         return false;
     }
 
+    public default void setLauncherPercentOutput(double goalOutput) {
+
+    }
+
     public default void intakeFuel() {}
     
     public default void periodic() {}

@@ -87,7 +87,7 @@ public final class Constants {
     public static final int ANGLE_MOTOR_ID = 13;
     public static final int ANGLE_FOLLOWER_MOTOR_ID = 14;
     public static final int INTAKE_MOTOR_ID = 15;
-    public static final int INTAKE_ANGLE_ENCODER_ID = 4;  // TEMP
+    public static final int INTAKE_ANGLE_ENCODER_ID = 9;  // TEMP
 
     // REVOLVER
     public static final int REVOLVER_MOTOR_ID = 16;
@@ -98,7 +98,7 @@ public final class Constants {
     public static final int KICK_MOTOR_ID = 19;
     public static final int HOOD_MOTOR_ID = 20;
     public static final int FUEL_FEED_SENSOR_ID = 21;  // CANRange
-    public static final int HOOD_ENCODER_ID = 5;
+    public static final int HOOD_ENCODER_ID = 8;
   
     // CLIMBER
     public static final int CLIMBER_MOTOR_ID = 22;
@@ -128,7 +128,7 @@ public final class Constants {
     public static final double ANGLE_JERK = 1600;
 
     public static final double EXTENDED_INTAKE_ANGLE = 80;
-    public static final double ENCODER_OFFSET = 0;
+    public static final double ENCODER_OFFSET = 72.126;
 
     public static final double ANGLE_REDUCTION = 99;
 
@@ -151,7 +151,7 @@ public final class Constants {
     public static final double BANG_BANG_LAUNCHER_kV = 0.0;
     public static final double BANG_BANG_LAUNCHER_kS = 0.0;
 
-    public static final double AT_SPEED_TOLERANCE_RPS = 2.0;
+    public static final double AT_SPEED_TOLERANCE_RPS = 1;
 
     public static final double LAUNCHER_PEAK_FORWARD_TORQUE_CURRENT = 40.0;
     public static final double LAUNCHER_PEAK_REVERSE_TORQUE_CURRENT = 0.0;
@@ -160,10 +160,10 @@ public final class Constants {
 
     // end bang bang stuff
 
-    public static final double LAUNCH_kP = 0.0;
+    public static final double LAUNCH_kP = 0.2;
     public static final double LAUNCH_kI = 0.0;
     public static final double LAUNCH_kD = 0.0;
-    public static final double LAUNCH_kV = 0.0;
+    public static final double LAUNCH_kV = 0.13;
     public static final double LAUNCH_kS = 0.0;
 
     public static final MotorAlignmentValue isFollowerAligned = MotorAlignmentValue.Opposed;
@@ -190,13 +190,13 @@ public final class Constants {
 
     public static final double BASE_ANGLE = 9.0;
     public static final double MAX_HOOD_OFFSET = 40.0;
-    public static final double HOOD_ENCODER_OFFSET = 0.0;
+    public static final double HOOD_ENCODER_OFFSET = 227.117;
 
     public static final Transform3d ROBOT_TO_LAUNCHER_TRANSFORM = new Transform3d(
                                                                       new Translation3d(Units.inchesToMeters(-6.279 + 2.95), Units.inchesToMeters(2.35), Units.inchesToMeters(18.113)),
                                                                       new Rotation3d()
                                                                   );
-    public static final double DEBOUNCE_LENGTH = 0.025; //in seconds how long the change must be real until you idk just search ts up
+    public static final double DEBOUNCE_LENGTH = 0.1; //in seconds how long the change must be real until you idk just search ts up
     public static final Distance FUEL_FEED_DISTANCE = Inches.of(4);  // the maximum the canrange should measure when a fuel is being fed
   }
 
