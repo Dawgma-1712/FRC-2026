@@ -121,13 +121,10 @@ public class LauncherSubsystem extends SubsystemBase {
 
     }
 
-    public boolean readyToShoot(AngularVelocity desiredLauncherVelocity) {
+    public void followLaunchCalculations() {
 
-        AngularVelocity launcherVelocity = getLauncherVelocity();
-        AngularVelocity tolerance = LauncherConstants.TARGET_VELOCITY_TOLERANCE;
-        boolean isLauncherReady = Math.abs(launcherVelocity.minus(desiredLauncherVelocity).magnitude()) < tolerance.magnitude();
-
-        return isLauncherReady;
+        ShotData currentShot = getShotData();
+        setLauncherVelocity(Units.RadiansPerSecond.of(currentShot.exitVelocity()));
 
     }
 
@@ -141,6 +138,7 @@ public class LauncherSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Launcher/Hood angle", getHoodPosition().in(Units.Degrees));
         SmartDashboard.putNumber("Launcher/Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
         io.hoodControlLoop();
+        // followLaunchCalculations(); uncomment if launch calculations are accurate enough
     }
 
 }

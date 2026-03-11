@@ -74,7 +74,8 @@ public class IntakeIOReal implements IntakeIO {
         IntakeConstants.ANGLE_kV
     );
 
-    private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(true);  // phoenix pro is pretty nice
+    private final VoltageOut voltageRequest = new VoltageOut(0);
+    private double intakeOutput = 0;
 
     public IntakeIOReal() {
         configureKrakens();
@@ -88,8 +89,6 @@ public class IntakeIOReal implements IntakeIO {
         // Current limits
         config.CurrentLimits.SupplyCurrentLimit = 40;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 80;
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
 
         angleMotor.getConfigurator().apply(config);
         angleFollowerMotor.getConfigurator().apply(config);
@@ -119,6 +118,7 @@ public class IntakeIOReal implements IntakeIO {
         totalVoltage = Math.max(-12.0, Math.min(12.0, totalVoltage));
 
         angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
+        intakeMotor.set(intakeOutput);
 
         SmartDashboard.putNumber("Arm/AngleDeg", getAngle().in(Units.Degrees));
         SmartDashboard.putNumber("Arm/TargetDeg", currentState.position);
@@ -138,7 +138,7 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public void setIntakeMotorSpeed(double percentOutput) {
-        intakeMotor.set(percentOutput);
+        intakeOutput = percentOutput;
     }
 
     @Override

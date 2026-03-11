@@ -28,6 +28,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import frc.robot.commandFactories.AutoLockAndShoot;
+import frc.robot.commandFactories.Shoot;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Joystick;
@@ -184,30 +185,22 @@ public class RobotContainer {
 
       new JoystickButton(driver, OperatorConstants.DRIVER_RB).onTrue(new SwerveSlowMode(0.15)).onFalse(new SwerveSlowMode(1));
 
-      new JoystickButton(driver, OperatorConstants.DRIVER_LB).whileTrue(AutoLockAndShoot.autoLockAndShoot(
+      new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(new AutoLock(
                                                                                           this.drivetrain,
-                                                                                          this.launcher,
-                                                                                          this.revolver,
+                                                                                          () -> launcher.getShotData().getTarget().toTranslation2d(),
                                                                                           () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2
                                                                                               ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0),
                                                                                           () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2
                                                                                               ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)
                                                                                       ).repeatedly());
 
+      // spin the kicker and revolver wheels, and set the hood angle to the calculated angle                                                                               
       new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(Commands.defer(() -> {
 
-          return Commands.run(() -> {
-            ShotData shot = launcher.getShotData();
-            launcher.setLauncherVelocity(Units.RadiansPerSecond.of(shot.exitVelocity()));
-          });
+          Supplier<ShotData> shotSupplier = () -> launcher.getShotData();
+          return Shoot.shoot(launcher, revolver, shotSupplier);
 
-      }, Set.of(launcher))
-      .finallyDo(() -> launcher.setLauncherVelocity(Units.RadiansPerSecond.of(0)))
-      );
-
-      new JoystickButton(driver, OperatorConstants.DRIVER_B).onTrue(Commands.runOnce(() -> {
-        launcher.setHoodPosition(Units.Degrees.of(20));
-      }));
+      }, Set.of(launcher, revolver)));
 
 
       new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(

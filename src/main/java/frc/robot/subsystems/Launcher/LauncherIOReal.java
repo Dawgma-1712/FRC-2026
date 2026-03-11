@@ -57,6 +57,9 @@ public class LauncherIOReal implements LauncherIO {
         config.Slot0.kV = Constants.LauncherConstants.LAUNCH_kV;
         config.Slot0.kS = Constants.LauncherConstants.LAUNCH_kS;
 
+        config.CurrentLimits.SupplyCurrentLimit = 40;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+
         launchLeaderKraken.getConfigurator().apply(config);
         launchFollowerKraken.getConfigurator().apply(config);
     }
