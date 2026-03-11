@@ -28,10 +28,10 @@ public class Shoot {
             Commands.waitSeconds(0.5)
         ).deadlineFor(
             Commands.run(() -> {
-        launcher.setLauncherVelocity(desiredLauncherVelocity);
-        launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
-        launcher.setHoodPosition(shot.getHoodAngle());  // ADD THIS
-    }, launcher)
+                launcher.setLauncherVelocity(desiredLauncherVelocity);
+                launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
+                launcher.setHoodPosition(shot.getHoodAngle());
+            }, launcher)
         ).finallyDo(() -> {
             revolver.stop();
             launcher.stop();

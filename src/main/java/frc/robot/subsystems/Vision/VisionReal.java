@@ -83,28 +83,6 @@ public class VisionReal implements VisionInterface {
 
     }
 
-    @Override
-    public void updateInputs(VisionIOInputs inputs) {
-        configureLimelightMegatag(limelightBack);
-        configureLimelightMegatag(limelightFront);
-
-        Optional<PoseEstimate> visionEstimateLeft = limelightBack.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
-
-        inputs.leftHasTarget = visionEstimateLeft.isPresent();
-        visionEstimateLeft.ifPresent(est -> {
-            inputs.leftEstimatedPose = est.pose.toPose2d();
-            inputs.leftTimestamp = est.timestampSeconds;
-        });
-
-        Optional<PoseEstimate> visionEstimateRight = limelightFront.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
-
-        inputs.rightHasTarget = visionEstimateRight.isPresent();
-        visionEstimateRight.ifPresent(est -> {
-            inputs.rightEstimatedPose = est.pose.toPose2d();
-            inputs.rightTimestamp = est.timestampSeconds;
-        });
-    }
-
 }
 
 

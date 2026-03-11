@@ -143,6 +143,8 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public void setAngleMotorPercentOutput(double percentOutput) {
+        if (angleEncoder.get() >= IntakeConstants.STOWED_INTAKE_ANGLE && percentOutput > 0) return;
+        else if (angleEncoder.get() <= IntakeConstants.EXTENDED_INTAKE_ANGLE && percentOutput < 0) return;
         angleMotor.set(percentOutput);
     }
 

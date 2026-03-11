@@ -47,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Intake angle", getAngle().in(Units.Degrees));
+        SmartDashboard.putNumber("Intake/Intake angle", getAngle().in(Units.Degrees));
         io.controlLoop();
     }
 

@@ -127,7 +127,8 @@ public final class Constants {
     public static final double ANGLE_ACCELERATION = 80;
     public static final double ANGLE_JERK = 1600;
 
-    public static final double EXTENDED_INTAKE_ANGLE = 80;
+    public static final double EXTENDED_INTAKE_ANGLE = 90;
+    public static final double STOWED_INTAKE_ANGLE = 0;
     public static final double ENCODER_OFFSET = 72.126;
 
     public static final double ANGLE_REDUCTION = 99;

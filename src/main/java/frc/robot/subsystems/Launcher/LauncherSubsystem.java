@@ -110,8 +110,8 @@ public class LauncherSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Hood angle", getHoodPosition().in(Units.Degrees));
-        SmartDashboard.putNumber("Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
+        SmartDashboard.putNumber("Launcher/Hood angle", getHoodPosition().in(Units.Degrees));
+        SmartDashboard.putNumber("Launcher/Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
         io.hoodControlLoop();
     }
 
