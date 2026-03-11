@@ -46,8 +46,6 @@ public class LauncherIOReal implements LauncherIO {
     // STATUS SIGNALS
     private final StatusSignal<AngularVelocity> launcherVelocitySignal = launchLeaderKraken.getVelocity();
     private final StatusSignal<AngularVelocity> kickerVelocitySignal = kickerKraken.getVelocity();
-
-    private final Debouncer launcherDebouncer = new Debouncer(LauncherConstants.DEBOUNCE_LENGTH, Debouncer.DebounceType.kRising);
     
     public LauncherIOReal() {
 
@@ -124,16 +122,5 @@ public class LauncherIOReal implements LauncherIO {
     public AngularVelocity getKickerVelocity() {
         return kickerVelocitySignal.refresh().getValue();
     }
-
-    private boolean fuelShot(AngularVelocity goalVelocity) {
-        // Because the command scheduler is so long (20 ms) when compared to the time the fuel is in contact with the flywheel (like 4 ms?),
-        // I think it's reasonable to assume that any drop in velocity will be detected after the shot has already.
-        double difference = goalVelocity.in(Units.RotationsPerSecond) - (-getLauncherVelocity().in(Units.RotationsPerSecond));
-        System.out.println(difference);
-        return launcherDebouncer.calculate(
-            difference > 0
-        );
-    }
-
 
 }

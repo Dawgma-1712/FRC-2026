@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Launcher;
 
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.Units;
@@ -14,7 +15,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import frc.Constants.LauncherConstants;
 import frc.Constants.FieldConstants;
-import frc.Constants.LauncherConstants;
 
 public class LaunchCalculations {
 
@@ -95,6 +95,16 @@ public class LaunchCalculations {
             predictedTarget
         );
     }
+
+    public static ShotData calculateShotLookupTable(
+        Pose2d robot, 
+        Translation3d target, 
+        InterpolatingDoubleTreeMap radiansPerSecondMap, 
+        InterpolatingDoubleTreeMap hoodMap) {
+            
+            double distanceMeters = getDistanceToTarget(robot, target).in(Units.Meters);
+            return new ShotData(radiansPerSecondMap.get(distanceMeters), hoodMap.get(distanceMeters), target);
+    }
     
     public static ShotData iterativeMovingShotFromFunnelClearance(Pose2d robot, ChassisSpeeds fieldSpeeds, Translation3d target, int iterations) {
         ShotData shot = calculateShotFromFunnelClearance(robot, target, target);
@@ -105,12 +115,36 @@ public class LaunchCalculations {
     
         for (int i = 0; i < iterations; i++) {
             predictedTarget = predictTargetPosition(target, fieldSpeeds, timeOfFlight);
-            shot = calculateShotFromFunnelClearance(robot, target, predictedTarget);
+            shot = calculateShotFromFunnelClearance(robot, predictedTarget, predictedTarget);
             timeOfFlight = calculateTimeOfFlight(
                     shot.getExitVelocity(), shot.getHoodAngle(), getDistanceToTarget(robot, predictedTarget));
         }
 
         return shot;
+    }
+
+    public static ShotData iterativeMovingShotLookupTable(
+        Pose2d robot, 
+        ChassisSpeeds fieldSpeeds, 
+        Translation3d target, 
+        int iterations,
+        InterpolatingDoubleTreeMap radiansPerSecondMap, 
+        InterpolatingDoubleTreeMap hoodMap) {
+
+        ShotData shot = calculateShotLookupTable(robot, target, radiansPerSecondMap, hoodMap);
+        Distance distance = getDistanceToTarget(robot, target);
+        Time timeOfFlight = calculateTimeOfFlight(shot.getExitVelocity(), shot.getHoodAngle(), distance);
+        Translation3d predictedTarget = target;
+
+        for (int i = 0; i < iterations; i++) {
+            predictedTarget = predictTargetPosition(target, fieldSpeeds, timeOfFlight);
+            shot = calculateShotLookupTable(robot, predictedTarget, radiansPerSecondMap, hoodMap);
+            timeOfFlight = calculateTimeOfFlight(
+            shot.getExitVelocity(), shot.getHoodAngle(), getDistanceToTarget(robot, predictedTarget));
+        }
+
+        return shot;
+
     }
     
     // exit velocity is in radians per second, hood angle is in radians

@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+
 import frc.Constants.FieldConstants;
 import frc.Constants.LauncherConstants;
 import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
@@ -21,11 +23,19 @@ public class LauncherSubsystem extends SubsystemBase {
 
     LauncherIO io;
     CommandSwerveDrivetrain drivetrain;
+    InterpolatingDoubleTreeMap radiansPerSecondMap;
+    InterpolatingDoubleTreeMap hoodAngleMap;
+
     private Angle hoodTarget = Units.Degrees.of(LauncherConstants.BASE_ANGLE);
 
     public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
+
         this.io = io;
         this.drivetrain = drivetrain;
+
+        this.radiansPerSecondMap = new InterpolatingDoubleTreeMap();
+        this.hoodAngleMap = new InterpolatingDoubleTreeMap();
+
     }
 
     public void setLauncherVelocity(AngularVelocity velocity) {
@@ -89,8 +99,26 @@ public class LauncherSubsystem extends SubsystemBase {
             drivetrain.getState().Pose,
             fieldSpeedsFromRelativeSpeeds(drivetrain.getState().Speeds),
             target,
-            1
+            3
         );
+    }
+
+    public ShotData getShotDataLookupTable() {
+
+        var alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+        Translation3d target = (alliance == Alliance.Red)
+            ? FieldConstants.RED_HUB_POSE.getTranslation()
+            : FieldConstants.BLUE_HUB_POSE.getTranslation();
+
+        return LaunchCalculations.iterativeMovingShotLookupTable(
+            drivetrain.getState().Pose, 
+            fieldSpeedsFromRelativeSpeeds(drivetrain.getState().Speeds), 
+            target, 
+            3, 
+            radiansPerSecondMap, 
+            hoodAngleMap
+        );
+
     }
 
     public boolean readyToShoot(AngularVelocity desiredLauncherVelocity) {
