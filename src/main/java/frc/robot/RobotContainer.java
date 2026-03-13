@@ -29,6 +29,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import frc.robot.commandFactories.Shoot;
@@ -226,7 +227,7 @@ public class RobotContainer {
                                                                                     ).repeatedly());
 
       // spin the kicker and revolver wheels, and set the hood angle to the calculated angle                                                                               
-      new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(Commands.defer(() -> {
+      new JoystickButton(driver, OperatorConstants.DRIVER_Y).whileTrue(Commands.defer(() -> {
 
           return Commands.run(() -> {
             launcher.setLauncherVelocity(Units.RotationsPerSecond.of(100));
@@ -367,6 +368,7 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
+    /*
     Command autoPreloads;
     Command prepAutoPreloads;
     Command launchAutoPreloads;
@@ -397,5 +399,7 @@ public class RobotContainer {
       autoPreloads = Commands.parallel(prepAutoPreloads.raceWith(new WaitCommand(10)), launchAutoPreloads.raceWith(new WaitCommand(10)));
 
     return autoPreloads;
+    */
+    return new PathPlannerAuto("Test");
   }
 }

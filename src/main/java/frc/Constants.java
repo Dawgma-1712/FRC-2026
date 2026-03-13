@@ -206,8 +206,8 @@ public final class Constants {
     public static final AprilTagFieldLayout APRIL_TAG_POSES = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
     public static final Transform3d LIMELIGHT_BACK_TO_ROBOT = new Transform3d(
-                                                                  new Translation3d(Units.inchesToMeters(-12.121), Units.inchesToMeters(3.125), Units.inchesToMeters(5.646) + 0.0508),  // the 0.0508 is the offset for advantagescope, remove
-                                                                  new Rotation3d(0, Math.toRadians(-30), Math.toRadians(180)
+                                                                  new Translation3d(-0.3937, -0.1016, 0.5969),
+                                                                  new Rotation3d(0, Math.toRadians(0), Math.toRadians(180)
                                                               ));
     public static final Transform3d LIMELIGHT_FRONT_TO_ROBOT = new Transform3d(
                                                                   new Translation3d(-0, -0.0, 0.254 + 0.0508), 
