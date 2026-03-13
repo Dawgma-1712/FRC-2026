@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Intake;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +28,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void holdPosition() {
         io.holdPosition();
+    }
+
+    public void manualTriggerIntakeSpeed(Supplier<Double> triggerOutput) {
+        double output = triggerOutput.get();
+        setIntakeMotorSpeed(output);
     }
 
     public Command setAngle(Angle target) {

@@ -67,13 +67,8 @@ public class LauncherIOReal implements LauncherIO {
     @Override
     public void setLauncherVelocity(AngularVelocity shooterRps) {
         
-        // if the velocity is under tolerance, use a duty cycle bang bang and try to get up to speed
-        // this will be the same regardless of whether it's trying to get up to speed from rest or recovering from a shot
         launchLeaderKraken.setControl(launcherControlMode.withVelocity(shooterRps));
-        // if it's up to speed, then use torque current control in preparation for a shot
-        // the fuel's only in contact for like 4ms, so by the time we detect that the velocity dropped, the fuel will have already left
         launchFollowerKraken.setControl(new Follower(launchLeaderKraken.getDeviceID(), MotorAlignmentValue.Opposed));
-
 
     }
 

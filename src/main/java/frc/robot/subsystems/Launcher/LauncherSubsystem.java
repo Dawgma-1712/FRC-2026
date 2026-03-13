@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Launcher;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.geometry.Translation2d;
 
 import frc.Constants.FieldConstants;
 import frc.Constants.LauncherConstants;
@@ -27,14 +29,22 @@ public class LauncherSubsystem extends SubsystemBase {
     InterpolatingDoubleTreeMap hoodAngleMap;
 
     private Angle hoodTarget = Units.Degrees.of(LauncherConstants.BASE_ANGLE);
+    public Translation3d target;
 
     public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
 
         this.io = io;
         this.drivetrain = drivetrain;
+        this.target = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
+            ? FieldConstants.RED_HUB_POSE.getTranslation()
+            : FieldConstants.BLUE_HUB_POSE.getTranslation();
 
         this.radiansPerSecondMap = new InterpolatingDoubleTreeMap();
         this.hoodAngleMap = new InterpolatingDoubleTreeMap();
+
+        hoodAngleMap.put(Units.Inches.of(101).in(Units.Meters), 17.0);
+        hoodAngleMap.put(Units.Inches.of(75).in(Units.Meters), 25.0);
+        hoodAngleMap.put(Units.Inches.of(45).in(Units.Meters), 16.0);
 
     }
 
@@ -121,10 +131,18 @@ public class LauncherSubsystem extends SubsystemBase {
 
     }
 
-    public void followLaunchCalculations() {
+    public void launcherLookupTable(Pose2d robotPose) {
 
-        ShotData currentShot = getShotData();
-        setLauncherVelocity(Units.RadiansPerSecond.of(currentShot.exitVelocity()));
+        Translation3d target = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
+            ? FieldConstants.RED_HUB_POSE.getTranslation()
+            : FieldConstants.BLUE_HUB_POSE.getTranslation();
+
+        Translation2d robotTranslation = robotPose.getTranslation();
+        double distance = robotTranslation.getDistance(target.toTranslation2d());
+
+        double hoodAngle = hoodAngleMap.get(distance);
+        setHoodPosition(Units.Degrees.of(hoodAngle));
+        setLauncherVelocity(Units.RotationsPerSecond.of(100));
 
     }
 
@@ -138,7 +156,6 @@ public class LauncherSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Launcher/Hood angle", getHoodPosition().in(Units.Degrees));
         SmartDashboard.putNumber("Launcher/Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
         io.hoodControlLoop();
-        // followLaunchCalculations(); uncomment if launch calculations are accurate enough
     }
 
 }

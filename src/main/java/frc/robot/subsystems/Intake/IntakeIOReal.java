@@ -118,6 +118,7 @@ public class IntakeIOReal implements IntakeIO {
         totalVoltage = Math.max(-12.0, Math.min(12.0, totalVoltage));
 
         angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
+        angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
         intakeMotor.set(intakeOutput);
 
         SmartDashboard.putNumber("Arm/AngleDeg", getAngle().in(Units.Degrees));
@@ -145,7 +146,9 @@ public class IntakeIOReal implements IntakeIO {
     public void setAngleMotorPercentOutput(double percentOutput) {
         if (angleEncoder.get() >= IntakeConstants.STOWED_INTAKE_ANGLE && percentOutput > 0) return;
         else if (angleEncoder.get() <= IntakeConstants.EXTENDED_INTAKE_ANGLE && percentOutput < 0) return;
+        
         angleMotor.set(percentOutput);
+        angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     @Override
