@@ -11,7 +11,9 @@ import frc.Constants.OperatorConstants;
 import frc.Constants.RevolverConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.SwerveSlowMode;
 import frc.robot.generated.TunerConstants;
 
@@ -33,6 +35,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -165,39 +168,58 @@ public class RobotContainer {
             .withRotationalRate(Math.abs(driver.getRawAxis(OperatorConstants.DRIVER_RX)) > 0.1 ? -driver.getRawAxis(OperatorConstants.DRIVER_RX) * MaxAngularRate * speed : 0)
           )
     );
+
+    // intake manual trigger
+    Supplier<Double> rtSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_RT);
+    Supplier<Double> ltSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_LT);
+    Supplier<Boolean> intakeStateSupplier = () -> intakeDeployed;
+    intake.setDefaultCommand(
+      Commands.run(() -> {
+        intake.manualTriggerIntakeSpeed(ltSupplier);
+      }, intake)
+    );
     
-/* 
-    intake.setDefaultCommand(intake.run(() -> {
-      double joystickY = operator.getRawAxis(OperatorConstants.OPERATOR_RY);
-      if (Math.abs(joystickY) > 0.1) { // deadband
-          double targetAngle = MathUtil.interpolate(
-              IntakeConstants.MIN_ANGLE,
-              IntakeConstants.MAX_ANGLE,
-              (joystickY + 1.0) / 2.0 // map -1 to 1 → 0 to 1
-          );
-          intake.setAngleDirect(Units.Degrees.of(targetAngle));
-      } else {
-          intake.holdPosition();
-      }
-    }));
-*/
     configureBindings();
   }
 
   private void configureBindings() {
 
-      new JoystickButton(driver, OperatorConstants.DRIVER_X).whileTrue(drivetrain.applyRequest(() -> brake));
+    // shoot sequence
+    Timer shootTimer = new Timer();
+    new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(
+        Commands.run(() -> {
+            Pose2d robotPose = drivetrain.getState().Pose;
+            launcher.launcherLookupTable(robotPose);
 
-      new JoystickButton(driver, OperatorConstants.DRIVER_RB).onTrue(new SwerveSlowMode(0.15)).onFalse(new SwerveSlowMode(1));
-
-      new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(new AutoLock(
-                                                                                          this.drivetrain,
-                                                                                          () -> launcher.getShotData().getTarget().toTranslation2d(),
-                                                                                          () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2
-                                                                                              ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0),
-                                                                                          () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2
-                                                                                              ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)
-                                                                                      ).repeatedly());
+            if (shootTimer.hasElapsed(0.2)) {
+                revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+                launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
+            }
+        }, launcher, revolver) 
+        .beforeStarting(() -> shootTimer.restart())
+        .finallyDo(() -> {
+            revolver.setRevolverPercentOutput(0);
+            launcher.setKickerPercentOutput(0);
+            launcher.setLauncherVelocity(Units.RadiansPerSecond.of(0)); 
+            launcher.setHoodPosition(Units.Degrees.of(0));
+        })
+    );
+    
+    // slow mode
+    new JoystickButton(driver, OperatorConstants.DRIVER_RB).onTrue(new SwerveSlowMode(0.15)).onFalse(new SwerveSlowMode(1));
+    
+    // x mode
+    new JoystickButton(driver, OperatorConstants.DRIVER_X).whileTrue(drivetrain.applyRequest(() -> brake));
+    
+    // auto align
+    new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(new AutoLock(
+                                                                                        this.drivetrain,
+                                                                                        () -> launcher.target.toTranslation2d(),
+                                                                                        () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2
+                                                                                            ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0),
+                                                                                        () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2
+                                                                                            ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)
+                                                                                    ).repeatedly());
 
       // spin the kicker and revolver wheels, and set the hood angle to the calculated angle                                                                               
       new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(Commands.defer(() -> {
@@ -245,15 +267,80 @@ public class RobotContainer {
           }, intake)
       );
 
-      new JoystickButton(operator, OperatorConstants.OPERATOR_A).whileTrue(
+    // launcher unloading
+    new JoystickButton(operator, OperatorConstants.OPERATOR_X).whileTrue(
         Commands.run(() -> {
-          revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
-          
-        }, revolver).finallyDo(() -> {
-          revolver.setRevolverPercentOutput(0);
+          launcher.setLauncherPercentOutput(-0.6);
+          launcher.setKickerPercentOutput(-0.6);
+        }).finallyDo(() -> {
+          launcher.setLauncherPercentOutput(0);
+          launcher.setKickerPercentOutput(0);
         })
-      );
+    );
+    
+    // launch at a lower speed, without adjusting the hood angle
+    Timer operatorShootTimer = new Timer();
+    new JoystickButton(operator, OperatorConstants.OPERATOR_B).whileTrue(
+        Commands.run(() -> {
+            launcher.setLauncherVelocity(Units.RotationsPerSecond.of(70));
+            if (shootTimer.hasElapsed(0.2)) {
+                revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+                launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
+            }
+        }, launcher, revolver) 
+        .beforeStarting(() -> operatorShootTimer.restart())
+        .finallyDo(() -> {
+            revolver.setRevolverPercentOutput(0);
+            launcher.setKickerPercentOutput(0);
+            launcher.setLauncherVelocity(Units.RadiansPerSecond.of(0)); 
+        })
+    );
+    
+    // angle manual up?
+    new JoystickButton(operator, OperatorConstants.OPERATOR_Y).whileTrue(
+      Commands.run(() -> {
+        intake.setAngleMotorSpeed(0.5);
+      }, intake)
+    );
 
+    // angle manual down?
+    new JoystickButton(operator, OperatorConstants.OPERATOR_A).whileTrue(
+      Commands.run(() -> {
+        intake.setAngleMotorSpeed(-0.5);
+      }, intake)
+    );
+
+    // spindexer manual CCW
+    new JoystickButton(operator, OperatorConstants.OPERATOR_RB).whileTrue(
+      Commands.run(() -> {
+        revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+      }, revolver).finallyDo(() -> {
+        revolver.setRevolverPercentOutput(0);
+      })
+    );
+
+    // spindexer manual CW
+    new JoystickButton(operator, OperatorConstants.OPERATOR_LB).whileTrue(
+      Commands.run(() -> {
+        revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+      }, revolver).finallyDo(() -> {
+        revolver.setRevolverPercentOutput(0);
+      })
+    );
+
+    // hood angle increase
+    new POVButton(operator, 0).whileTrue(
+      Commands.run(() -> {
+        launcher.setHoodPosition(launcher.getHoodPosition().plus(Units.Degrees.of(0.1)));
+      })
+    );
+    
+    // hood angle decrease
+    new POVButton(operator, 180).whileTrue(
+      Commands.run(() -> {
+        launcher.setHoodPosition(launcher.getHoodPosition().minus(Units.Degrees.of(0.1)));
+      })
+    );
       new JoystickButton(operator, OperatorConstants.OPERATOR_LB).whileTrue(
         Commands.run(() -> {
           ShotData s = launcher.getShotData();
