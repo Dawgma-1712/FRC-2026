@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.Constants.FieldConstants;
 import frc.Constants.IntakeConstants;
 import frc.Constants.LauncherConstants;
 import frc.Constants.OperatorConstants;
@@ -27,7 +28,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import frc.robot.commandFactories.AutoLockAndShoot;
 import frc.robot.commandFactories.Shoot;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -43,6 +43,10 @@ import frc.robot.utils.FuelSim;
 
 import java.util.Set;
 import java.util.function.Supplier;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 
 public class RobotContainer {
 
@@ -142,6 +146,7 @@ public class RobotContainer {
 
     this.launcher = new LauncherSubsystem(this.launcherIO, this.drivetrain);
     this.intake = new IntakeSubsystem(this.intakeIO);
+    System.out.println(intakeIO.getClass());
     this.climber = new ClimberSubsystem(this.climberIO);
     this.revolver = new RevolverSubsystem(this.revolverIO);
     //this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
@@ -197,10 +202,34 @@ public class RobotContainer {
       // spin the kicker and revolver wheels, and set the hood angle to the calculated angle                                                                               
       new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(Commands.defer(() -> {
 
-          Supplier<ShotData> shotSupplier = () -> launcher.getShotData();
-          return Shoot.shoot(launcher, revolver, shotSupplier);
+          return Commands.run(() -> {
+            launcher.setLauncherVelocity(Units.RotationsPerSecond.of(100));
+            launcher.setHoodPosition(Units.Degrees.of(launcher.hoodAngleMap.get(Units.Inches.of(89.0).in(Units.Meters))));
+          });
 
-      }, Set.of(launcher, revolver)));
+      }, Set.of(launcher))
+      .finallyDo(() -> {
+        launcher.setLauncherVelocity(Units.RadiansPerSecond.of(0)); 
+        launcher.setHoodPosition(Units.Degrees.of(0));
+      }));
+
+      new JoystickButton(driver, OperatorConstants.DRIVER_B).whileTrue(Commands.run(() -> {
+        revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+        launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
+      }).finallyDo(
+        () -> {
+        revolver.setRevolverPercentOutput(-0);
+        launcher.setKickerPercentOutput(0);
+        }
+      ));
+
+      new JoystickButton(driver, OperatorConstants.DRIVER_A).whileTrue(Commands.run(() -> {
+        intake.setIntakeMotorSpeed(1);
+      }).finallyDo(
+        () -> {
+        intake.setIntakeMotorSpeed(0);
+        }
+      ));
 
 
       new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(
@@ -219,6 +248,7 @@ public class RobotContainer {
       new JoystickButton(operator, OperatorConstants.OPERATOR_A).whileTrue(
         Commands.run(() -> {
           revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+          
         }, revolver).finallyDo(() -> {
           revolver.setRevolverPercentOutput(0);
         })
@@ -226,7 +256,8 @@ public class RobotContainer {
 
       new JoystickButton(operator, OperatorConstants.OPERATOR_LB).whileTrue(
         Commands.run(() -> {
-          launcher.setLauncherVelocity(Units.RotationsPerSecond.of(-50));
+          ShotData s = launcher.getShotData();
+          launcher.setLauncherVelocity(Units.RotationsPerSecond.of(s.exitVelocity() / (2 * Math.PI)));
         }).finallyDo(() -> {
             launcher.setLauncherVelocity(Units.RotationsPerSecond.of(0));
           })

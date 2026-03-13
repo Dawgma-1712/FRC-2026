@@ -5,8 +5,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import frc.Constants.IdConstants;
 import frc.Constants.IntakeConstants;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -96,12 +100,16 @@ public class IntakeIOReal implements IntakeIO {
         angleFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
 
         angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+
+        SparkMaxConfig hoodConfig = new SparkMaxConfig();
+        hoodConfig.idleMode(IdleMode.kCoast);
+        hoodConfig.smartCurrentLimit(30); // adjust for bag motor
+        hoodConfig.inverted(true);
+        intakeMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
     public void controlLoop() {
-
-        if (!isProfileRunning) return;
 
         updateVelocity();  // update the velocity state variable
 

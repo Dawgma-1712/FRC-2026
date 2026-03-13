@@ -24,9 +24,10 @@ public class LauncherSubsystem extends SubsystemBase {
     LauncherIO io;
     CommandSwerveDrivetrain drivetrain;
     InterpolatingDoubleTreeMap radiansPerSecondMap;
-    InterpolatingDoubleTreeMap hoodAngleMap;
+    public InterpolatingDoubleTreeMap hoodAngleMap;
 
     private Angle hoodTarget = Units.Degrees.of(LauncherConstants.BASE_ANGLE);
+    AngularVelocity targetVelocity;
 
     public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
 
@@ -35,6 +36,14 @@ public class LauncherSubsystem extends SubsystemBase {
 
         this.radiansPerSecondMap = new InterpolatingDoubleTreeMap();
         this.hoodAngleMap = new InterpolatingDoubleTreeMap();
+
+        hoodAngleMap.put(Units.Inches.of(100).in(Units.Meters), 17.0);
+        radiansPerSecondMap.put(Units.Inches.of(100).in(Units.Meters), 100 * 2 * Math.PI);
+
+        hoodAngleMap.put(Units.Inches.of(45).in(Units.Meters), 16.0);
+        radiansPerSecondMap.put(Units.Inches.of(45).in(Units.Meters), 100 * 2 * Math.PI);
+
+        hoodAngleMap.put(Units.Inches.of(75).in(Units.Meters), 25.0);
 
     }
 
@@ -137,8 +146,9 @@ public class LauncherSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Launcher/Hood angle", getHoodPosition().in(Units.Degrees));
         SmartDashboard.putNumber("Launcher/Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
+        SmartDashboard.putNumber("Target Velocity",getShotData().exitVelocity() / (2 * Math.PI));
+        SmartDashboard.putNumber("Hood Goal", hoodTarget.in(Units.Degrees));
         io.hoodControlLoop();
         // followLaunchCalculations(); uncomment if launch calculations are accurate enough
     }
-
 }

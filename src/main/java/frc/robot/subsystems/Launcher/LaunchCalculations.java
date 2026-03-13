@@ -96,6 +96,47 @@ public class LaunchCalculations {
         );
     }
 
+    public static ShotData calculateShotDistance(
+        double distanceMeters
+    ) {
+                Distance DISTANCE_ABOVE_FUNNEL = Units.Inches.of(0);
+
+        double x_dist = distanceMeters;
+        double y_dist = FieldConstants.BLUE_HUB_POSE
+                .getMeasureZ()
+                .minus(LauncherConstants.ROBOT_TO_LAUNCHER_TRANSFORM.getMeasureZ())
+                .in(Units.Inches);
+        double g = 386;
+        double r = FieldConstants.FUNNEL_RADIUS.in(Units.Inches)
+                * x_dist
+                / distanceMeters;
+        double h = FieldConstants.FUNNEL_HEIGHT.plus(DISTANCE_ABOVE_FUNNEL).in(Units.Inches);
+        double A1 = x_dist * x_dist;
+        double B1 = x_dist;
+        double D1 = y_dist;
+        double A2 = -x_dist * x_dist + (x_dist - r) * (x_dist - r);
+        double B2 = -r;
+        double D2 = h;
+        double Bm = -B2 / B1;
+        double A3 = Bm * A1 + A2;
+        double D3 = Bm * D1 + D2;
+        double a = D3 / A3;
+        double b = (D1 - A1 * a) / B1;
+        double theta = Math.atan(b);
+        double v0 = Math.sqrt(-g / (2 * a * (Math.cos(theta)) * (Math.cos(theta))));
+
+        if (Double.isNaN(v0) || Double.isNaN(theta)) {
+            v0 = 0;
+            theta = 0;
+        }
+
+        return new ShotData(
+            linearToAngularVelocity(Units.InchesPerSecond.of(v0), Units.Inches.of(LauncherConstants.FLYWHEEL_WHEEL_DIAMETER / 2)),
+            Units.Radians.of(theta), 
+            FieldConstants.BLUE_HUB_POSE.getTranslation()
+        );
+    }
+
     public static ShotData calculateShotLookupTable(
         Pose2d robot, 
         Translation3d target, 
@@ -122,6 +163,8 @@ public class LaunchCalculations {
 
         return shot;
     }
+
+
 
     public static ShotData iterativeMovingShotLookupTable(
         Pose2d robot, 

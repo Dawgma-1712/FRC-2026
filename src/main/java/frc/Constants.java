@@ -114,7 +114,7 @@ public final class Constants {
 
     public static final double POSITION_TOLERANCE = 2.0;  // in degrees
 
-    public static final double ANGLE_kP = 0.1;
+    public static final double ANGLE_kP = 0.0;
     public static final double ANGLE_kI = 0.0;
     public static final double ANGLE_kD = 0.0;
 
@@ -169,13 +169,13 @@ public final class Constants {
 
     public static final MotorAlignmentValue isFollowerAligned = MotorAlignmentValue.Opposed;
 
-    public static final double KICKER_kP = 0.0;
+    public static final double KICKER_kP = 0.1;
     public static final double KICKER_kI = 0.0;
     public static final double KICKER_kD = 0.0;
     public static final double KICKER_kV = 0.0;
     public static final double KICKER_kS = 0.0;
 
-    public static final double HOOD_kP = 0.0;
+    public static final double HOOD_kP = .5;
     public static final double HOOD_kI = 0.0;
     public static final double HOOD_kD = 0.0;
 
@@ -183,15 +183,15 @@ public final class Constants {
     public static final double HOOD_kG = 0.0;
     public static final double HOOD_kV = 0.0;
 
-    public static final double KICKER_PERCENT_OUTPUT = 0.6;
+    public static final double KICKER_PERCENT_OUTPUT = 0.9;
 
     public static final double BANG_BANG_TARGET_VELOCITY_TOLERANCE = 0.95;
     public static final double TARGET_HOOD_TOLERANCE_DEGREES = 1.0;
     public static final AngularVelocity TARGET_VELOCITY_TOLERANCE = edu.wpi.first.units.Units.RotationsPerSecond.of(10);
 
-    public static final double BASE_ANGLE = 9.0;
+    public static final double BASE_ANGLE = 0;
     public static final double MAX_HOOD_OFFSET = 40.0;
-    public static final double HOOD_ENCODER_OFFSET = 227.117;
+    public static final double HOOD_ENCODER_OFFSET = 227.117 + 35.318;
 
     public static final Transform3d ROBOT_TO_LAUNCHER_TRANSFORM = new Transform3d(
                                                                       new Translation3d(Units.inchesToMeters(-6.279 + 2.95), Units.inchesToMeters(2.35), Units.inchesToMeters(18.113)),
@@ -227,7 +227,7 @@ public final class Constants {
 
   public static class RevolverConstants {
     
-    public static final double SHOOTING_PERCENTAGE_OUTPUT = 0.6;
+    public static final double SHOOTING_PERCENTAGE_OUTPUT = 0.3;
 
   }
 
