@@ -11,6 +11,7 @@ import frc.Constants.OperatorConstants;
 import frc.Constants.RevolverConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -46,6 +47,9 @@ import frc.robot.utils.FuelSim;
 
 import java.util.Set;
 import java.util.function.Supplier;
+
+import org.ejml.equation.Sequence;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -87,8 +91,8 @@ public class RobotContainer {
   private final RevolverSubsystem revolver;
   private final RevolverIO revolverIO;
 
- // private final VisionInterface visionInterface;
-  //private final VisionSubsystem vision;
+  private final VisionInterface visionInterface;
+  private final VisionSubsystem vision;
 
 
   private final Joystick driver;
@@ -107,7 +111,7 @@ public class RobotContainer {
       this.intakeIO = new IntakeIOReal();
       this.climberIO = new ClimberIOReal();
       this.revolverIO = new RevolverIOReal();
-      //this.visionInterface = new VisionReal(this.drivetrain);
+      this.visionInterface = new VisionReal(this.drivetrain);
 
     } else {
 
@@ -115,7 +119,7 @@ public class RobotContainer {
       this.intakeIO = new IntakeIOSim();
       this.climberIO = new ClimberIOSim();
       this.revolverIO = new RevolverIOSim();
-      //this.visionInterface = new VisionSim(this.drivetrain);
+      this.visionInterface = new VisionSim(this.drivetrain);
 
       // FuelSim stuff
 
@@ -152,7 +156,7 @@ public class RobotContainer {
     System.out.println(intakeIO.getClass());
     this.climber = new ClimberSubsystem(this.climberIO);
     this.revolver = new RevolverSubsystem(this.revolverIO);
-    //this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
+    this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
 
     // autoHandler = new ModularAutoHandler();
 
@@ -284,7 +288,7 @@ public class RobotContainer {
         Commands.run(() -> {
             launcher.setLauncherVelocity(Units.RotationsPerSecond.of(70));
             if (shootTimer.hasElapsed(0.2)) {
-                revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+                revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
                 launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
             }
         }, launcher, revolver) 
@@ -363,8 +367,35 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    return Commands.run(() -> {
+    Command autoPreloads;
+    Command prepAutoPreloads;
+    Command launchAutoPreloads;
+    
+      prepAutoPreloads = Commands.defer(() -> {
 
-    });
+          return Commands.run(() -> {
+            launcher.setLauncherVelocity(Units.RotationsPerSecond.of(100));
+            launcher.setHoodPosition(Units.Degrees.of(launcher.hoodAngleMap.get(Units.Inches.of(89.0).in(Units.Meters))));
+          });
+
+      }, Set.of(launcher))
+      .finallyDo(() -> {
+        launcher.setLauncherVelocity(Units.RadiansPerSecond.of(0)); 
+        launcher.setHoodPosition(Units.Degrees.of(0));
+      });
+
+      launchAutoPreloads = new SequentialCommandGroup(new WaitCommand(1), Commands.run(() -> {
+        revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+        launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
+      }).finallyDo(
+        () -> {
+        revolver.setRevolverPercentOutput(-0);
+        launcher.setKickerPercentOutput(0);
+        }
+      ));
+
+      autoPreloads = Commands.parallel(prepAutoPreloads.raceWith(new WaitCommand(10)), launchAutoPreloads.raceWith(new WaitCommand(10)));
+
+    return autoPreloads;
   }
 }

@@ -77,9 +77,9 @@ public class VisionReal implements VisionInterface {
             drivetrain.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
         });
 
-        estimatorFront.getPoseEstimate().ifPresent((PoseEstimate poseEstimate) -> {
-            drivetrain.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
-        });
+        // estimatorFront.getPoseEstimate().ifPresent((PoseEstimate poseEstimate) -> {
+        //     drivetrain.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
+        // });
 
     }
 

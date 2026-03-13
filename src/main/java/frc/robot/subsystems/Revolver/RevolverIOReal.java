@@ -22,6 +22,7 @@ public class RevolverIOReal implements RevolverIO {
     @Override
     public void setRevolverPercentOutput(double percentOutput) {
         revolverMotor.set(percentOutput);
+        System.out.println(percentOutput);
     }
 
     @Override

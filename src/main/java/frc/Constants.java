@@ -175,9 +175,9 @@ public final class Constants {
     public static final double KICKER_kV = 0.0;
     public static final double KICKER_kS = 0.0;
 
-    public static final double HOOD_kP = .5;
+    public static final double HOOD_kP = .55;
     public static final double HOOD_kI = 0.0;
-    public static final double HOOD_kD = 0.0;
+    public static final double HOOD_kD = 0.01;
 
     public static final double HOOD_kS = 0.0;
     public static final double HOOD_kG = 0.0;

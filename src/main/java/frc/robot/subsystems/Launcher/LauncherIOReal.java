@@ -98,8 +98,6 @@ public class LauncherIOReal implements LauncherIO {
             // if it's up to speed, then use torque current control in preparation for a shot
             // the fuel's only in contact for like 4ms, so by the time we detect that the velocity dropped, the fuel will have already left
             launchFollowerKraken.setControl(new Follower(launchLeaderKraken.getDeviceID(), MotorAlignmentValue.Opposed));
-    
-    
         }
     
         @Override
