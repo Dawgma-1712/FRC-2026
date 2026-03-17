@@ -99,7 +99,7 @@ public class IntakeIOReal implements IntakeIO {
         angleMotor.setNeutralMode(NeutralModeValue.Brake);
         angleFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
 
-        angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+        angleMotor.setControl(new Follower(angleFollowerMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
         SparkMaxConfig hoodConfig = new SparkMaxConfig();
         hoodConfig.idleMode(IdleMode.kCoast);
@@ -151,9 +151,11 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
-    public void setAngleMotorPercentOutput(double percentOutput) {
-        if (angleEncoder.get() >= IntakeConstants.STOWED_INTAKE_ANGLE && percentOutput > 0) return;
-        else if (angleEncoder.get() <= IntakeConstants.EXTENDED_INTAKE_ANGLE && percentOutput < 0) return;
+    public void setAngleMotorPercentOutput(double percentOutput) {  //down is positive up is negative
+        // if (angleEncoder.get() <= IntakeConstants.STOWED_INTAKE_ANGLE && percentOutput < 0) return;
+        // else if (angleEncoder.get() >= IntakeConstants.EXTENDED_INTAKE_ANGLE && percentOutput > 0) return;
+
+        //extended is 90 stowed is 0
         
         angleMotor.set(percentOutput);
         angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));

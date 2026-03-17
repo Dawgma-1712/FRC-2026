@@ -45,7 +45,7 @@
     "rotation": 26.880000000000003
   },
   "reversed": false,
-  "folder": "Shoot",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 26.880000000000003
