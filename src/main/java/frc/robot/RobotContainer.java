@@ -20,7 +20,6 @@ import frc.robot.generated.TunerConstants;
 
 import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.Launcher.*;
-import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Revolver.*;
 
@@ -29,14 +28,17 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import frc.robot.commandFactories.Shoot;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -101,6 +103,8 @@ public class RobotContainer {
   // robot state
   private boolean intakeDeployed = false;
 
+  private SendableChooser<Command> autoChooser;
+
   public RobotContainer() {
 
     fuelSim = new FuelSim();
@@ -144,6 +148,8 @@ public class RobotContainer {
       Distance intakeXMax = Units.Inches.of(25.14);
       Distance intakeYMax = Units.Inches.of(17.024);
 
+      NamedCommands.registerCommand("Shoot", getAutoPreloads());
+
       fuelSim.registerIntake(intakeXMin, intakeXMax, intakeYMin, intakeYMax, () -> true, () -> { launcherIO.intakeFuel(); });
 
       fuelSim.start();
@@ -174,15 +180,18 @@ public class RobotContainer {
     );
 
     // intake manual trigger
-    Supplier<Double> rtSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_RT);
     Supplier<Double> ltSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_LT);
-    Supplier<Boolean> intakeStateSupplier = () -> intakeDeployed;
     intake.setDefaultCommand(
       Commands.run(() -> {
         intake.manualTriggerIntakeSpeed(ltSupplier);
       }, intake)
     );
-    
+      autoChooser = AutoBuilder.buildAutoChooser();
+      autoChooser.addOption("OuterBumpRight", new PathPlannerAuto("OuterBumpRight"));
+      autoChooser.addOption("InnerBumpRight", new PathPlannerAuto("InnerBumpRight"));
+      autoChooser.setDefaultOption("OuterBumpRight", new PathPlannerAuto("OuterBumpRight"));
+      SmartDashboard.putData("Auto Chooser", autoChooser);
+
     configureBindings();
   }
 
@@ -196,7 +205,7 @@ public class RobotContainer {
             launcher.launcherLookupTable(robotPose);
 
             if (shootTimer.hasElapsed(0.2)) {
-                revolver.setRevolverPercentOutput(RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
+                revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
                 launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
             }
         }, launcher, revolver) 
@@ -226,7 +235,7 @@ public class RobotContainer {
                                                                                     ).repeatedly());
 
       // spin the kicker and revolver wheels, and set the hood angle to the calculated angle                                                                               
-      new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(Commands.defer(() -> {
+      new JoystickButton(driver, OperatorConstants.DRIVER_Y).whileTrue(Commands.defer(() -> {
 
           return Commands.run(() -> {
             launcher.setLauncherVelocity(Units.RotationsPerSecond.of(100));
@@ -249,14 +258,6 @@ public class RobotContainer {
         }
       ));
 
-      new JoystickButton(driver, OperatorConstants.DRIVER_A).whileTrue(Commands.run(() -> {
-        intake.setIntakeMotorSpeed(1);
-      }).finallyDo(
-        () -> {
-        intake.setIntakeMotorSpeed(0);
-        }
-      ));
-
 
       new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(
           Commands.runOnce(() -> {
@@ -271,11 +272,13 @@ public class RobotContainer {
           }, intake)
       );
 
+      new JoystickButton(driver, OperatorConstants.DRIVER_START).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
     // launcher unloading
     new JoystickButton(operator, OperatorConstants.OPERATOR_X).whileTrue(
         Commands.run(() -> {
-          launcher.setLauncherPercentOutput(-0.6);
-          launcher.setKickerPercentOutput(-0.6);
+          launcher.setLauncherPercentOutput(0.6);
+          launcher.setKickerPercentOutput(0.6);
         }).finallyDo(() -> {
           launcher.setLauncherPercentOutput(0);
           launcher.setKickerPercentOutput(0);
@@ -303,14 +306,14 @@ public class RobotContainer {
     // angle manual up?
     new JoystickButton(operator, OperatorConstants.OPERATOR_Y).whileTrue(
       Commands.run(() -> {
-        intake.setAngleMotorSpeed(0.5);
+        intake.setAngleMotorSpeed(-0.1);
       }, intake)
     );
 
     // angle manual down?
     new JoystickButton(operator, OperatorConstants.OPERATOR_A).whileTrue(
       Commands.run(() -> {
-        intake.setAngleMotorSpeed(-0.5);
+        intake.setAngleMotorSpeed(0.1);
       }, intake)
     );
 
@@ -345,28 +348,12 @@ public class RobotContainer {
         launcher.setHoodPosition(launcher.getHoodPosition().minus(Units.Degrees.of(0.1)));
       })
     );
-      new JoystickButton(operator, OperatorConstants.OPERATOR_LB).whileTrue(
-        Commands.run(() -> {
-          ShotData s = launcher.getShotData();
-          launcher.setLauncherVelocity(Units.RotationsPerSecond.of(s.exitVelocity() / (2 * Math.PI)));
-        }).finallyDo(() -> {
-            launcher.setLauncherVelocity(Units.RotationsPerSecond.of(0));
-          })
-        );
-
-      new JoystickButton(operator, OperatorConstants.OPERATOR_RB).whileTrue(
-        Commands.run(() -> {
-          launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
-        }).finallyDo(() -> {
-          launcher.setKickerPercentOutput(0);
-        }));
-
 
       // new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(launcher.adaptiveShoot(() -> launcher.calculateDistance()));
   }
 
 
-  public Command getAutonomousCommand() {
+  public Command getAutoPreloads() {
     Command autoPreloads;
     Command prepAutoPreloads;
     Command launchAutoPreloads;
@@ -375,7 +362,7 @@ public class RobotContainer {
 
           return Commands.run(() -> {
             launcher.setLauncherVelocity(Units.RotationsPerSecond.of(100));
-            launcher.setHoodPosition(Units.Degrees.of(launcher.hoodAngleMap.get(Units.Inches.of(89.0).in(Units.Meters))));
+            launcher.setHoodPosition(Units.Degrees.of(launcher.hoodAngleMap.get(drivetrain.getState().Pose.getTranslation().getDistance(launcher.target.toTranslation2d()))));
           });
 
       }, Set.of(launcher))
@@ -395,7 +382,11 @@ public class RobotContainer {
       ));
 
       autoPreloads = Commands.parallel(prepAutoPreloads.raceWith(new WaitCommand(10)), launchAutoPreloads.raceWith(new WaitCommand(10)));
-
     return autoPreloads;
+  }
+
+  public Command getAutonomousCommand() {
+    drivetrain.configureAutoBuilder();
+    return autoChooser.getSelected();
   }
 }

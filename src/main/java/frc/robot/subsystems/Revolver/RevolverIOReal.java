@@ -12,11 +12,6 @@ public class RevolverIOReal implements RevolverIO {
     public final TalonFX revolverMotor = new TalonFX(IdConstants.REVOLVER_MOTOR_ID);   
 
     public RevolverIOReal() {
-
-        TalonFXConfiguration configs = new TalonFXConfiguration();
-        configs.CurrentLimits.SupplyCurrentLimit = 30;
-        configs.CurrentLimits.SupplyCurrentLimitEnable = true;
-        revolverMotor.getConfigurator().apply(configs);
     }
 
     @Override

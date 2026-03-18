@@ -341,7 +341,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
 
-    private void configureAutoBuilder() {
+    public void configureAutoBuilder() {
+        System.out.println(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red);
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(

@@ -151,6 +151,7 @@ public class LauncherIOReal implements LauncherIO {
     @Override
     public void setLauncherPercentOutput(double goalOutput) {
         launchLeaderKraken.set(goalOutput);
+        launchFollowerKraken.setControl(new Follower(launchLeaderKraken.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     @Override
