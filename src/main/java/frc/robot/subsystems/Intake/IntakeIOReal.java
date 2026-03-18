@@ -101,11 +101,11 @@ public class IntakeIOReal implements IntakeIO {
 
         angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
-        SparkMaxConfig hoodConfig = new SparkMaxConfig();
-        hoodConfig.idleMode(IdleMode.kCoast);
-        hoodConfig.smartCurrentLimit(30); // adjust for bag motor
-        hoodConfig.inverted(true);
-        intakeMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        intakeConfig.idleMode(IdleMode.kCoast);
+        intakeConfig.smartCurrentLimit(30);
+        intakeConfig.inverted(true);
+        intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
