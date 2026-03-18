@@ -27,11 +27,11 @@ import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
 public class VisionReal implements VisionInterface {
     
-   // Limelight limelightBack = new Limelight(IdConstants.LIMELIGHT_BACK_ID);
+   Limelight limelightBack = new Limelight(IdConstants.LIMELIGHT_BACK_ID);
 
-    //private final LimelightPoseEstimator estimatorBack;
+    private final LimelightPoseEstimator estimatorBack;
     private boolean poseEstimated = false;
-   // private StructPublisher<Pose3d> limelightPoseEstimationPublisher = NetworkTableInstance.getDefault().getStructTopic("VisionPoseEstimate", Pose3d.struct).publish();
+   private StructPublisher<Pose3d> limelightPoseEstimationPublisher = NetworkTableInstance.getDefault().getStructTopic("VisionPoseEstimate", Pose3d.struct).publish();
 
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon;
@@ -51,8 +51,8 @@ public class VisionReal implements VisionInterface {
         this.drivetrain = drivetrain;
         this.pigeon = drivetrain.getPigeon2();
 
-       //configureLimelight(limelightBack, new Pose3d().transformBy(VisionConstants.LIMELIGHT_BACK_TO_ROBOT));
-        //estimatorBack = limelightBack.createPoseEstimator(EstimationMode.MEGATAG2);
+       configureLimelight(limelightBack, new Pose3d().transformBy(VisionConstants.LIMELIGHT_BACK_TO_ROBOT));
+        estimatorBack = limelightBack.createPoseEstimator(EstimationMode.MEGATAG2);
     }
 
     // configures the target limelight for MegaTag2 detection, needed before fetching pose in periodic
@@ -76,31 +76,31 @@ public class VisionReal implements VisionInterface {
     @Override
     public void addVisionMeasurements() {
 
-        // configureLimelightMegatag(limelightBack);
+        configureLimelightMegatag(limelightBack);
 
-        // estimatorBack.getPoseEstimate().ifPresentOrElse((PoseEstimate poseEstimate) -> {
-        //     poseEstimated = true;
-        //     limelightPoseEstimationPublisher.set(poseEstimate.pose);
-        //     boolean rejectPose =
-        //     poseEstimate.tagCount == 0 // Must have at least one tag
-        //         || (poseEstimate.tagCount == 1
-        //             && poseEstimate.getAvgTagAmbiguity() > 0.5) // Cannot be high ambiguity
-        //         || Math.abs(poseEstimate.pose.getZ())
-        //             > 1 // Must have realistic Z coordinate
+        estimatorBack.getPoseEstimate().ifPresentOrElse((PoseEstimate poseEstimate) -> {
+            poseEstimated = true;
+            limelightPoseEstimationPublisher.set(poseEstimate.pose);
+            boolean rejectPose =
+            poseEstimate.tagCount == 0 // Must have at least one tag
+                || (poseEstimate.tagCount == 1
+                    && poseEstimate.getAvgTagAmbiguity() > 0.5) // Cannot be high ambiguity
+                || Math.abs(poseEstimate.pose.getZ())
+                    > 1 // Must have realistic Z coordinate
 
-        //         // Must be within the field boundaries
-        //         || poseEstimate.pose.getX() < 0.0
-        //         || poseEstimate.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
-        //         || poseEstimate.pose.getY() < 0.0
-        //         || poseEstimate.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
+                // Must be within the field boundaries
+                || poseEstimate.pose.getX() < 0.0
+                || poseEstimate.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
+                || poseEstimate.pose.getY() < 0.0
+                || poseEstimate.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
             
-        //     Pose2d newPose = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? poseEstimate.pose.toPose2d() : poseEstimate.pose.toPose2d().rotateBy(new Rotation2d(Units.Degrees.of(180)));
-        //     if (!rejectPose) drivetrain.addVisionMeasurement(newPose, poseEstimate.timestampSeconds);
-        // }, () -> {
-        //     poseEstimated = false;
-        // });
+            Pose2d newPose = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? poseEstimate.pose.toPose2d() : poseEstimate.pose.toPose2d().rotateBy(new Rotation2d(Units.Degrees.of(180)));
+            if (!rejectPose) drivetrain.addVisionMeasurement(newPose, poseEstimate.timestampSeconds);
+        }, () -> {
+            poseEstimated = false;
+        });
 
-        // SmartDashboard.putBoolean("Vision/Pose Estimated", poseEstimated);
+        SmartDashboard.putBoolean("Vision/Pose Estimated", poseEstimated);
 
     }
 

@@ -13,7 +13,6 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import frc.Constants.FieldConstants;
 import frc.Constants.LauncherConstants;
-import frc.robot.subsystems.Launcher.LaunchCalculations.ShotData;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 import frc.robot.utils.FuelSim;
 
@@ -42,18 +41,6 @@ public class LauncherIOSim implements LauncherIO {
     @Override
     public void intakeFuel() {
         fuelStored++;
-    }
-
-    public void launchFuel(ShotData shot) {
-        update++;
-        if (update != 50) return;
-        update = 0;
-        fuelSim.launchFuel(
-                shot.getExitVelocity(),
-                shot.getHoodAngle(),
-                Units.Degrees.of(0),
-                Units.Meters.of(LauncherConstants.LAUNCHER_HEIGHT_METERS)
-        );
     }
 
     @Override
