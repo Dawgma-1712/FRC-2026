@@ -52,7 +52,7 @@ public class VisionReal implements VisionInterface {
         this.pigeon = drivetrain.getPigeon2();
 
        //configureLimelight(limelightBack, new Pose3d().transformBy(VisionConstants.LIMELIGHT_BACK_TO_ROBOT));
-        estimatorBack = limelightBack.createPoseEstimator(EstimationMode.MEGATAG2);
+        estimatorBack = limelightBack.createPoseEstimator(EstimationMode.MEGATAG1);
     }
 
     // configures the target limelight for MegaTag2 detection, needed before fetching pose in periodic
@@ -94,7 +94,8 @@ public class VisionReal implements VisionInterface {
                 || poseEstimate.pose.getY() < 0.0
                 || poseEstimate.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
             
-            Pose2d newPose = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? poseEstimate.pose.toPose2d() : poseEstimate.pose.toPose2d().rotateBy(new Rotation2d(Units.Degrees.of(180)));
+            //Pose2d newPose = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? poseEstimate.pose.toPose2d() : poseEstimate.pose.toPose2d().rotateBy(new Rotation2d(Units.Degrees.of(180)));
+            Pose2d newPose = poseEstimate.pose.toPose2d();
             if (!rejectPose) drivetrain.addVisionMeasurement(newPose, poseEstimate.timestampSeconds);
         }, () -> {
             poseEstimated = false;
