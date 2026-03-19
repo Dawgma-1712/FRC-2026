@@ -14,6 +14,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import limelight.networktables.Orientation3d;
@@ -28,22 +29,24 @@ import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 public class VisionReal implements VisionInterface {
     
    Limelight limelightBack = new Limelight(IdConstants.LIMELIGHT_BACK_ID);
+   Limelight limelightFront = new Limelight(IdConstants.LIMELIGHT_FRONT_ID);
 
     private final LimelightPoseEstimator estimatorBack;
+    private final LimelightPoseEstimator estimatorFront;
     private boolean poseEstimated = false;
-   private StructPublisher<Pose3d> limelightPoseEstimationPublisher = NetworkTableInstance.getDefault().getStructTopic("VisionPoseEstimate", Pose3d.struct).publish();
+    private boolean poseEstimatedFront = false;
+    private StructPublisher<Pose3d> limelightPoseEstimationPublisher = NetworkTableInstance.getDefault().getStructTopic("VisionPoseEstimate", Pose3d.struct).publish();
+    private StructPublisher<Pose3d> limelightFrontPoseEstimationPublisher = NetworkTableInstance.getDefault().getStructTopic("VisionPoseEstimate/Front", Pose3d.struct).publish();
 
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon;
 
     // configures the target limelight initially, only needed once in the initializer
     private void configureLimelight(Limelight limelight, Pose3d offset) {
-
       limelight.getSettings()
         .withLimelightLEDMode(LEDMode.PipelineControl)  // the LEDs will be on or off depending on the pipeline
         .withCameraOffset(offset)  // where the limelight is relative to the robot center
         .save();
-
     }
 
     public VisionReal(CommandSwerveDrivetrain drivetrain) {
@@ -53,6 +56,7 @@ public class VisionReal implements VisionInterface {
 
        //configureLimelight(limelightBack, new Pose3d().transformBy(VisionConstants.LIMELIGHT_BACK_TO_ROBOT));
         estimatorBack = limelightBack.createPoseEstimator(EstimationMode.MEGATAG1);
+        estimatorFront = limelightFront.createPoseEstimator(EstimationMode.MEGATAG1);
     }
 
     // configures the target limelight for MegaTag2 detection, needed before fetching pose in periodic
@@ -71,40 +75,86 @@ public class VisionReal implements VisionInterface {
             .save();
     }
 
+    private boolean rejectPose(PoseEstimate pose, boolean back) {
+        double ageSeconds = Timer.getFPGATimestamp() - pose.timestampSeconds;
+        boolean rejectPose =
+            pose.tagCount == 0 // Must have at least one tag
+                || ageSeconds > 0.1
+                || (pose.tagCount == 1
+                    && pose.getAvgTagAmbiguity() > 0.5) // Cannot be high ambiguity
+                || Math.abs(pose.pose.getZ())
+                    > 1 // Must have realistic Z coordinate
 
+                // Must be within the field boundaries
+                || pose.pose.getX() < 0.0
+                || pose.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
+                || pose.pose.getY() < 0.0
+                || pose.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
+        if (back) {
+            if (pose.tagCount == 0) {
+                System.out.println("No tags detected");
+            } else if (pose.tagCount == 1 && pose.getAvgTagAmbiguity() > 0.5) {
+                System.out.println(pose.getAvgTagAmbiguity());
+                System.out.println("Avg tag ambiguity too high");
+            } else if (pose.pose.getX() < 0.0
+                    || pose.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
+                    || pose.pose.getY() < 0.0
+                    || pose.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth()) {
+                        System.out.println("Outisde of field measurements");
+            }
+        }
+        return rejectPose;
+    }
 
     @Override
     public void addVisionMeasurements() {
 
         configureLimelightMegatag(limelightBack);
+        configureLimelightMegatag(limelightFront);
 
-        estimatorBack.getPoseEstimate().ifPresentOrElse((PoseEstimate poseEstimate) -> {
+        estimatorFront.getPoseEstimate().ifPresentOrElse((PoseEstimate poseEstimate1) -> {
+            poseEstimatedFront = true;
+            Pose2d newPoseFront = poseEstimate1.pose.toPose2d();
+            if (!rejectPose(poseEstimate1, false)) {
+                drivetrain.addVisionMeasurement(newPoseFront, poseEstimate1.timestampSeconds); 
+            } else {
+                poseEstimatedFront = false;
+            }
+            limelightFrontPoseEstimationPublisher.set(poseEstimate1.pose);
+        }, () -> {
+            poseEstimatedFront = false;
+        });
+
+        // Timmy: Mom...I'm Hungary,
+        // Mum: Why don't you Czech the fridge.
+        // Timmy: OK. I'm Russian to the kitchen.
+        // Mum: Hmmm...Maybe you'll find some Turkey
+        // Timmy: Yeah...But its all covered in Greece. Yuck!
+        // Mum: There's Norway you can eat that.
+        // Timmy: I know, I guess I'll just have a can of Chile
+        // Mum: Denmark your name on the can.
+        // Timmy: Kenya do it for me?
+        // Mum: OK. I'm Ghana do it.
+        // Timmy: Thanks, I'm so tired...Iran for an hour today
+        // Mum: It Tokyo long enough
+        // Timmy: Yeah. Israeli hard sometimes.
+        estimatorBack.getPoseEstimate().ifPresentOrElse((PoseEstimate poseEstimateBack) -> {
             poseEstimated = true;
-            limelightPoseEstimationPublisher.set(poseEstimate.pose);
-            boolean rejectPose =
-            poseEstimate.tagCount == 0 // Must have at least one tag
-                || (poseEstimate.tagCount == 1
-                    && poseEstimate.getAvgTagAmbiguity() > 0.5) // Cannot be high ambiguity
-                || Math.abs(poseEstimate.pose.getZ())
-                    > 1 // Must have realistic Z coordinate
+            Pose2d newPose = poseEstimateBack.pose.toPose2d();
+            if (!rejectPose(poseEstimateBack, true)) {
+                drivetrain.addVisionMeasurement(newPose, poseEstimateBack.timestampSeconds);
+            } else {
+                poseEstimated = false;
+            }
+            limelightPoseEstimationPublisher.set(poseEstimateBack.pose);
 
-                // Must be within the field boundaries
-                || poseEstimate.pose.getX() < 0.0
-                || poseEstimate.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
-                || poseEstimate.pose.getY() < 0.0
-                || poseEstimate.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
-            
-            //Pose2d newPose = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? poseEstimate.pose.toPose2d() : poseEstimate.pose.toPose2d().rotateBy(new Rotation2d(Units.Degrees.of(180)));
-            Pose2d newPose = poseEstimate.pose.toPose2d();
-            if (!rejectPose) drivetrain.addVisionMeasurement(newPose, poseEstimate.timestampSeconds);
         }, () -> {
             poseEstimated = false;
         });
 
         SmartDashboard.putBoolean("Vision/Pose Estimated", poseEstimated);
-
+        SmartDashboard.putBoolean("Vision/Pose Estimated Front", poseEstimatedFront);
     }
-
 }
 
 

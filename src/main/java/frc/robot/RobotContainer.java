@@ -148,8 +148,6 @@ public class RobotContainer {
       Distance intakeXMax = Units.Inches.of(25.14);
       Distance intakeYMax = Units.Inches.of(17.024);
 
-      NamedCommands.registerCommand("Shoot", getAutoPreloads());
-
       fuelSim.registerIntake(intakeXMin, intakeXMax, intakeYMin, intakeYMax, () -> true, () -> { launcherIO.intakeFuel(); });
 
       fuelSim.start();
@@ -159,10 +157,11 @@ public class RobotContainer {
 
     this.launcher = new LauncherSubsystem(this.launcherIO, this.drivetrain);
     this.intake = new IntakeSubsystem(this.intakeIO);
-    System.out.println(intakeIO.getClass());
     this.climber = new ClimberSubsystem(this.climberIO);
     this.revolver = new RevolverSubsystem(this.revolverIO);
     this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
+    NamedCommands.registerCommand("Shoot", getAutoPreloads());
+
 
     // autoHandler = new ModularAutoHandler();
 
@@ -366,6 +365,7 @@ public class RobotContainer {
           });
 
       }, Set.of(launcher))
+      
       .finallyDo(() -> {
         launcher.setLauncherVelocity(Units.RadiansPerSecond.of(0)); 
         launcher.setHoodPosition(Units.Degrees.of(0));

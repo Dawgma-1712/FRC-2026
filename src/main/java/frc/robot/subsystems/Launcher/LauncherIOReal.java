@@ -13,6 +13,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANrange;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 
@@ -84,6 +85,8 @@ public class LauncherIOReal implements LauncherIO {
             hoodConfig.idleMode(IdleMode.kBrake);
             hoodConfig.smartCurrentLimit(30); // adjust for bag motor
             hoodBagMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+            kickerKraken.optimizeBusUtilization();
 
             cumulativeEncoderDegrees += getHoodPosition().in(Units.Degrees) * 17 + 7.745 * 17 - 3.953 * 17;
     
