@@ -90,19 +90,6 @@ public class VisionReal implements VisionInterface {
                 || pose.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
                 || pose.pose.getY() < 0.0
                 || pose.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
-        if (back) {
-            if (pose.tagCount == 0) {
-                System.out.println("No tags detected");
-            } else if (pose.tagCount == 1 && pose.getAvgTagAmbiguity() > 0.5) {
-                System.out.println(pose.getAvgTagAmbiguity());
-                System.out.println("Avg tag ambiguity too high");
-            } else if (pose.pose.getX() < 0.0
-                    || pose.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
-                    || pose.pose.getY() < 0.0
-                    || pose.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth()) {
-                        System.out.println("Outisde of field measurements");
-            }
-        }
         return rejectPose;
     }
 

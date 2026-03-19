@@ -25,6 +25,7 @@ public class LauncherSubsystem extends SubsystemBase {
     LauncherIO io;
     CommandSwerveDrivetrain drivetrain;
     public InterpolatingDoubleTreeMap hoodAngleMap;
+    public InterpolatingDoubleTreeMap rpsMap;
 
     private Angle hoodTarget = Units.Degrees.of(LauncherConstants.BASE_ANGLE);
     AngularVelocity targetVelocity;
@@ -39,10 +40,28 @@ public class LauncherSubsystem extends SubsystemBase {
             : FieldConstants.BLUE_HUB_POSE.getTranslation();
 
         this.hoodAngleMap = new InterpolatingDoubleTreeMap();
+        this.rpsMap = new InterpolatingDoubleTreeMap();
 
-        hoodAngleMap.put(Units.Inches.of(101).in(Units.Meters), 17.0);
-        hoodAngleMap.put(Units.Inches.of(75).in(Units.Meters), 25.0);
-        hoodAngleMap.put(Units.Inches.of(45).in(Units.Meters), 16.0);
+        hoodAngleMap.put(Units.Inches.of(44).in(Units.Meters), 7.0);
+        rpsMap.put(Units.Inches.of(44).in(Units.Meters), 50.0);
+
+        hoodAngleMap.put(Units.Inches.of(68).in(Units.Meters), 10.0);
+        rpsMap.put(Units.Inches.of(68).in(Units.Meters), 50.0);
+
+        hoodAngleMap.put(Units.Inches.of(97).in(Units.Meters), 16.0);
+        rpsMap.put(Units.Inches.of(97).in(Units.Meters), 50.0);
+
+        hoodAngleMap.put(Units.Inches.of(120).in(Units.Meters), 21.0);
+        rpsMap.put(Units.Inches.of(120).in(Units.Meters), 55.0);
+
+        hoodAngleMap.put(Units.Inches.of(140).in(Units.Meters), 25.0);
+        rpsMap.put(Units.Inches.of(140).in(Units.Meters), 55.0);
+
+        hoodAngleMap.put(Units.Inches.of(176.5).in(Units.Meters), 25.0);
+        rpsMap.put(Units.Inches.of(176.5).in(Units.Meters), 60.0);
+
+        hoodAngleMap.put(Units.Inches.of(211).in(Units.Meters), 35.0);
+        rpsMap.put(Units.Inches.of(211).in(Units.Meters), 65.0);
 
     }
 
@@ -107,8 +126,9 @@ public class LauncherSubsystem extends SubsystemBase {
         double distance = robotTranslation.getDistance(target.toTranslation2d());
 
         double hoodAngle = hoodAngleMap.get(distance);
+        AngularVelocity velocity = Units.RotationsPerSecond.of(rpsMap.get(distance));
         setHoodPosition(Units.Degrees.of(hoodAngle));
-        setLauncherVelocity(Units.RotationsPerSecond.of(100));
+        setLauncherVelocity(velocity);
 
     }
 

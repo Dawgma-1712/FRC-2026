@@ -202,7 +202,6 @@ public class RobotContainer {
         Commands.run(() -> {
             Pose2d robotPose = drivetrain.getState().Pose;
             launcher.launcherLookupTable(robotPose);
-
             if (shootTimer.hasElapsed(0.2)) {
                 revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
                 launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
