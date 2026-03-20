@@ -9,12 +9,14 @@ import frc.Constants.IntakeConstants;
 import frc.Constants.LauncherConstants;
 import frc.Constants.OperatorConstants;
 import frc.Constants.RevolverConstants;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+
 import frc.robot.commands.SwerveSlowMode;
 import frc.robot.generated.TunerConstants;
 
@@ -22,6 +24,8 @@ import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.Launcher.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Revolver.*;
+
+import frc.robot.commandFactories.ShootOnTheMove;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -202,6 +206,9 @@ public class RobotContainer {
         Commands.run(() -> {
             Pose2d robotPose = drivetrain.getState().Pose;
             launcher.launcherLookupTable(robotPose);
+            // alternatively,
+            ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(drivetrain.getState().Speeds, drivetrain.getState().Pose.getRotation());
+            ShootOnTheMove.launcherShootOnTheMove(drivetrain, fieldSpeeds, launcher.target.toTranslation2d(), launcher, 3);
             if (shootTimer.hasElapsed(0.2)) {
                 revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
                 launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);

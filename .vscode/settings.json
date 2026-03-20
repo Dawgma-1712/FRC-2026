@@ -60,5 +60,5 @@
   "java.dependency.enableDependencyCheckup": false,
   "java.project.sourcePaths": ["src/main/java", "build/generated/sources/annotationProcessor/java/main"],
   "java.autobuild.enabled": false,
-  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -Xlog:disable"
+  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx16G -Xms100m -Xlog:disable"
 }
