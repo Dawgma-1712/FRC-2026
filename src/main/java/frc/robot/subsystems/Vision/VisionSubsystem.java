@@ -8,7 +8,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     private final CommandSwerveDrivetrain drivetrain;
     private final VisionInterface visionIO;
-    private final VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
 
     public VisionSubsystem(CommandSwerveDrivetrain drivetrain, VisionInterface visionInterface) {
         this.drivetrain = drivetrain;

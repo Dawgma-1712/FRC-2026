@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import frc.Constants.FieldConstants;
 import frc.Constants.IntakeConstants;
 import frc.Constants.LauncherConstants;
 import frc.Constants.OperatorConstants;
@@ -44,7 +43,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.subsystems.Swerve.*;
@@ -53,13 +51,6 @@ import frc.robot.utils.FuelSim;
 
 import java.util.Set;
 import java.util.function.Supplier;
-
-import org.ejml.equation.Sequence;
-
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 
 public class RobotContainer {
 

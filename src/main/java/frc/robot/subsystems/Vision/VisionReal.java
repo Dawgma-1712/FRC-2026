@@ -1,21 +1,12 @@
 package frc.robot.subsystems.Vision;
 
 import limelight.Limelight;
-import limelight.networktables.LimelightSettings.LEDMode;
 
 import java.util.Optional;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
@@ -34,20 +25,9 @@ public class VisionReal implements VisionInterface {
     private final LimelightPoseEstimator estimatorBack;
     private final LimelightPoseEstimator estimatorFront;
     private boolean poseEstimated = false;
-    private boolean poseEstimatedFront = false;
-    private StructPublisher<Pose3d> limelightPoseEstimationPublisher = NetworkTableInstance.getDefault().getStructTopic("VisionPoseEstimate", Pose3d.struct).publish();
-    private StructPublisher<Pose3d> limelightFrontPoseEstimationPublisher = NetworkTableInstance.getDefault().getStructTopic("VisionPoseEstimate/Front", Pose3d.struct).publish();
 
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon;
-
-    // configures the target limelight initially, only needed once in the initializer
-    private void configureLimelight(Limelight limelight, Pose3d offset) {
-      limelight.getSettings()
-        .withLimelightLEDMode(LEDMode.PipelineControl)  // the LEDs will be on or off depending on the pipeline
-        .withCameraOffset(offset)  // where the limelight is relative to the robot center
-        .save();
-    }
 
     public VisionReal(CommandSwerveDrivetrain drivetrain) {
 
@@ -75,7 +55,7 @@ public class VisionReal implements VisionInterface {
             .save();
     }
 
-    private boolean rejectPose(PoseEstimate pose, boolean back) {
+    private boolean rejectPose(PoseEstimate pose) {
         double ageSeconds = Timer.getFPGATimestamp() - pose.timestampSeconds;
         boolean rejectPose =
             pose.tagCount == 0 // Must have at least one tag
@@ -93,24 +73,50 @@ public class VisionReal implements VisionInterface {
         return rejectPose;
     }
 
+    private PoseEstimate betterPoseEstimate(PoseEstimate back, PoseEstimate front) {
+
+        // compare tag counts
+        if (back.tagCount != front.tagCount) {
+            return back.tagCount > front.tagCount ? back : front;
+        }
+
+        // then ambiguity
+        if (back.getAvgTagAmbiguity() != front.getAvgTagAmbiguity()) {
+            return back.getAvgTagAmbiguity() < front.getAvgTagAmbiguity() ? back : front;
+        }
+
+        // then timestamps
+        return back.timestampSeconds > front.timestampSeconds ? back : front;
+    }
+
     @Override
     public void addVisionMeasurements() {
 
         configureLimelightMegatag(limelightBack);
         configureLimelightMegatag(limelightFront);
 
-        estimatorFront.getPoseEstimate().ifPresentOrElse((PoseEstimate poseEstimate1) -> {
-            poseEstimatedFront = true;
-            Pose2d newPoseFront = poseEstimate1.pose.toPose2d();
-            if (!rejectPose(poseEstimate1, false)) {
-                drivetrain.addVisionMeasurement(newPoseFront, poseEstimate1.timestampSeconds); 
-            } else {
-                poseEstimatedFront = false;
-            }
-            limelightFrontPoseEstimationPublisher.set(poseEstimate1.pose);
-        }, () -> {
-            poseEstimatedFront = false;
-        });
+        Optional<PoseEstimate> backPoseEstimate =  estimatorBack.getPoseEstimate().filter(p -> !rejectPose(p));
+        Optional<PoseEstimate> frontPoseEstimate =  estimatorFront.getPoseEstimate().filter(p -> !rejectPose(p));
+        poseEstimated = true;
+
+        if (backPoseEstimate.isPresent() && frontPoseEstimate.isPresent()) {
+
+            PoseEstimate bestPoseEstimate = betterPoseEstimate(backPoseEstimate.get(), frontPoseEstimate.get());
+            drivetrain.addVisionMeasurement(bestPoseEstimate.pose.toPose2d(), bestPoseEstimate.timestampSeconds);
+
+        } else if (backPoseEstimate.isPresent()) {
+            
+            PoseEstimate poseEstimate = backPoseEstimate.get();
+            drivetrain.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
+
+        } else if (frontPoseEstimate.isPresent()) {
+
+            PoseEstimate poseEstimate = frontPoseEstimate.get();
+            drivetrain.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
+
+        } else {
+            poseEstimated = false;
+        }
 
         // Timmy: Mom...I'm Hungary,
         // Mum: Why don't you Czech the fridge.
@@ -125,22 +131,8 @@ public class VisionReal implements VisionInterface {
         // Timmy: Thanks, I'm so tired...Iran for an hour today
         // Mum: It Tokyo long enough
         // Timmy: Yeah. Israeli hard sometimes.
-        estimatorBack.getPoseEstimate().ifPresentOrElse((PoseEstimate poseEstimateBack) -> {
-            poseEstimated = true;
-            Pose2d newPose = poseEstimateBack.pose.toPose2d();
-            if (!rejectPose(poseEstimateBack, true)) {
-                drivetrain.addVisionMeasurement(newPose, poseEstimateBack.timestampSeconds);
-            } else {
-                poseEstimated = false;
-            }
-            limelightPoseEstimationPublisher.set(poseEstimateBack.pose);
-
-        }, () -> {
-            poseEstimated = false;
-        });
 
         SmartDashboard.putBoolean("Vision/Pose Estimated", poseEstimated);
-        SmartDashboard.putBoolean("Vision/Pose Estimated Front", poseEstimatedFront);
     }
 }
 
