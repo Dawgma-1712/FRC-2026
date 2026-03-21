@@ -1,6 +1,7 @@
 package frc.robot.commandFactories;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -50,6 +51,8 @@ public class ShootOnTheMove {
         double hoodAngleDegrees = launcher.hoodAngleMap.get(distance.in(Units.Meters));
         double rps = launcher.rpsMap.get(distance.in(Units.Meters));
 
+        Translation2d predictedTarget = target;
+
         AngularVelocity angularVelocity = Units.RotationsPerSecond.of(rps);
         LinearVelocity linearVelocity = angularToLinearVelocity(angularVelocity, Units.Inches.of(LauncherConstants.FLYWHEEL_WHEEL_DIAMETER / 2));
         Angle hoodAngle = Units.Degrees.of(hoodAngleDegrees);
@@ -57,7 +60,7 @@ public class ShootOnTheMove {
         Time timeOfFlight = calculateTimeOfFlight(linearVelocity, hoodAngle, distance);
 
         for(int i = 0; i < iterations; i++) {
-            Translation2d predictedTarget = predictTargetPos(target, fieldSpeeds, timeOfFlight);
+            predictedTarget = predictTargetPos(target, fieldSpeeds, timeOfFlight);
 
             distance = Units.Meters.of(robotTranslation.getDistance(predictedTarget));
             hoodAngleDegrees = launcher.hoodAngleMap.get(distance.in(Units.Meters));
@@ -71,7 +74,7 @@ public class ShootOnTheMove {
 
         launcher.setLauncherVelocity(angularVelocity);
         launcher.setHoodPosition(hoodAngle);
-        
+        launcher.target = new Translation3d(predictedTarget);
     }
 
     public static Command shootOnTheMoveCommand(

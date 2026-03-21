@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Launcher;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -42,23 +43,32 @@ public class LauncherSubsystem extends SubsystemBase {
         this.hoodAngleMap = new InterpolatingDoubleTreeMap();
         this.rpsMap = new InterpolatingDoubleTreeMap();
 
-        hoodAngleMap.put(Units.Inches.of(44).in(Units.Meters), 7.0);
-        rpsMap.put(Units.Inches.of(44).in(Units.Meters), 50.0);
+        hoodAngleMap.put(Units.Inches.of(58).in(Units.Meters), 7.0);
+        rpsMap.put(Units.Inches.of(58).in(Units.Meters), 50.0);
 
         hoodAngleMap.put(Units.Inches.of(68).in(Units.Meters), 10.0);
         rpsMap.put(Units.Inches.of(68).in(Units.Meters), 50.0);
 
+        hoodAngleMap.put(Units.Inches.of(76).in(Units.Meters), 12.0);
+        rpsMap.put(Units.Inches.of(76).in(Units.Meters), 50.0);
+
         hoodAngleMap.put(Units.Inches.of(97).in(Units.Meters), 16.0);
         rpsMap.put(Units.Inches.of(97).in(Units.Meters), 50.0);
 
+        hoodAngleMap.put(Units.Inches.of(111).in(Units.Meters), 16.0);
+        rpsMap.put(Units.Inches.of(111).in(Units.Meters), 51.0);
+        
         hoodAngleMap.put(Units.Inches.of(120).in(Units.Meters), 21.0);
-        rpsMap.put(Units.Inches.of(120).in(Units.Meters), 55.0);
+        rpsMap.put(Units.Inches.of(120).in(Units.Meters), 54.0);
 
         hoodAngleMap.put(Units.Inches.of(140).in(Units.Meters), 25.0);
         rpsMap.put(Units.Inches.of(140).in(Units.Meters), 55.0);
 
         hoodAngleMap.put(Units.Inches.of(176.5).in(Units.Meters), 25.0);
         rpsMap.put(Units.Inches.of(176.5).in(Units.Meters), 60.0);
+
+        hoodAngleMap.put(Units.Inches.of(201.18).in(Units.Meters), 30.0);
+        rpsMap.put(Units.Inches.of(201.18).in(Units.Meters), 64.0);
 
         hoodAngleMap.put(Units.Inches.of(211).in(Units.Meters), 35.0);
         rpsMap.put(Units.Inches.of(211).in(Units.Meters), 65.0);
@@ -122,7 +132,7 @@ public class LauncherSubsystem extends SubsystemBase {
             ? FieldConstants.RED_HUB_POSE.getTranslation()
             : FieldConstants.BLUE_HUB_POSE.getTranslation();
 
-        Translation2d robotTranslation = robotPose.getTranslation();
+        Translation2d robotTranslation = new Pose3d(robotPose).transformBy(LauncherConstants.ROBOT_TO_LAUNCHER_TRANSFORM).toPose2d().getTranslation();
         double distance = robotTranslation.getDistance(target.toTranslation2d());
 
         double hoodAngle = hoodAngleMap.get(distance);
@@ -142,6 +152,9 @@ public class LauncherSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Launcher/Hood angle", getHoodPosition().in(Units.Degrees));
         SmartDashboard.putNumber("Launcher/Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
         SmartDashboard.putNumber("Hood Goal", hoodTarget.in(Units.Degrees));
+        Translation2d robotTranslation = new Pose3d(drivetrain.getState().Pose).transformBy(LauncherConstants.ROBOT_TO_LAUNCHER_TRANSFORM).toPose2d().getTranslation();
+        double distance = robotTranslation.getDistance(target.toTranslation2d());
+        SmartDashboard.putNumber("Current Distance", Units.Meters.of(distance).in(Units.Inches));
         io.hoodControlLoop();
     }
 }

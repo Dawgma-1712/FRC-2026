@@ -91,6 +91,9 @@ public class RobotContainer {
   private final VisionInterface visionInterface;
   private final VisionSubsystem vision;
 
+  private final VisionInterface visionInterfaceBack;
+  private final VisionSubsystemBack visionSubsystemBack;
+
 
   private final Joystick driver;
   private final Joystick operator;
@@ -111,6 +114,7 @@ public class RobotContainer {
       this.climberIO = new ClimberIOReal();
       this.revolverIO = new RevolverIOReal();
       this.visionInterface = new VisionReal(this.drivetrain);
+      this.visionInterfaceBack = new VisionRealBackIO(this.drivetrain);
 
     } else {
 
@@ -119,6 +123,7 @@ public class RobotContainer {
       this.climberIO = new ClimberIOSim();
       this.revolverIO = new RevolverIOSim();
       this.visionInterface = new VisionSim(this.drivetrain);
+      this.visionInterfaceBack = new VisionSim(this.drivetrain);
 
       // FuelSim stuff
 
@@ -154,6 +159,7 @@ public class RobotContainer {
     this.intake = new IntakeSubsystem(this.intakeIO);
     this.climber = new ClimberSubsystem(this.climberIO);
     this.revolver = new RevolverSubsystem(this.revolverIO);
+    this.visionSubsystemBack = new VisionSubsystemBack(this.drivetrain, this.visionInterfaceBack);
     this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
     NamedCommands.registerCommand("Shoot", getAutoPreloads());
 
@@ -183,6 +189,7 @@ public class RobotContainer {
       autoChooser = AutoBuilder.buildAutoChooser();
       autoChooser.addOption("OuterBumpRight", new PathPlannerAuto("OuterBumpRight"));
       autoChooser.addOption("InnerBumpRight", new PathPlannerAuto("InnerBumpRight"));
+      autoChooser.addOption("InnerBumpLeftShoot", new PathPlannerAuto("InnerBumpLeftShoot"));
       autoChooser.setDefaultOption("OuterBumpRight", new PathPlannerAuto("OuterBumpRight"));
       SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -198,13 +205,23 @@ public class RobotContainer {
             Pose2d robotPose = drivetrain.getState().Pose;
             launcher.launcherLookupTable(robotPose);
             // alternatively,
+            /*
             ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(drivetrain.getState().Speeds, drivetrain.getState().Pose.getRotation());
-            ShootOnTheMove.launcherShootOnTheMove(drivetrain, fieldSpeeds, launcher.target.toTranslation2d(), launcher, 3);
+            ShootOnTheMove.launcherShootOnTheMove(drivetrain, fieldSpeeds, launcher.target.toTranslation2d(), launcher, 1);
+            */
             if (shootTimer.hasElapsed(0.2)) {
                 revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
                 launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
             }
-        }, launcher, revolver) 
+        }, launcher, revolver)
+        .alongWith(new AutoLock(
+                                                                                        this.drivetrain,
+                                                                                        () -> launcher.target.toTranslation2d(),
+                                                                                        () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2
+                                                                                            ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0),
+                                                                                        () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2
+                                                                                            ? -driver.getRawAxis(OperatorConstants.DRIVER_LX) * MaxSpeed * speed : 0)
+                                                                                    ).repeatedly()) 
         .beforeStarting(() -> shootTimer.restart())
         .finallyDo(() -> {
             revolver.setRevolverPercentOutput(0);
@@ -357,8 +374,7 @@ public class RobotContainer {
       prepAutoPreloads = Commands.defer(() -> {
 
           return Commands.run(() -> {
-            launcher.setLauncherVelocity(Units.RotationsPerSecond.of(100));
-            launcher.setHoodPosition(Units.Degrees.of(launcher.hoodAngleMap.get(drivetrain.getState().Pose.getTranslation().getDistance(launcher.target.toTranslation2d()))));
+            launcher.launcherLookupTable(drivetrain.getState().Pose);
           });
 
       }, Set.of(launcher))

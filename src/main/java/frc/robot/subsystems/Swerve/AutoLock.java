@@ -31,7 +31,7 @@ public class AutoLock extends Command {
         this.xSupplier = xSupplier;
         this.ySupplier = ySupplier;
 
-        this.rotationController = new PIDController(0.17, 0, 0.003);
+        this.rotationController = new PIDController(0.1, 0, 0.003);
         this.rotationController.enableContinuousInput(-180, 180); 
         
         addRequirements(drivetrain);

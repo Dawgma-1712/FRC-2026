@@ -194,7 +194,7 @@ public final class Constants {
     public static final double HOOD_ENCODER_OFFSET = 227.117 + 35.318;
 
     public static final Transform3d ROBOT_TO_LAUNCHER_TRANSFORM = new Transform3d(
-                                                                      new Translation3d(Units.inchesToMeters(-6.279 + 2.95), Units.inchesToMeters(2.35), Units.inchesToMeters(18.113)),
+                                                                      new Translation3d(Units.inchesToMeters(-4), Units.inchesToMeters(4.7), Units.inchesToMeters(0)),
                                                                       new Rotation3d()
                                                                   );
     public static final double DEBOUNCE_LENGTH = 0.1; //in seconds how long the change must be real until you idk just search ts up

@@ -21,17 +21,14 @@ import frc.Constants.IdConstants;
 import frc.Constants.VisionConstants;
 import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
-public class VisionReal implements VisionInterface {
+public class VisionRealBackIO implements VisionInterface {
     
-   Limelight limelightFront = new Limelight(IdConstants.LIMELIGHT_FRONT_ID);
-
-    private double lastFrontTimestamp = 0;
-    private boolean poseEstimated = false;
+   Limelight limelightBack = new Limelight(IdConstants.LIMELIGHT_BACK_ID);
 
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon;
 
-    public VisionReal(CommandSwerveDrivetrain drivetrain) {
+    public VisionRealBackIO(CommandSwerveDrivetrain drivetrain) {
 
         this.drivetrain = drivetrain;
         this.pigeon = drivetrain.getPigeon2();
@@ -73,19 +70,18 @@ public class VisionReal implements VisionInterface {
     @Override
     public void addVisionMeasurements() {
 
-        configureLimelightMegatag(limelightFront);
+        configureLimelightMegatag(limelightBack);
 
-        Optional<PoseEstimate> frontPoseEstimate = BotPose.BLUE_MEGATAG2.get(limelightFront)
-            .filter(p -> !rejectPose(p))
-            .filter(p -> p.timestampSeconds != lastFrontTimestamp);
+        Optional<PoseEstimate> backPoseEstimate = BotPose.BLUE_MEGATAG2.get(limelightBack)
+            .filter(p -> !rejectPose(p));
 
-        if (frontPoseEstimate.isPresent()) {
-            SmartDashboard.putBoolean("Vision/Front Estimated", true);
-            PoseEstimate poseEstimate = frontPoseEstimate.get();
+        if (backPoseEstimate.isPresent()) {
+            SmartDashboard.putBoolean("Vision/Back Estimated", true);
+            PoseEstimate poseEstimate = backPoseEstimate.get();
             drivetrain.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
 
         } else {
-            SmartDashboard.putBoolean("Vision/Front Estimated", false);
+            SmartDashboard.putBoolean("Vision/Back Estimated", false);
         }
 
         // Timmy: Mom...I'm Hungary,
