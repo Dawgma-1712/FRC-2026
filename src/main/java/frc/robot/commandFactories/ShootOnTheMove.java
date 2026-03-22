@@ -1,5 +1,6 @@
 package frc.robot.commandFactories;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -46,7 +47,9 @@ public class ShootOnTheMove {
         int iterations
     ) {
 
-        Translation2d robotTranslation = drivetrain.getState().Pose.getTranslation();
+        // laziest code I've ever written
+        Translation2d robotTranslation = new Pose3d(drivetrain.getState().Pose).transformBy(LauncherConstants.ROBOT_TO_LAUNCHER_TRANSFORM).toPose2d().getTranslation();
+        
         Distance distance = Units.Meters.of(robotTranslation.getDistance(target));
         double hoodAngleDegrees = launcher.hoodAngleMap.get(distance.in(Units.Meters));
         double rps = launcher.rpsMap.get(distance.in(Units.Meters));
@@ -74,19 +77,19 @@ public class ShootOnTheMove {
 
         launcher.setLauncherVelocity(angularVelocity);
         launcher.setHoodPosition(hoodAngle);
-        launcher.target = new Translation3d(predictedTarget);
+        launcher.predictedTarget = new Translation3d(predictedTarget);
     }
 
     public static Command shootOnTheMoveCommand(
         CommandSwerveDrivetrain drivetrain, 
-        ChassisSpeeds fieldSpeeds, 
         Translation2d target, 
         LauncherSubsystem launcher, 
         int iterations) {
 
             return Commands.run(() -> {
+                ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(drivetrain.getState().Speeds, drivetrain.getState().Pose.getRotation());
                 launcherShootOnTheMove(drivetrain, fieldSpeeds, target, launcher, iterations);
-            });
+            }, launcher);
     }
 
 }

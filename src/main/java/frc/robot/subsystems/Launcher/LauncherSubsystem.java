@@ -31,6 +31,7 @@ public class LauncherSubsystem extends SubsystemBase {
     private Angle hoodTarget = Units.Degrees.of(LauncherConstants.BASE_ANGLE);
     AngularVelocity targetVelocity;
     public Translation3d target;
+    public Translation3d predictedTarget;
 
     public LauncherSubsystem(LauncherIO io, CommandSwerveDrivetrain drivetrain) {
 
@@ -39,6 +40,7 @@ public class LauncherSubsystem extends SubsystemBase {
         this.target = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
             ? FieldConstants.RED_HUB_POSE.getTranslation()
             : FieldConstants.BLUE_HUB_POSE.getTranslation();
+        this.predictedTarget = this.target;
 
         this.hoodAngleMap = new InterpolatingDoubleTreeMap();
         this.rpsMap = new InterpolatingDoubleTreeMap();
@@ -152,9 +154,14 @@ public class LauncherSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Launcher/Hood angle", getHoodPosition().in(Units.Degrees));
         SmartDashboard.putNumber("Launcher/Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
         SmartDashboard.putNumber("Hood Goal", hoodTarget.in(Units.Degrees));
+
+        target = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
+            ? FieldConstants.RED_HUB_POSE.getTranslation()
+            : FieldConstants.BLUE_HUB_POSE.getTranslation();
         Translation2d robotTranslation = new Pose3d(drivetrain.getState().Pose).transformBy(LauncherConstants.ROBOT_TO_LAUNCHER_TRANSFORM).toPose2d().getTranslation();
         double distance = robotTranslation.getDistance(target.toTranslation2d());
         SmartDashboard.putNumber("Current Distance", Units.Meters.of(distance).in(Units.Inches));
+
         io.hoodControlLoop();
     }
 }

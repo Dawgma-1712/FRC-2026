@@ -202,13 +202,14 @@ public class RobotContainer {
     Timer shootTimer = new Timer();
     new JoystickButton(driver, OperatorConstants.DRIVER_RT).whileTrue(
         Commands.run(() -> {
+          /*
             Pose2d robotPose = drivetrain.getState().Pose;
             launcher.launcherLookupTable(robotPose);
-            // alternatively,
-            /*
+          */
+
             ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(drivetrain.getState().Speeds, drivetrain.getState().Pose.getRotation());
             ShootOnTheMove.launcherShootOnTheMove(drivetrain, fieldSpeeds, launcher.target.toTranslation2d(), launcher, 1);
-            */
+
             if (shootTimer.hasElapsed(0.2)) {
                 revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
                 launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
@@ -216,7 +217,7 @@ public class RobotContainer {
         }, launcher, revolver)
         .alongWith(new AutoLock(
                                                                                         this.drivetrain,
-                                                                                        () -> launcher.target.toTranslation2d(),
+                                                                                        () -> launcher.predictedTarget.toTranslation2d(),
                                                                                         () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LY)) > 0.2
                                                                                             ? -driver.getRawAxis(OperatorConstants.DRIVER_LY) * MaxSpeed * speed : 0),
                                                                                         () -> (Math.abs(-driver.getRawAxis(OperatorConstants.DRIVER_LX)) > 0.2
@@ -303,7 +304,7 @@ public class RobotContainer {
     new JoystickButton(operator, OperatorConstants.OPERATOR_B).whileTrue(
         Commands.run(() -> {
             launcher.setLauncherVelocity(Units.RotationsPerSecond.of(70));
-            if (shootTimer.hasElapsed(0.2)) {
+            if (operatorShootTimer.hasElapsed(0.2)) {
                 revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
                 launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
             }
