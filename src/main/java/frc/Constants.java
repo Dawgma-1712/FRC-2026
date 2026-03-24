@@ -280,6 +280,25 @@ public static class FieldConstants {
         Rotation2d.fromDegrees(0)
     );
 
+public static final Pose3d BLUE_FEED_POSE = new Pose3d(
+        new Translation3d(
+            Units.inchesToMeters(93.44),   // avg X of blue hub tags 18-21
+            Units.inchesToMeters(154.82),   // avg Y of blue hub tags 18-21
+            Units.inchesToMeters(72)        // funnel top height
+        ),
+        new Rotation3d(0, 0, 0)
+    );
+    public static final Pose3d RED_FEED_POSE = new Pose3d(
+        new Translation3d(
+            Units.inchesToMeters(556.68),   // avg X of red hub tags 2-5
+            Units.inchesToMeters(161.82),   // avg Y of red hub tags 2-5
+            Units.inchesToMeters(72)        // funnel top height
+        ),
+        new Rotation3d(0, 0, 0)
+    );
+    public static final Distance RED_TRENCH_LINE = edu.wpi.first.units.Units.Inches.of(651.22 - 182.11);
+    public static final Distance BLUE_TRENCH_LINE = edu.wpi.first.units.Units.Inches.of(182.11);
+
     public static final Distance FUNNEL_RADIUS = edu.wpi.first.units.Units.Inches.of(24);
     public static final Distance FUNNEL_HEIGHT = edu.wpi.first.units.Units.Inches.of(72 - 56.4);
 }

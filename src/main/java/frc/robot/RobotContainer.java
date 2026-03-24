@@ -159,8 +159,9 @@ public class RobotContainer {
     this.intake = new IntakeSubsystem(this.intakeIO);
     this.climber = new ClimberSubsystem(this.climberIO);
     this.revolver = new RevolverSubsystem(this.revolverIO);
-    this.visionSubsystemBack = new VisionSubsystemBack(this.drivetrain, this.visionInterfaceBack);
     this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
+    this.visionSubsystemBack = new VisionSubsystemBack(this.drivetrain, this.visionInterfaceBack);
+    
     NamedCommands.registerCommand("Shoot", getAutoPreloads());
 
 

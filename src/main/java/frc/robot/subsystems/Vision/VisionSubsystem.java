@@ -8,7 +8,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     private final CommandSwerveDrivetrain drivetrain;
     private final VisionInterface visionIO;
-    private boolean isMyTurn = true;
 
     public VisionSubsystem(CommandSwerveDrivetrain drivetrain, VisionInterface visionInterface) {
         this.drivetrain = drivetrain;
@@ -17,9 +16,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (isMyTurn) {
-            visionIO.addVisionMeasurements();
-        }
-        isMyTurn = !isMyTurn;
+        visionIO.addVisionMeasurements();
     }
 }

@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OuterBumpLeft"
+            "pathName": "InnerBumpLeftKamikaze"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Outer Bump Left",
+  "folder": "Inner Bump Left",
   "choreoAuto": false
 }

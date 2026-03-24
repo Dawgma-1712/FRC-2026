@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OuterBumpLeft"
+            "pathName": "InnerBumpLeftHP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "PickupHP"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Outer Bump Left",
+  "folder": "Inner Bump Left",
   "choreoAuto": false
 }

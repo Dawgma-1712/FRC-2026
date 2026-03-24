@@ -11,7 +11,14 @@
     "Middle",
     "Right"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Inner Bump Left",
+    "Inner Bump Right",
+    "Trench Right",
+    "Outer Bump Left",
+    "Outer Bump Right",
+    "Trench Left"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
