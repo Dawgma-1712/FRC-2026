@@ -75,7 +75,7 @@ public class VisionReal implements VisionInterface {
 
         configureLimelightMegatag(limelightFront);
 
-        Optional<PoseEstimate> frontPoseEstimate = BotPose.BLUE_MEGATAG2.get(limelightFront);
+        Optional<PoseEstimate> frontPoseEstimate = BotPose.BLUE_MEGATAG2.get(limelightFront).filter(p -> !rejectPose(p));
 
         if (frontPoseEstimate.isPresent()) {
             SmartDashboard.putBoolean("Vision/Front Estimated", true);

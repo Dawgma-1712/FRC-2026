@@ -40,6 +40,7 @@ private StructPublisher<Pose3d> limelightPosePublisher = NetworkTableInstance.ge
 
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon;
+    boolean backPoseEstimated = true;
 
     public VisionRealBackIO(CommandSwerveDrivetrain drivetrain) {
 
@@ -64,19 +65,13 @@ private StructPublisher<Pose3d> limelightPosePublisher = NetworkTableInstance.ge
             .save();
     }
 
-    private boolean rejectPose(PoseEstimate pose) {
+    private boolean rejectPose(Pose2d pose) {
         boolean rejectPose =
-            pose.tagCount == 0 // Must have at least one tag
-                || (pose.tagCount == 1
-                    && pose.getAvgTagAmbiguity() > 0.5) // Cannot be high ambiguity
-                || Math.abs(pose.pose.getZ())
-                    > 1 // Must have realistic Z coordinate
-
                 // Must be within the field boundaries
-                || pose.pose.getX() < 0.0
-                || pose.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
-                || pose.pose.getY() < 0.0
-                || pose.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
+                pose.getX() < 0.0
+                || pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
+                || pose.getY() < 0.0
+                || pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
         return rejectPose;
     }
 
@@ -85,20 +80,33 @@ private StructPublisher<Pose3d> limelightPosePublisher = NetworkTableInstance.ge
         this.configureLimelightMegatag(ll);
 
         // 2. Fetch the raw botpose array manually.
-        // MegaTag2 data is stored in "botpose_orb_wpiblue"
         double[] rawPose = ll.getNTTable().getEntry("botpose_orb_wpiblue").getDoubleArray(new double[0]);
 
         // 3. Validate data (Array must have at least 8 elements, and index 7 is tag count)
         if (rawPose.length < 8 || rawPose[7] == 0) {
-            return null; // Or return new Pose2d() depending on your preference
+            backPoseEstimated = false;
         }
 
-        // MegaTag2 Array Map:
-        // [0]x, [1]y, [2]z, [3]roll, [4]pitch, [5]yaw, [6]latency, [7]tagCount...
-        return new Pose2d(
+        Pose2d estimatedPose = new Pose2d(
             new Translation2d(rawPose[0], rawPose[1]),
             Rotation2d.fromDegrees(rawPose[5])
         );
+
+        if (rejectPose(estimatedPose)) {
+            backPoseEstimated = false;
+        }
+
+        if (backPoseEstimated = false) {
+            backPoseEstimated = true;
+            SmartDashboard.putBoolean("Vision/Back Pose Estimated", backPoseEstimated);
+            return null;
+        }
+
+        SmartDashboard.putBoolean("Vision/Back Pose Estimated", backPoseEstimated);
+
+        // MegaTag2 Array Map:
+        // [0]x, [1]y, [2]z, [3]roll, [4]pitch, [5]yaw, [6]latency, [7]tagCount...
+        return estimatedPose;
     }
 
     /**
@@ -121,12 +129,13 @@ private StructPublisher<Pose3d> limelightPosePublisher = NetworkTableInstance.ge
         double timestamp = getMegaTag2Timestamp(limelightBack);
         double now = Timer.getFPGATimestamp();
 
-        Optional<PoseEstimate> backPoseEstimate = BotPose.BLUE_MEGATAG2.get(limelightBack);
-
         if (manualPose != null) {
             if (timestamp > 0 && timestamp <= now) {
-            drivetrain.addVisionMeasurement(manualPose, timestamp);
-    }
+                System.out.println("adding pose!");
+                if (!rejectPose(manualPose)) {
+                    drivetrain.addVisionMeasurement(manualPose, timestamp);
+                }
+            }
             limelightPosePublisher.set(new Pose3d(manualPose));
         }
 
