@@ -83,6 +83,7 @@ public class IntakeIOReal implements IntakeIO {
 
     public IntakeIOReal() {
         configureKrakens();
+        angleEncoder.setInverted(false);
     }
 
     private void configureKrakens() {
@@ -125,8 +126,8 @@ public class IntakeIOReal implements IntakeIO {
         // voltage clamp
         totalVoltage = Math.max(-12.0, Math.min(12.0, totalVoltage));
 
-        angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
-        angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+        //angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
+        //angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
         intakeMotor.set(intakeOutput);
 
         SmartDashboard.putNumber("Arm/AngleDeg", getAngle().in(Units.Degrees));

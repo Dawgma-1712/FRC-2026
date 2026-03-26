@@ -41,7 +41,7 @@
       },
       "nextControl": {
         "x": 8.259214255493932,
-        "y": 0.5898868223776352
+        "y": 0.5898868223776328
       },
       "isLocked": false,
       "linkedName": null
@@ -76,7 +76,20 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.3554757630161578,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Stow Intake",
+      "waypointRelativePos": 2.138240574506285,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

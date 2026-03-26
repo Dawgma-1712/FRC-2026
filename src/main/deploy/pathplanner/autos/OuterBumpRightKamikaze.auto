@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OuterBumpLeftKamikaze"
+            "pathName": "OuterBumpRightKamikaze"
           }
         },
         {
@@ -20,6 +20,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Outer Bump Left",
+  "folder": "Outer Bump Right",
   "choreoAuto": false
 }

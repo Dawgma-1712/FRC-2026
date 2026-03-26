@@ -129,12 +129,14 @@ public final class Constants {
 
     public static final double EXTENDED_INTAKE_ANGLE = 90;
     public static final double STOWED_INTAKE_ANGLE = 0;
-    public static final double ENCODER_OFFSET = 72.126;
+    public static final double ENCODER_OFFSET = 98.532 - 97;
 
     public static final double ANGLE_REDUCTION = 99;
 
     public static final double MIN_ANGLE = 0.0;
     public static final double MAX_ANGLE = 90.0;
+
+    public static final double INTAKE_DUTY_CYCLE = 1;
   }
 
   public static class LauncherConstants {
@@ -199,6 +201,7 @@ public final class Constants {
                                                                   );
     public static final double DEBOUNCE_LENGTH = 0.1; //in seconds how long the change must be real until you idk just search ts up
     public static final Distance FUEL_FEED_DISTANCE = Inches.of(4);  // the maximum the canrange should measure when a fuel is being fed
+    public static final double SHOOT_WAIT_LENGTH = 5;
   }
 
   public static class VisionConstants {

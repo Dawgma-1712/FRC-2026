@@ -37,7 +37,7 @@
       },
       "prevControl": {
         "x": 1.0593645238604987,
-        "y": 1.213403059690133
+        "y": 1.2134030596901328
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,12 +62,6 @@
     {
       "name": "Stow Intake",
       "waypointRelativePos": 1.3931777378815058,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 2.0,
       "endWaypointRelativePos": null,
       "command": null
     }

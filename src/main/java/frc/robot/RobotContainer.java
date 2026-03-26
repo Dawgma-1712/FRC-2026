@@ -163,7 +163,25 @@ public class RobotContainer {
     this.visionSubsystemBack = new VisionSubsystemBack(this.drivetrain, this.visionInterfaceBack);
     
     NamedCommands.registerCommand("Shoot", getAutoPreloads());
+    NamedCommands.registerCommand("Intake", Commands.sequence(
+                                                                          Commands.runOnce(() -> {
+                                                                            intake.setAngleDirect(Units.Degrees.of(IntakeConstants.EXTENDED_INTAKE_ANGLE));
+                                                                          }),
+                                                                          Commands.runOnce(() -> {
+                                                                            intake.setIntakeMotorSpeed(IntakeConstants.INTAKE_DUTY_CYCLE);
+                                                                          })                                                                         
+      ));
+      NamedCommands.registerCommand("Stow Intake", Commands.sequence(
+        
+                                                                          Commands.runOnce(() -> {
+                                                                            intake.setIntakeMotorSpeed(0);
+                                                                          }),
+                                                                          Commands.runOnce(() -> {
+                                                                            intake.setAngleDirect(Units.Degrees.of(IntakeConstants.STOWED_INTAKE_ANGLE));
+                                                                          })
 
+      ));
+    
 
     // autoHandler = new ModularAutoHandler();
 
@@ -396,7 +414,7 @@ public class RobotContainer {
         }
       ));
 
-      autoPreloads = Commands.parallel(prepAutoPreloads.raceWith(new WaitCommand(10)), launchAutoPreloads.raceWith(new WaitCommand(10)));
+      autoPreloads = Commands.parallel(prepAutoPreloads.raceWith(new WaitCommand(LauncherConstants.SHOOT_WAIT_LENGTH)), launchAutoPreloads.raceWith(new WaitCommand(LauncherConstants.SHOOT_WAIT_LENGTH)));
     return autoPreloads;
   }
 

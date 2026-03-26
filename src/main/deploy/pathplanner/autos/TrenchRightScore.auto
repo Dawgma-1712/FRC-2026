@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OuterBumpLeftKamikaze"
+            "pathName": "TrenchRightScore"
           }
         },
         {
@@ -20,6 +20,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Outer Bump Left",
+  "folder": "Trench Right",
   "choreoAuto": false
 }
