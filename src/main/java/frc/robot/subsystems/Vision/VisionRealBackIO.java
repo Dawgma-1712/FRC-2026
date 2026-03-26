@@ -41,6 +41,7 @@ private StructPublisher<Pose3d> limelightPosePublisher = NetworkTableInstance.ge
     CommandSwerveDrivetrain drivetrain;
     Pigeon2 pigeon;
     boolean backPoseEstimated = true;
+    boolean backPoseApriltags = false;
 
     public VisionRealBackIO(CommandSwerveDrivetrain drivetrain) {
 
@@ -96,6 +97,14 @@ private StructPublisher<Pose3d> limelightPosePublisher = NetworkTableInstance.ge
             backPoseEstimated = false;
         }
 
+        if (rawPose[7] < 1) {
+            backPoseApriltags = false;
+        } else {
+            backPoseApriltags = true;
+        }
+
+        SmartDashboard.putBoolean("Back Apriltags", backPoseApriltags);
+
         if (backPoseEstimated = false) {
             backPoseEstimated = true;
             SmartDashboard.putBoolean("Vision/Back Pose Estimated", backPoseEstimated);
@@ -131,8 +140,7 @@ private StructPublisher<Pose3d> limelightPosePublisher = NetworkTableInstance.ge
 
         if (manualPose != null) {
             if (timestamp > 0 && timestamp <= now) {
-                System.out.println("adding pose!");
-                if (!rejectPose(manualPose)) {
+                if (!rejectPose(manualPose) && backPoseApriltags) {
                     drivetrain.addVisionMeasurement(manualPose, timestamp);
                 }
             }
