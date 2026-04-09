@@ -104,7 +104,7 @@ public class IntakeIOReal implements IntakeIO {
 
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
         intakeConfig.idleMode(IdleMode.kCoast);
-        intakeConfig.smartCurrentLimit(30);
+        intakeConfig.smartCurrentLimit(45);
         intakeConfig.inverted(true);
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -159,7 +159,7 @@ public class IntakeIOReal implements IntakeIO {
         //extended is 90 stowed is 0
         
         angleMotor.set(percentOutput);
-        angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+        angleFollowerMotor.set(-percentOutput);
     }
 
     @Override

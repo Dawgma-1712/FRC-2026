@@ -46,6 +46,10 @@ public interface LauncherIO {
 
     }
 
+    public default void inGameHoodOffset(double offset){
+        
+    }
+
     public default void intakeFuel() {}
     
     public default void periodic() {}

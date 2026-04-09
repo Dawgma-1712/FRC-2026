@@ -13,13 +13,19 @@
         {
           "type": "named",
           "data": {
-            "name": "Intake"
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TrenchLeftCycleBlockShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "X Mode"
           }
         }
       ]

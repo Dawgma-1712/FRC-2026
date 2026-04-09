@@ -7,25 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchLeftScore"
+            "pathName": "OuterBumpLeftCenterBlock"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Intake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "name": "X Mode"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Trench Left",
+  "folder": "Outer Bump Left",
   "choreoAuto": false
 }

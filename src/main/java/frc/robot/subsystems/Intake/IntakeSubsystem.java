@@ -30,9 +30,46 @@ public class IntakeSubsystem extends SubsystemBase {
         io.holdPosition();
     }
 
-    public void manualTriggerIntakeSpeed(Supplier<Double> triggerOutput) {
+    public void manualTriggerIntakeSpeed(Supplier<Double> triggerOutput, Supplier<Double> triggerOutput2) {
         double output = triggerOutput.get();
+        double rightOutput = triggerOutput2.get();
+        if (output > rightOutput) {
         setIntakeMotorSpeed(output);
+        } else {
+            setIntakeMotorSpeed(-rightOutput);
+        }
+    }
+
+    public void dumbDumbPID(double goalAngle) {
+        // double currentAngle = getAngle().in(Units.Degrees);
+
+        // if(Math.abs(currentAngle - goalAngle) <= 5) {
+        //     io.setAngleMotorPercentOutput(0);
+        // }
+        // else if (currentAngle > goalAngle) {
+        //     io.setAngleMotorPercentOutput(0.1);
+        // }
+        // else if (currentAngle < goalAngle) {
+        //     io.setAngleMotorPercentOutput(-0.2);
+        // }
+
+        io.setAngleMotorPercentOutput(0.1);
+    }
+
+    public void nodumbDumbPID(double goalAngle) {
+        // double currentAngle = getAngle().in(Units.Degrees);
+
+        // if(Math.abs(currentAngle - goalAngle) <= 5) {
+        //     io.setAngleMotorPercentOutput(0);
+        // }
+        // else if (currentAngle > goalAngle) {
+        //     io.setAngleMotorPercentOutput(0.1);
+        // }
+        // else if (currentAngle < goalAngle) {
+        //     io.setAngleMotorPercentOutput(-0.2);
+        // }
+
+        io.setAngleMotorPercentOutput(0);
     }
 
     public Command setAngle(Angle target) {

@@ -14,10 +14,11 @@
   "autoFolders": [
     "Inner Bump Left",
     "Inner Bump Right",
-    "Trench Right",
+    "Center",
     "Outer Bump Left",
     "Outer Bump Right",
-    "Trench Left"
+    "Trench Left",
+    "Trench Right"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

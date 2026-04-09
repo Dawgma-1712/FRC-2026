@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchLeftScore"
+            "pathName": "CenterScore"
           }
         },
         {
@@ -26,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Trench Left",
+  "folder": "Center",
   "choreoAuto": false
 }

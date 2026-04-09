@@ -23,7 +23,7 @@ import frc.robot.subsystems.Swerve.CommandSwerveDrivetrain;
 
 public class VisionReal implements VisionInterface {
     
-   Limelight limelightFront = new Limelight(IdConstants.LIMELIGHT_FRONT_ID);
+   Limelight limelight = new Limelight(IdConstants.LIMELIGHT_BACK_ID);
 
     private double lastFrontTimestamp = 0;
     private boolean poseEstimated = false;
@@ -67,15 +67,29 @@ public class VisionReal implements VisionInterface {
                 || pose.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
                 || pose.pose.getY() < 0.0
                 || pose.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth();
+
+        /*
+        if (rejectPose) {
+            if (pose.tagCount == 0) {
+                System.out.println("No tags");
+            } else if (pose.tagCount == 1 && pose.getAvgTagAmbiguity() > 0.5) System.out.println("Too high ambiguity");
+            else if (pose.pose.getX() < 0.0
+                || pose.pose.getX() > VisionConstants.APRIL_TAG_POSES.getFieldLength()
+                || pose.pose.getY() < 0.0
+                || pose.pose.getY() > VisionConstants.APRIL_TAG_POSES.getFieldWidth()) {
+                    System.out.println("Outside field");
+                }
+        }
+                */
         return rejectPose;
     }
 
     @Override
     public void addVisionMeasurements() {
 
-        configureLimelightMegatag(limelightFront);
+        configureLimelightMegatag(limelight);
 
-        Optional<PoseEstimate> frontPoseEstimate = BotPose.BLUE_MEGATAG2.get(limelightFront).filter(p -> !rejectPose(p));
+        Optional<PoseEstimate> frontPoseEstimate = BotPose.BLUE_MEGATAG2.get(limelight).filter(p -> !rejectPose(p));
 
         if (frontPoseEstimate.isPresent()) {
             SmartDashboard.putBoolean("Vision/Front Estimated", true);
@@ -99,6 +113,20 @@ public class VisionReal implements VisionInterface {
         // Timmy: Thanks, I'm so tired...Iran for an hour today
         // Mum: It Tokyo long enough
         // Timmy: Yeah. Israeli hard sometimes.
+
+        //Isaac: I saudi the problem, and Iran to fix it.
+
+        //Class of 2020: We didnt even get a graduation.
+
+        //Random kid: I thought you said pair of shoes!
+
+        //Finn: What are you doing now did you fix the back limelight
+        //Aria: I'm commenting
+        //Ayaan: I feel like I'm stuck between Iraq and a hard place.
+
+        //Gas Station: *explodes*
+        //CITY BOYYYYYY!!!!!!!!!!!!!!!!
+
 
     }
 }

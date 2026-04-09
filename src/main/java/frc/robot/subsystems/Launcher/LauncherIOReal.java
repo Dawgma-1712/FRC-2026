@@ -10,6 +10,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANrange;
@@ -55,6 +56,7 @@ public class LauncherIOReal implements LauncherIO {
 
     private final Debouncer launcherDebouncer = new Debouncer(LauncherConstants.DEBOUNCE_LENGTH, Debouncer.DebounceType.kRising);
 
+
     // Replace these three fields:
     //   private double angle = hoodEncoder.get();
     //   private double totalAngle = (hoodEncoder.get()) + 81 * 17;
@@ -68,7 +70,10 @@ public class LauncherIOReal implements LauncherIO {
         
         public LauncherIOReal() {
     
-            var config = new TalonFXConfiguration();
+            //var config = new TalonFXConfiguration();
+            var config = new TalonFXConfiguration().withCurrentLimits(new CurrentLimitsConfigs()
+            .withSupplyCurrentLimit(Units.Amps.of(50))
+            .withSupplyCurrentLimitEnable(true));
     
             config.Slot0.kP = LauncherConstants.LAUNCH_kP;
             config.Slot0.kI = LauncherConstants.LAUNCH_kI;
@@ -119,6 +124,11 @@ public class LauncherIOReal implements LauncherIO {
             SmartDashboard.putNumber("Launcher/Clamped Voltage", clamped);
     
             hoodBagMotor.setVoltage(clamped);
+        }
+
+        @Override
+        public void inGameHoodOffset(double offset){
+            
         }
     
         @Override

@@ -5,9 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "InnerBumpLeftShoot"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "InnerBumpLeftShoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         },
         {

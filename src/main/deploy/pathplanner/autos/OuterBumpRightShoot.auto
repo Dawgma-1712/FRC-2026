@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "InnerBumpRightShoot"
+                  "pathName": "OuterBumpRightShoot"
                 }
               },
               {
@@ -33,6 +33,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Inner Bump Right",
+  "folder": "Outer Bump Right",
   "choreoAuto": false
 }
