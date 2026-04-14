@@ -155,18 +155,13 @@ public class RobotContainer {
     
     NamedCommands.registerCommand("Shoot", getAutoPreloads());
     NamedCommands.registerCommand("Intake", Commands.sequence(
-                                                                          Commands.run(() -> {
-                                                                            //intake.setAngleDirect(Units.Degrees.of(IntakeConstants.EXTENDED_INTAKE_ANGLE));
-                                                                            intake.dumbDumbPID(270);
-                                                                          }).raceWith(new WaitCommand(0.75)),
-                                                                          Commands.runOnce(() -> {
-                                                                            //intake.setAngleDirect(Units.Degrees.of(IntakeConstants.EXTENDED_INTAKE_ANGLE));
-                                                                            intake.nodumbDumbPID(270);
-                                                                          }),
-                                                                          Commands.runOnce(() -> {
-                                                                            intake.setIntakeMotorSpeed(IntakeConstants.INTAKE_DUTY_CYCLE);
-                                                                          })                                                                         
-      ));
+        Commands.runOnce(() -> {
+          intake.setAngleDirect(Units.Degrees.of(0));
+        })
+    ));
+    NamedCommands.registerCommand("Run Intake", Commands.run(() -> {
+      intake.setIntakeMotorSpeed(1);
+    }).repeatedly());
       NamedCommands.registerCommand("Stow Intake", Commands.sequence(
         
                                                                           Commands.runOnce(() -> {
@@ -177,6 +172,7 @@ public class RobotContainer {
                                                                           })
 
       ));
+      NamedCommands.registerCommand("X Mode", drivetrain.applyRequest(() -> brake).repeatedly());
     
 
     // autoHandler = new ModularAutoHandler();
@@ -282,67 +278,40 @@ public class RobotContainer {
       ));
 
 
-      new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(
-          Commands.runOnce(() -> {
-              intakeDeployed = !intakeDeployed;
-              if (intakeDeployed) {
-                  intake.setAngleDirect(Units.Degrees.of(IntakeConstants.EXTENDED_INTAKE_ANGLE));
-                  intake.setIntakeMotorSpeed(0.8);  // spin intake roller when deployed
-              } else {
-                  intake.setAngleDirect(Units.Degrees.of(IntakeConstants.STOWED_INTAKE_ANGLE));  // stow
-                  intake.setIntakeMotorSpeed(0);  // stop roller when stowed
-              }
-          }, intake)
-      );
+      new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(Commands.sequence(
+        Commands.runOnce(() -> {
+          intake.setAngleDirect(Units.Degrees.of(0));
+        }),
+        Commands.run(() -> {
+          intake.setIntakeMotorSpeed(1);
+        })
+    ));
 
       new JoystickButton(driver, OperatorConstants.DRIVER_START).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // launcher unloading
-    new JoystickButton(operator, OperatorConstants.OPERATOR_X).whileTrue(
-        Commands.run(() -> {
-          launcher.setLauncherPercentOutput(0.6);
-          launcher.setKickerPercentOutput(0.6);
-        }).finallyDo(() -> {
-          launcher.setLauncherPercentOutput(0);
-          launcher.setKickerPercentOutput(0);
-        })
-    );
     
-    // launch at a lower speed, without adjusting the hood angle
-    Timer operatorShootTimer = new Timer();
-    new JoystickButton(operator, OperatorConstants.OPERATOR_B).whileTrue(
-        Commands.run(() -> {
-            launcher.setLauncherVelocity(Units.RotationsPerSecond.of(70));
-            if (operatorShootTimer.hasElapsed(0.2)) {
-                revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
-                launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
-            }
-        }, launcher, revolver) 
-        .beforeStarting(() -> operatorShootTimer.restart())
-        .finallyDo(() -> {
-            revolver.setRevolverPercentOutput(0);
-            launcher.setKickerPercentOutput(0);
-            launcher.setLauncherVelocity(Units.RadiansPerSecond.of(0)); 
-        })
-    );
+    
+    new JoystickButton(operator, OperatorConstants.OPERATOR_B).onTrue(Commands.runOnce(() -> {
+      intake.toggleIntake();
+    }));
+
+     new JoystickButton(operator, OperatorConstants.OPERATOR_X).onTrue(Commands.runOnce(() -> {
+      intake.setAngleDirect(Units.Degrees.of(0));
+    }));
     
     new JoystickButton(operator, OperatorConstants.OPERATOR_Y).whileTrue(
       Commands.run(() -> {
-        intake.setAngleMotorSpeed(-0.3);
-      })
-    ).onFalse(
-      Commands.run(() -> {
-        intake.setAngleMotorSpeed(0);
+        intake.setAngleDirect(Units.Degrees.of(
+          intake.getAngle().in(Units.Degrees) + 5
+        ));
       })
     );
 
     new JoystickButton(operator, OperatorConstants.OPERATOR_A).whileTrue(
       Commands.run(() -> {
-        intake.setAngleMotorSpeed(0.1);
-      })
-    ).onFalse(
-      Commands.run(() -> {
-        intake.setAngleMotorSpeed(0);
+        intake.setAngleDirect(Units.Degrees.of(
+          intake.getAngle().in(Units.Degrees) - 5
+        ));
       })
     );
 

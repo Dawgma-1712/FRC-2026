@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public class IntakeSubsystem extends SubsystemBase {
 
     IntakeIO io;
+    private boolean intakeDown = false;
     
     public IntakeSubsystem(IntakeIO io){
         this.io = io;
@@ -28,6 +29,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void holdPosition() {
         io.holdPosition();
+    }
+
+    public void toggleIntake() {
+        if (intakeDown) {
+            setAngleDirect(Units.Degrees.of(90));
+        } else {
+            setAngleDirect(Units.Degrees.of(0));
+        }
+        intakeDown = !intakeDown;
     }
 
     public void manualTriggerIntakeSpeed(Supplier<Double> triggerOutput, Supplier<Double> triggerOutput2) {

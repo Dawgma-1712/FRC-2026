@@ -7,19 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "InnerBumpLeftDepot"
+            "pathName": "InnerBumpLeftDepotScore"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PickupDepot"
+            "pathName": "InnerBumpLeftDepot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftDepotScore3"
           }
         }
       ]

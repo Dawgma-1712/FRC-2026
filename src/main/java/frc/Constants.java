@@ -87,6 +87,7 @@ public final class Constants {
     public static final int ANGLE_MOTOR_ID = 13;
     public static final int ANGLE_FOLLOWER_MOTOR_ID = 14;
     public static final int INTAKE_MOTOR_ID = 15;
+    public static final int INTAKE_MOTOR_2_ID = 21;
     public static final int INTAKE_ANGLE_ENCODER_ID = 9;  // TEMP
 
     // REVOLVER
@@ -114,22 +115,22 @@ public final class Constants {
 
     public static final double POSITION_TOLERANCE = 2.0;  // in degrees
 
-    public static final double ANGLE_kP = 0.0;
+    public static final double ANGLE_kP = 0.06;
     public static final double ANGLE_kI = 0.0;
     public static final double ANGLE_kD = 0.0;
 
     public static final double ANGLE_kS = 0.0;
-    public static final double ANGLE_kV = 0.0;
+    public static final double ANGLE_kV = 1.45;
     public static final double ANGLE_kA = 0.0;
-    public static final double ANGLE_kG = 0.0;
+    public static final double ANGLE_kG = 0.4;
 
-    public static final double ANGLE_CRUISE_VELOCITY = 40;
-    public static final double ANGLE_ACCELERATION = 80;
+    public static final double ANGLE_CRUISE_VELOCITY = 90;
+    public static final double ANGLE_ACCELERATION = 150;
     public static final double ANGLE_JERK = 1600;
 
     public static final double EXTENDED_INTAKE_ANGLE = 90;
     public static final double STOWED_INTAKE_ANGLE = 0;
-    public static final double ENCODER_OFFSET = 274.5450068636252;
+    public static final double ENCODER_OFFSET = 297.7450068636252;
 
     public static final double ANGLE_REDUCTION = 99;
 

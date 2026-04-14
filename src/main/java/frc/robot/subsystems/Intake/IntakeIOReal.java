@@ -32,6 +32,7 @@ public class IntakeIOReal implements IntakeIO {
      * MOTORS
      */
 
+     private final SparkMax intakeMotor2 = new SparkMax(IdConstants.INTAKE_MOTOR_2_ID, MotorType.kBrushed);
     private final SparkMax intakeMotor = new SparkMax(IdConstants.INTAKE_MOTOR_ID, MotorType.kBrushed);
 
     private final TalonFX angleMotor = new TalonFX(IdConstants.ANGLE_MOTOR_ID);
@@ -106,7 +107,13 @@ public class IntakeIOReal implements IntakeIO {
         intakeConfig.idleMode(IdleMode.kCoast);
         intakeConfig.smartCurrentLimit(45);
         intakeConfig.inverted(true);
+
+        SparkMaxConfig intakeConfig2 = new SparkMaxConfig();
+        intakeConfig2.idleMode(IdleMode.kCoast);
+        intakeConfig2.smartCurrentLimit(45);
+        intakeConfig2.inverted(true);
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakeMotor2.configure(intakeConfig2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
@@ -115,20 +122,21 @@ public class IntakeIOReal implements IntakeIO {
         updateVelocity();  // update the velocity state variable
 
         currentState = trapezoidProfile.calculate(0.020, currentState, goalState);  // instead of passing the goal position to the pid controller, we can use the trapezoidal profile instead to avoid giant jumps in voltage.
-        double pidOutput = pidController.calculate(getAngle().in(Units.Degrees), currentState.position);
+        double pidOutput = -pidController.calculate(getAngle().in(Units.Degrees), currentState.position);
 
         double positionRadians = Math.toRadians(currentState.position);
         double velocityRadiansPerSecond = Math.toRadians(currentState.velocity);
-        double feedforwardOutput = armFeedforward.calculate(positionRadians, velocityRadiansPerSecond);
+        double feedforwardOutput = -armFeedforward.calculate(positionRadians, velocityRadiansPerSecond);
 
         double totalVoltage = pidOutput + feedforwardOutput;
 
         // voltage clamp
         totalVoltage = Math.max(-12.0, Math.min(12.0, totalVoltage));
 
-        //angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
-        //angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+        angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
+        angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
         intakeMotor.set(intakeOutput);
+        intakeMotor2.set(intakeOutput);
 
         SmartDashboard.putNumber("Arm/AngleDeg", getAngle().in(Units.Degrees));
         SmartDashboard.putNumber("Arm/TargetDeg", currentState.position);
@@ -179,7 +187,11 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public Angle getAngle() {
-        return Units.Degrees.of(angleEncoder.get());
+        Angle angle = Units.Degrees.of(angleEncoder.get());
+        if (angle.in(Units.Degrees) >= 350) {
+            return Units.Degrees.of(0);
+        }
+        return angle;
     }
 
     private void updateVelocity() {
