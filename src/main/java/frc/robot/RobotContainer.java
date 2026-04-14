@@ -157,7 +157,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake", Commands.sequence(
         Commands.runOnce(() -> {
           intake.setAngleDirect(Units.Degrees.of(0));
-        }, intake)));
+        })));
     NamedCommands.registerCommand("Run Intake", Commands.run(() -> {
       intake.setIntakeMotorSpeed(1);
     }, intake));
@@ -379,6 +379,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     drivetrain.configureAutoBuilder();
+    System.out.println(autoChooser.getSelected().getName());
     return new SequentialCommandGroup(new WaitCommand(SmartDashboard.getNumber("Wait Time", 0)),
         autoChooser.getSelected());
   }

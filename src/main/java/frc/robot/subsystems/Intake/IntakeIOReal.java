@@ -188,8 +188,9 @@ public class IntakeIOReal implements IntakeIO {
     @Override
     public Angle getAngle() {
         Angle angle = Units.Degrees.of(angleEncoder.get());
+        double angleDegs = angle.in(Units.Degrees);
         if (angle.in(Units.Degrees) >= 350) {
-            return Units.Degrees.of(0);
+            return Units.Degrees.of(-(360-angleDegs));
         }
         return angle;
     }

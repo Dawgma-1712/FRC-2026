@@ -122,7 +122,7 @@ public final class Constants {
     public static final double ANGLE_kS = 0.0;
     public static final double ANGLE_kV = 1.45;
     public static final double ANGLE_kA = 0.0;
-    public static final double ANGLE_kG = 0.4;
+    public static final double ANGLE_kG = 0.15;
 
     public static final double ANGLE_CRUISE_VELOCITY = 90;
     public static final double ANGLE_ACCELERATION = 150;
@@ -130,7 +130,7 @@ public final class Constants {
 
     public static final double EXTENDED_INTAKE_ANGLE = 90;
     public static final double STOWED_INTAKE_ANGLE = 0;
-    public static final double ENCODER_OFFSET = 297.7450068636252;
+    public static final double ENCODER_OFFSET = 296.7450068636252;
 
     public static final double ANGLE_REDUCTION = 99;
 

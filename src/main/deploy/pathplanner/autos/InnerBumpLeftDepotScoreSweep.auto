@@ -21,19 +21,39 @@
                 }
               },
               {
-                "type": "parallel",
+                "type": "race",
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
+                      "type": "sequential",
                       "data": {
-                        "name": "Intake"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Run Intake"
+                        "commands": [
+                          {
+                            "type": "race",
+                            "data": {
+                              "commands": [
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "Intake"
+                                  }
+                                },
+                                {
+                                  "type": "wait",
+                                  "data": {
+                                    "waitTime": 1.0
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Run Intake"
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -57,14 +77,14 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
           }
         }
       ]
