@@ -115,7 +115,7 @@ public final class Constants {
 
     public static final double POSITION_TOLERANCE = 2.0;  // in degrees
 
-    public static final double ANGLE_kP = 0.06;
+    public static final double ANGLE_kP = 0.02;
     public static final double ANGLE_kI = 0.0;
     public static final double ANGLE_kD = 0.0;
 

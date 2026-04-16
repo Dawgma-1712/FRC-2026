@@ -153,8 +153,6 @@ public class RobotContainer {
     this.revolver = new RevolverSubsystem(this.revolverIO);
     this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
 
-    intake.setAngleDirect(Units.Degrees.of(90));
-
     NamedCommands.registerCommand("Shoot", getAutoPreloads());
     NamedCommands.registerCommand("Intake", Commands.sequence(
         Commands.runOnce(() -> {

@@ -22,6 +22,8 @@ import com.ctre.phoenix6.controls.Follower;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.Units;
@@ -56,7 +58,8 @@ public class IntakeIOReal implements IntakeIO {
 
     private double prevAngle = 0.0;
     private double currentVelocity = 0.0;
-    private boolean isProfileRunning = false;
+    private boolean runProfile = false;
+    private Debouncer armDebouncer = new Debouncer(0.5);
 
     // what actually controls how much voltage is going to the motors
     private final PIDController pidController = new PIDController(
@@ -73,7 +76,7 @@ public class IntakeIOReal implements IntakeIO {
     );
 
     private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
-    private TrapezoidProfile.State goalState = new TrapezoidProfile.State(0, 0);
+    private TrapezoidProfile.State goalState = new TrapezoidProfile.State(90, 0);
 
     // it's an arm, so we're going to have to fight gravity as well as a bunch of other factors that need feedforward
     private final ArmFeedforward armFeedforward = new ArmFeedforward(
@@ -136,8 +139,14 @@ public class IntakeIOReal implements IntakeIO {
         // voltage clamp
         totalVoltage = Math.max(-12.0, Math.min(12.0, totalVoltage));
 
-        angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
-        angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+        if (runProfile) {
+            angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
+            angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+            if (atAngle()) {
+                runProfile = false;
+            }
+        }
+
         intakeMotor.set(intakeOutput);
         intakeMotor2.set(intakeOutput);
 
@@ -148,13 +157,8 @@ public class IntakeIOReal implements IntakeIO {
         SmartDashboard.putNumber("Arm/VoltageOut", totalVoltage);
         SmartDashboard.putNumber("Arm/FF", feedforwardOutput);
         SmartDashboard.putNumber("Arm/PID", pidOutput);
-        SmartDashboard.putBoolean("Arm/AtGoal", atGoal());
-    }
-
-    public boolean atGoal() {
-        return isProfileRunning &&
-               Math.abs(getAngle().in(Units.Degrees) - goalState.position) < 1.0 &&   // rn it's 1 degree of tolerance, might need to change that
-               Math.abs(currentVelocity) < 2.0;
+        SmartDashboard.putBoolean("Arm/RunPID", runProfile);
+        SmartDashboard.putBoolean("Arm/AtAngle", atAngle());
     }
 
     @Override
@@ -178,20 +182,40 @@ public class IntakeIOReal implements IntakeIO {
         double angleClamped = Math.max(IntakeConstants.MIN_ANGLE, Math.min(IntakeConstants.MAX_ANGLE, target.in(Units.Degrees)));
         currentState = new TrapezoidProfile.State(getAngle().in(Units.Degrees), currentVelocity);
         goalState = new TrapezoidProfile.State(angleClamped, 0.0);
-
+        if (atAngle()) { 
+            goalState = new TrapezoidProfile.State(getAngle().in(Units.Degrees), 0);
+            return;
+        }
+        runProfile = true;
         pidController.reset();
-        isProfileRunning = true;
     }
 
     @Override
     public void setAngleMotorSupplier(Supplier<Double> stickSupplier) {
-        setAngleMotorPercentOutput(stickSupplier.get());
-        setAngle(getAngle());
+        
+        double output = stickSupplier.get();
+        if (Math.abs(output) < 0.05) {
+            return;
+        }
+
+        runProfile = false;
+        if (output > 0) {
+            output *= 0.1;
+        } else {
+            output *= 0.2;
+        }
+
+        setAngleMotorPercentOutput(output);
+        holdPosition();
     }
 
     @Override
     public void holdPosition() {
         setAngle(getAngle());
+    }
+
+    public boolean atAngle() {
+        return armDebouncer.calculate(Math.abs(getAngle().in(Units.Degrees) - getGoalAngle().in(Units.Degrees)) < 3);
     }
 
     @Override
