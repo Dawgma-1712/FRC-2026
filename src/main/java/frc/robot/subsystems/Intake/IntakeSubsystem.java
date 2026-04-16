@@ -50,6 +50,10 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public Angle getGoalAngle() {
+        return io.getGoalAngle();
+    }
+
     public void dumbDumbPID(double goalAngle) {
         // double currentAngle = getAngle().in(Units.Degrees);
 
@@ -93,6 +97,9 @@ public class IntakeSubsystem extends SubsystemBase {
         io.setAngle(target);
     }
 
+    public void setAngleSupplier(Supplier<Double> stickSupplier) {
+        io.setAngleMotorSupplier(stickSupplier);
+    }
 
     public Angle getAngle() {
         return io.getAngle();
@@ -101,6 +108,7 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Intake/Intake angle", getAngle().in(Units.Degrees));
+        SmartDashboard.putNumber("Intake/Intake Goal Angle", getGoalAngle().in(Units.Degrees));
         io.controlLoop();
     }
 

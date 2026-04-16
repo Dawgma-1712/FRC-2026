@@ -153,6 +153,8 @@ public class RobotContainer {
     this.revolver = new RevolverSubsystem(this.revolverIO);
     this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
 
+    intake.setAngleDirect(Units.Degrees.of(90));
+
     NamedCommands.registerCommand("Shoot", getAutoPreloads());
     NamedCommands.registerCommand("Intake", Commands.sequence(
         Commands.runOnce(() -> {
@@ -195,10 +197,12 @@ public class RobotContainer {
     // intake manual trigger
     Supplier<Double> ltSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_LT);
     Supplier<Double> rtSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_RT);
+    Supplier<Double> stickSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_RY);
 
     intake.setDefaultCommand(
         Commands.run(() -> {
           intake.manualTriggerIntakeSpeed(ltSupplier, rtSupplier);
+          intake.setAngleSupplier(stickSupplier);
         }, intake));
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -299,18 +303,6 @@ public class RobotContainer {
     new JoystickButton(operator, OperatorConstants.OPERATOR_X).onTrue(Commands.runOnce(() -> {
       intake.setAngleDirect(Units.Degrees.of(0));
     }));
-
-    new JoystickButton(operator, OperatorConstants.OPERATOR_Y).whileTrue(
-        Commands.run(() -> {
-          intake.setAngleDirect(Units.Degrees.of(
-              intake.getAngle().in(Units.Degrees) + 5));
-        }));
-
-    new JoystickButton(operator, OperatorConstants.OPERATOR_A).whileTrue(
-        Commands.run(() -> {
-          intake.setAngleDirect(Units.Degrees.of(
-              intake.getAngle().in(Units.Degrees) - 5));
-        }));
 
     // spindexer manual CCW
     new JoystickButton(operator, OperatorConstants.OPERATOR_RB).whileTrue(

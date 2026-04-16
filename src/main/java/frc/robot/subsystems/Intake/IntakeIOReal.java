@@ -11,6 +11,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -181,6 +184,12 @@ public class IntakeIOReal implements IntakeIO {
     }
 
     @Override
+    public void setAngleMotorSupplier(Supplier<Double> stickSupplier) {
+        setAngleMotorPercentOutput(stickSupplier.get());
+        setAngle(getAngle());
+    }
+
+    @Override
     public void holdPosition() {
         setAngle(getAngle());
     }
@@ -193,6 +202,11 @@ public class IntakeIOReal implements IntakeIO {
             return Units.Degrees.of(-(360-angleDegs));
         }
         return angle;
+    }
+
+    @Override
+    public Angle getGoalAngle() {
+        return Units.Degrees.of(goalState.position);
     }
 
     private void updateVelocity() {
