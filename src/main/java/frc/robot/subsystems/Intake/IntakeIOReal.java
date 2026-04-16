@@ -37,7 +37,7 @@ public class IntakeIOReal implements IntakeIO {
      * MOTORS
      */
 
-     private final SparkMax intakeMotor2 = new SparkMax(IdConstants.INTAKE_MOTOR_2_ID, MotorType.kBrushed);
+    private final SparkMax intakeMotor2 = new SparkMax(IdConstants.INTAKE_MOTOR_2_ID, MotorType.kBrushed);
     private final SparkMax intakeMotor = new SparkMax(IdConstants.INTAKE_MOTOR_ID, MotorType.kBrushed);
 
     private final TalonFX angleMotor = new TalonFX(IdConstants.ANGLE_MOTOR_ID);
@@ -58,13 +58,13 @@ public class IntakeIOReal implements IntakeIO {
 
     private double prevAngle = 0.0;
     private double currentVelocity = 0.0;
-    private boolean runProfile = false;
+    private boolean runProfile = true;
     private Debouncer armDebouncer = new Debouncer(0.5);
 
     // what actually controls how much voltage is going to the motors
     private final PIDController pidController = new PIDController(
         IntakeConstants.ANGLE_kP, 
-        IntakeConstants.ANGLE_kI, 
+        IntakeConstants.ANGLE_kI,
         IntakeConstants.ANGLE_kD
     );
 
@@ -75,7 +75,7 @@ public class IntakeIOReal implements IntakeIO {
             IntakeConstants.ANGLE_ACCELERATION)  
     );
 
-    private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
+    private TrapezoidProfile.State currentState = new TrapezoidProfile.State(90, 0);
     private TrapezoidProfile.State goalState = new TrapezoidProfile.State(90, 0);
 
     // it's an arm, so we're going to have to fight gravity as well as a bunch of other factors that need feedforward
@@ -111,12 +111,12 @@ public class IntakeIOReal implements IntakeIO {
 
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
         intakeConfig.idleMode(IdleMode.kCoast);
-        intakeConfig.smartCurrentLimit(45);
+        intakeConfig.smartCurrentLimit(25);
         intakeConfig.inverted(true);
 
         SparkMaxConfig intakeConfig2 = new SparkMaxConfig();
         intakeConfig2.idleMode(IdleMode.kCoast);
-        intakeConfig2.smartCurrentLimit(45);
+        intakeConfig2.smartCurrentLimit(25);
         intakeConfig2.inverted(true);
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         intakeMotor2.configure(intakeConfig2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
