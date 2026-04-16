@@ -133,7 +133,11 @@ public class LauncherIOReal implements LauncherIO {
     
         @Override
         public void setHoodAngle(Angle goalAngle) {
-            hoodGoalAngle = goalAngle;
+            if (goalAngle.in(Units.Degrees) > 30) {
+                hoodGoalAngle = Units.Degrees.of(30);
+            } else {
+                hoodGoalAngle = goalAngle;
+            }  
         }
     
        @Override

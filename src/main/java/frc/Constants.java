@@ -286,7 +286,7 @@ public static class FieldConstants {
 
 public static final Pose3d BLUE_FEED_POSE = new Pose3d(
         new Translation3d(
-            Units.inchesToMeters(93.44),   // avg X of blue hub tags 18-21
+            Units.inchesToMeters(0),   // avg X of blue hub tags 18-21
             Units.inchesToMeters(154.82),   // avg Y of blue hub tags 18-21
             Units.inchesToMeters(72)        // funnel top height
         ),
@@ -294,7 +294,7 @@ public static final Pose3d BLUE_FEED_POSE = new Pose3d(
     );
     public static final Pose3d RED_FEED_POSE = new Pose3d(
         new Translation3d(
-            Units.inchesToMeters(556.68),   // avg X of red hub tags 2-5
+            VisionConstants.APRIL_TAG_POSES.getFieldLength(),
             Units.inchesToMeters(161.82),   // avg Y of red hub tags 2-5
             Units.inchesToMeters(72)        // funnel top height
         ),
