@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TrenchRightScore"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TrenchRightGoMiddle"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Trench Right",
+  "choreoAuto": false
+}

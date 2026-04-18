@@ -111,12 +111,12 @@ public class IntakeIOReal implements IntakeIO {
 
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
         intakeConfig.idleMode(IdleMode.kCoast);
-        intakeConfig.smartCurrentLimit(25);
+        intakeConfig.smartCurrentLimit(45);
         intakeConfig.inverted(true);
 
         SparkMaxConfig intakeConfig2 = new SparkMaxConfig();
         intakeConfig2.idleMode(IdleMode.kCoast);
-        intakeConfig2.smartCurrentLimit(25);
+        intakeConfig2.smartCurrentLimit(45);
         intakeConfig2.inverted(true);
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         intakeMotor2.configure(intakeConfig2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
