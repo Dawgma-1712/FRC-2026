@@ -26,11 +26,13 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 
 public class LauncherIOReal implements LauncherIO {
+
 
     // KICKER
     private final TalonFX kickerKraken = new TalonFX(IdConstants.KICK_MOTOR_ID);
@@ -45,7 +47,9 @@ public class LauncherIOReal implements LauncherIO {
     private final ArmFeedforward hoodFeedforward = new ArmFeedforward(LauncherConstants.HOOD_kS, LauncherConstants.HOOD_kG, LauncherConstants.HOOD_kV);
 
     // SENSORS
-    private final DutyCycleEncoder hoodEncoder = new DutyCycleEncoder(IdConstants.HOOD_ENCODER_ID, 360, LauncherConstants.HOOD_ENCODER_OFFSET);
+    // Relative-mode hood encoder: we only ever consume deltas, so expectedZero is 0.
+    // Any offset here cancels out of (currentRaw - lastRawAngle) and does nothing.
+    private final DutyCycleEncoder hoodEncoder = new DutyCycleEncoder(IdConstants.HOOD_ENCODER_ID, 360, 0.0);
 
     // CONTROL MODES
     private final VelocityVoltage launcherControlMode = new VelocityVoltage(0);
@@ -57,14 +61,13 @@ public class LauncherIOReal implements LauncherIO {
     private final Debouncer launcherDebouncer = new Debouncer(LauncherConstants.DEBOUNCE_LENGTH, Debouncer.DebounceType.kRising);
 
 
-    // Replace these three fields:
-    //   private double angle = hoodEncoder.get();
-    //   private double totalAngle = (hoodEncoder.get()) + 81 * 17;
-    //   private double direction = 1;
+    // Encoder shaft rotations per hood rotation.
+    private static final double HOOD_GEAR_RATIO = 17.0;
 
-    // With:
-    private double lastRawAngle = hoodEncoder.get();
+    // raw angle is zero here, because the encoder has not initialized yet. 
+    private double lastRawAngle = 0.0;
     private double cumulativeEncoderDegrees = 0.0;
+    private boolean hoodZeroed = false;
     private Angle hoodGoalAngle = Units.Degrees.of(0);
 
         
@@ -93,8 +96,6 @@ public class LauncherIOReal implements LauncherIO {
 
             kickerKraken.optimizeBusUtilization();
 
-            cumulativeEncoderDegrees += getHoodPosition().in(Units.Degrees) * 17 + 7.745 * 17 - 3.953 * 17;
-    
         }
     
         @Override
@@ -110,6 +111,13 @@ public class LauncherIOReal implements LauncherIO {
     
         @Override
         public void hoodControlLoop() {
+
+            if (!hoodZeroed) {
+                // No valid encoder reading yet, so getHoodPosition() would report a
+                // constant 0 and the PID would drive the hood open-loop into a hard stop.
+                hoodBagMotor.setVoltage(0);
+                return;
+            }
 
             Angle currentAngle = getHoodPosition();
     
@@ -140,24 +148,38 @@ public class LauncherIOReal implements LauncherIO {
             }  
         }
     
-       @Override
-        public Angle getHoodPosition() {
-            double currentRaw = hoodEncoder.get();
-            double delta = currentRaw - lastRawAngle;
+    /**
+     * Accumulates hood encoder motion. Must be called exactly once per robot loop,
+     * before hoodControlLoop().
+     */
+    @Override
+    public void periodic() {
+        boolean connected = hoodEncoder.isConnected();
+        SmartDashboard.putBoolean("Launcher/Hood Encoder Connected", connected);
 
-            // Handle 0/360 wraparound
-            if (delta > 180) {
-                delta -= 360;
-            } else if (delta < -180) {
-                delta += 360;
-            }
-
-            cumulativeEncoderDegrees += delta;
-            lastRawAngle = currentRaw;
-
-            double projectileAngle = 0 - (cumulativeEncoderDegrees / 17.0);
-            return Units.Degrees.of(projectileAngle);
+        if (!connected) {
+            return;
         }
+
+        double currentRaw = hoodEncoder.get();
+
+        if (!hoodZeroed) {
+            // First valid reading since boot: this is our zero.
+            lastRawAngle = currentRaw;
+            cumulativeEncoderDegrees = 0.0;
+            hoodZeroed = true;
+            return;
+        }
+
+        // Handle 0/360 wraparound
+        cumulativeEncoderDegrees += MathUtil.inputModulus(currentRaw - lastRawAngle, -180, 180);
+        lastRawAngle = currentRaw;
+    }
+
+    @Override
+    public Angle getHoodPosition() {
+        return Units.Degrees.of(-cumulativeEncoderDegrees / HOOD_GEAR_RATIO);
+    }
     
     @Override
     public AngularVelocity getLauncherVelocity() {
@@ -180,5 +202,4 @@ public class LauncherIOReal implements LauncherIO {
     public AngularVelocity getKickerVelocity() {
         return kickerVelocitySignal.refresh().getValue();
     }
-
 }

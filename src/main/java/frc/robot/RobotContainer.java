@@ -153,6 +153,7 @@ public class RobotContainer {
     this.revolver = new RevolverSubsystem(this.revolverIO);
     this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
 
+    /* 
     intake.setAngle(Units.Degrees.of(90));
 
     NamedCommands.registerCommand("Shoot", getAutoPreloads());
@@ -174,7 +175,7 @@ public class RobotContainer {
 
     ));
     NamedCommands.registerCommand("X Mode", drivetrain.applyRequest(() -> brake).repeatedly());
-
+    */
     // autoHandler = new ModularAutoHandler();
 
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
@@ -199,11 +200,14 @@ public class RobotContainer {
     Supplier<Double> rtSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_RT);
     Supplier<Double> stickSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_RY);
 
+    /*
     intake.setDefaultCommand(
         Commands.run(() -> {
           intake.manualTriggerIntakeSpeed(ltSupplier, rtSupplier);
           intake.setAngleSupplier(stickSupplier);
         }, intake));
+
+        */
 
     autoChooser = AutoBuilder.buildAutoChooser();
     autoChooser.addOption("OuterBumpRight", new PathPlannerAuto("OuterBumpRight"));
@@ -285,6 +289,7 @@ public class RobotContainer {
           launcher.setKickerPercentOutput(0);
         }));
 
+        /* 
     new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(Commands.sequence(
         Commands.runOnce(() -> {
           intake.setAngleDirect(Units.Degrees.of(0));
@@ -304,6 +309,7 @@ public class RobotContainer {
       intake.setAngleDirect(Units.Degrees.of(0));
     }));
 
+    */
     // spindexer manual CCW
     new JoystickButton(operator, OperatorConstants.OPERATOR_RB).whileTrue(
         Commands.run(() -> {

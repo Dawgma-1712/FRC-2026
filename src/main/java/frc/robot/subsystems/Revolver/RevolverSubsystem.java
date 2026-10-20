@@ -7,9 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 
 
-public class RevolverSubsystem extends SubsystemBase{
-
-    private final RevolverIOInputsAutoLogged inputs = new RevolverIOInputsAutoLogged();
+public class RevolverSubsystem extends SubsystemBase {
 
     RevolverIO io;
 
@@ -31,9 +29,6 @@ public class RevolverSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Revolver", inputs);
-
 
     }
 

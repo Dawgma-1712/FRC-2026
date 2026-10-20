@@ -25,11 +25,12 @@ public class LauncherSubsystem extends SubsystemBase {
 
     LauncherIO io;
     CommandSwerveDrivetrain drivetrain;
+
     public InterpolatingDoubleTreeMap hoodAngleMap;
     public InterpolatingDoubleTreeMap rpsMap;
 
     private Angle hoodTarget = Units.Degrees.of(LauncherConstants.BASE_ANGLE);
-    AngularVelocity targetVelocity;
+    public AngularVelocity targetVelocity;
     public Translation3d target;
     public Translation3d predictedTarget;
 
@@ -145,12 +146,11 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     @Override
-    public void simulationPeriodic() {
-        io.periodic();
-    }
-
-    @Override
     public void periodic() {
+        // Must run before anything reads the hood position. periodic() is called in
+        // simulation too, so the IO only needs this one call site.
+        io.periodic();
+
         SmartDashboard.putNumber("Launcher/Hood angle", getHoodPosition().in(Units.Degrees));
         SmartDashboard.putNumber("Launcher/Launcher Velocity", getLauncherVelocity().in(Units.RotationsPerSecond));
         SmartDashboard.putNumber("Hood Goal", hoodTarget.in(Units.Degrees));

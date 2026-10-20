@@ -96,7 +96,7 @@ public class IntakeIOReal implements IntakeIO {
     private void configureKrakens() {
 
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         // Current limits
         config.CurrentLimits.SupplyCurrentLimit = 40;
@@ -104,8 +104,8 @@ public class IntakeIOReal implements IntakeIO {
 
         angleMotor.getConfigurator().apply(config);
         angleFollowerMotor.getConfigurator().apply(config);
-        angleMotor.setNeutralMode(NeutralModeValue.Brake);
-        angleFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+        angleMotor.setNeutralMode(NeutralModeValue.Coast);
+        angleFollowerMotor.setNeutralMode(NeutralModeValue.Coast);
 
         angleMotor.setControl(new Follower(angleFollowerMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
@@ -147,8 +147,11 @@ public class IntakeIOReal implements IntakeIO {
             }
         }
 
+        /*
         intakeMotor.set(intakeOutput);
         intakeMotor2.set(intakeOutput);
+
+        */
 
         SmartDashboard.putNumber("Arm/AngleDeg", getAngle().in(Units.Degrees));
         SmartDashboard.putNumber("Arm/TargetDeg", currentState.position);
@@ -194,9 +197,12 @@ public class IntakeIOReal implements IntakeIO {
     public void setAngleMotorSupplier(Supplier<Double> stickSupplier) {
         
         double output = stickSupplier.get();
+
+        // deadband
         if (Math.abs(output) < 0.05) {
             return;
         }
+
 
         runProfile = false;
         if (output > 0) {

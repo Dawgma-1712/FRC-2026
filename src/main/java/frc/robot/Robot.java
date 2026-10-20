@@ -21,23 +21,6 @@ public class Robot extends LoggedRobot {
     private final RobotContainer m_robotContainer;
 
     public Robot() {
-        // ====== ADVANTAGEKIT LOGGING SETUP (must come BEFORE RobotContainer) ======
-
-        // Set metadata about this build
-        Logger.recordMetadata("ProjectName", "FRC2026Robot");
-        Logger.recordMetadata("Team", "1712");
-
-        if (RobotBase.isReal()) {
-            // REAL ROBOT: log to USB stick + publish to NetworkTables for live viewing
-            Logger.addDataReceiver(new WPILOGWriter());   // Saves to /U/logs on USB stick
-            Logger.addDataReceiver(new NT4Publisher());    // Publishes to NetworkTables (for AdvantageScope live view)
-        } else {
-            Logger.addDataReceiver(new WPILOGWriter()); // optional: save sim logs
-            Logger.addDataReceiver(new NT4Publisher()); // publishes live to AdvantageScope/SmartDashboard
-        }
-
-        // Start the logger — no more receivers or metadata after this!
-        Logger.start();
 
         // ====== Now create RobotContainer (all subsystem initialization) ======
         m_robotContainer = new RobotContainer();
@@ -58,10 +41,14 @@ public class Robot extends LoggedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    //24188
+
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
+
   public void disabledInit() {}
 
   @Override
@@ -116,4 +103,5 @@ public class Robot extends LoggedRobot {
   public void simulationPeriodic() {
     m_robotContainer.fuelSim.updateSim();
   }
+
 }

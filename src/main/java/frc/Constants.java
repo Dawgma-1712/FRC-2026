@@ -194,7 +194,6 @@ public final class Constants {
 
     public static final double BASE_ANGLE = 0;
     public static final double MAX_HOOD_OFFSET = 40.0;
-    public static final double HOOD_ENCODER_OFFSET = 227.117 + 35.318;
 
     public static final Transform3d ROBOT_TO_LAUNCHER_TRANSFORM = new Transform3d(
                                                                       new Translation3d(Units.inchesToMeters(-4), Units.inchesToMeters(4.7), Units.inchesToMeters(0)),
