@@ -155,7 +155,7 @@ public class RobotContainer {
 
     /* 
     intake.setAngle(Units.Degrees.of(90));
-
+    */
     NamedCommands.registerCommand("Shoot", getAutoPreloads());
     NamedCommands.registerCommand("Intake", Commands.sequence(
         Commands.runOnce(() -> {
@@ -175,7 +175,7 @@ public class RobotContainer {
 
     ));
     NamedCommands.registerCommand("X Mode", drivetrain.applyRequest(() -> brake).repeatedly());
-    */
+
     // autoHandler = new ModularAutoHandler();
 
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
@@ -200,14 +200,12 @@ public class RobotContainer {
     Supplier<Double> rtSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_RT);
     Supplier<Double> stickSupplier = () -> operator.getRawAxis(OperatorConstants.OPERATOR_RY);
 
-    /*
     intake.setDefaultCommand(
         Commands.run(() -> {
           intake.manualTriggerIntakeSpeed(ltSupplier, rtSupplier);
           intake.setAngleSupplier(stickSupplier);
         }, intake));
 
-        */
 
     autoChooser = AutoBuilder.buildAutoChooser();
     autoChooser.addOption("OuterBumpRight", new PathPlannerAuto("OuterBumpRight"));
@@ -250,7 +248,7 @@ public class RobotContainer {
         .onFalse(new SwerveSlowMode(1));
 
     // x mode
-    new JoystickButton(driver, OperatorConstants.DRIVER_X).whileTrue(drivetrain.applyRequest(() -> brake));
+
 
     // auto align
     new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(new AutoLock(
