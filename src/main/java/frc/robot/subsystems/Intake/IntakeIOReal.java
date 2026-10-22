@@ -139,6 +139,7 @@ public class IntakeIOReal implements IntakeIO {
         // voltage clamp
         totalVoltage = Math.max(-12.0, Math.min(12.0, totalVoltage));
 
+        /*
         if (runProfile) {
             angleMotor.setControl(voltageRequest.withOutput(totalVoltage));
             angleFollowerMotor.setControl(new Follower(angleMotor.getDeviceID(), MotorAlignmentValue.Opposed));
@@ -146,12 +147,9 @@ public class IntakeIOReal implements IntakeIO {
                 runProfile = false;
             }
         }
-
-        /*
+        */
         intakeMotor.set(intakeOutput);
         intakeMotor2.set(intakeOutput);
-
-        */
 
         SmartDashboard.putNumber("Arm/AngleDeg", getAngle().in(Units.Degrees));
         SmartDashboard.putNumber("Arm/TargetDeg", currentState.position);
@@ -176,8 +174,16 @@ public class IntakeIOReal implements IntakeIO {
 
         //extended is 90 stowed is 0
         
-        angleMotor.set(percentOutput);
-        angleFollowerMotor.set(-percentOutput);
+
+        if (Math.abs(percentOutput) < 0.15 ) {
+            angleMotor.set(0);
+            angleFollowerMotor.set(-0);
+        } else {
+            angleMotor.set(percentOutput);
+            angleFollowerMotor.set(-percentOutput);
+        }
+
+        SmartDashboard.putNumber("Arm/GoalPercent", percentOutput);
     }
 
     @Override
@@ -196,21 +202,29 @@ public class IntakeIOReal implements IntakeIO {
     @Override
     public void setAngleMotorSupplier(Supplier<Double> stickSupplier) {
         
-        double output = stickSupplier.get();
+        double output = -stickSupplier.get();
 
-        // deadband
-        if (Math.abs(output) < 0.05) {
-            return;
+        if (Math.abs(output) < 0.1) {
+            output = 0;
         }
 
 
         runProfile = false;
-        if (output > 0) {
-            output *= 0.1;
+        double angle = getAngle().in(Units.Degrees);
+
+        if (output < 0) {
+            if (angle < 180 && angle > 80) {
+                output = 0; 
+            }
+            output *= 0.75;
         } else {
-            output *= 0.2;
+            if (angle > 180 && angle < 345) {
+                output = 0;
+            }
+            output *= 0.65;
         }
 
+        SmartDashboard.putNumber("Intake/Intake goal dutycycle", output);
         setAngleMotorPercentOutput(output);
         holdPosition();
     }
