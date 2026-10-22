@@ -175,13 +175,14 @@ public class IntakeIOReal implements IntakeIO {
         //extended is 90 stowed is 0
         
 
-        if (percentOutput < 0.1) {
+        if (Math.abs(percentOutput) < 0.15 ) {
             angleMotor.set(0);
             angleFollowerMotor.set(-0);
         } else {
             angleMotor.set(percentOutput);
             angleFollowerMotor.set(-percentOutput);
         }
+
         SmartDashboard.putNumber("Arm/GoalPercent", percentOutput);
     }
 
@@ -203,16 +204,24 @@ public class IntakeIOReal implements IntakeIO {
         
         double output = -stickSupplier.get();
 
-        if (Math.abs(output) < 0.05) {
-            return;
+        if (Math.abs(output) < 0.1) {
+            output = 0;
         }
 
 
         runProfile = false;
+        double angle = getAngle().in(Units.Degrees);
+
         if (output < 0) {
-            output *= 0.4;
+            if (angle < 180 && angle > 80) {
+                output = 0; 
+            }
+            output *= 0.75;
         } else {
-            output *= 0.3;
+            if (angle > 180 && angle < 345) {
+                output = 0;
+            }
+            output *= 0.65;
         }
 
         SmartDashboard.putNumber("Intake/Intake goal dutycycle", output);

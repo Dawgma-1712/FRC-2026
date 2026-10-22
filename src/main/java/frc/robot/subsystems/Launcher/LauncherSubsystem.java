@@ -139,8 +139,8 @@ public class LauncherSubsystem extends SubsystemBase {
         double distance = robotTranslation.getDistance(target.toTranslation2d());
 
         double hoodAngle = hoodAngleMap.get(distance);
-        AngularVelocity velocity = Units.RotationsPerSecond.of(rpsMap.get(distance));
-        setHoodPosition(Units.Degrees.of(hoodAngle));
+        AngularVelocity velocity = Units.RotationsPerSecond.of(54);
+        setHoodPosition(Units.Degrees.of(21));
         setLauncherVelocity(velocity);
 
     }

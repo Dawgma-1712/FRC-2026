@@ -248,7 +248,7 @@ public class RobotContainer {
         .onFalse(new SwerveSlowMode(1));
 
     // x mode
-
+    new JoystickButton(driver, OperatorConstants.DRIVER_X).whileTrue(drivetrain.applyRequest(() -> brake));
 
     // auto align
     new JoystickButton(driver, OperatorConstants.DRIVER_LT).whileTrue(new AutoLock(
