@@ -38,6 +38,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -96,7 +97,12 @@ public class RobotContainer {
   // robot state
   private boolean intakeDeployed = false;
 
-  private SendableChooser<Command> autoChooser;
+  private static final String NO_AUTO = "None";
+
+  // holds auto names, not commands, so a fresh PathPlannerAuto gets built every time auto runs
+  private SendableChooser<String> autoChooser;
+  private SendableChooser<Boolean> useModularAuto;
+  private ModularAutoHandler autoHandler;
 
   public RobotContainer() {
 
@@ -176,7 +182,7 @@ public class RobotContainer {
     ));
     NamedCommands.registerCommand("X Mode", drivetrain.applyRequest(() -> brake).repeatedly());
 
-    // autoHandler = new ModularAutoHandler();
+    autoHandler = new ModularAutoHandler();
 
     driver = new Joystick(OperatorConstants.DRIVER_JOYSTICK_PORT);
     operator = new Joystick(OperatorConstants.OPERATOR_JOYSTICK_PORT);
@@ -207,13 +213,27 @@ public class RobotContainer {
         }, intake));
 
 
-    autoChooser = AutoBuilder.buildAutoChooser();
-    autoChooser.addOption("OuterBumpRight", new PathPlannerAuto("OuterBumpRight"));
-    autoChooser.addOption("InnerBumpRight", new PathPlannerAuto("InnerBumpRight"));
-    autoChooser.addOption("InnerBumpLeftShoot", new PathPlannerAuto("InnerBumpLeftShoot"));
-    autoChooser.addOption("TrenchLeftScore", new PathPlannerAuto("TrenchLeftScore"));
-    autoChooser.setDefaultOption("OuterBumpRight", new PathPlannerAuto("OuterBumpRight"));
+    // lists every auto in deploy/pathplanner/autos, same as AutoBuilder.buildAutoChooser() did
+    autoChooser = new SendableChooser<String>();
+    autoChooser.addOption("None", NO_AUTO);
+    for (String autoName : AutoBuilder.getAllAutoNames().stream().sorted().toList()) {
+      autoChooser.addOption(autoName, autoName);
+
+      // loads the auto's paths into PathPlanner's cache now so building it at auto start is quick
+      try {
+        PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+      } catch (Exception e) {
+        DriverStation.reportError("Failed to load auto " + autoName + ": " + e.getMessage(), false);
+      }
+    }
+    autoChooser.setDefaultOption("OuterBumpRight", "OuterBumpRight");
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // pick between the preset auto above and the modular auto (Starting Side + Action 1-3)
+    useModularAuto = new SendableChooser<Boolean>();
+    useModularAuto.setDefaultOption("Preset Auto", false);
+    useModularAuto.addOption("Modular Auto", true);
+    SmartDashboard.putData("Auto Mode", useModularAuto);
 
     SmartDashboard.putNumber("Wait Time", 0);
 
@@ -375,8 +395,18 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     drivetrain.configureAutoBuilder();
-    System.out.println(autoChooser.getSelected().getName());
-    return new SequentialCommandGroup(new WaitCommand(SmartDashboard.getNumber("Wait Time", 0)),
-        autoChooser.getSelected());
+
+    Command auto;
+    if (useModularAuto.getSelected()) {
+      // built here (called from autonomousInit) so it uses the current chooser selections
+      auto = autoHandler.getSelectedModularCommand();
+    } else {
+      String autoName = autoChooser.getSelected();
+      System.out.println(autoName);
+      // built new each time, reusing the same PathPlannerAuto would throw the second time auto is enabled
+      auto = autoName.equals(NO_AUTO) ? Commands.none() : new PathPlannerAuto(autoName);
+    }
+
+    return new SequentialCommandGroup(new WaitCommand(SmartDashboard.getNumber("Wait Time", 0)), auto);
   }
 }
