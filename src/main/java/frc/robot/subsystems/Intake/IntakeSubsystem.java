@@ -54,38 +54,6 @@ public class IntakeSubsystem extends SubsystemBase {
         return io.getGoalAngle();
     }
 
-    public void dumbDumbPID(double goalAngle) {
-        // double currentAngle = getAngle().in(Units.Degrees);
-
-        // if(Math.abs(currentAngle - goalAngle) <= 5) {
-        //     io.setAngleMotorPercentOutput(0);
-        // }
-        // else if (currentAngle > goalAngle) {
-        //     io.setAngleMotorPercentOutput(0.1);
-        // }
-        // else if (currentAngle < goalAngle) {
-        //     io.setAngleMotorPercentOutput(-0.2);
-        // }
-
-        io.setAngleMotorPercentOutput(0.1);
-    }
-
-    public void nodumbDumbPID(double goalAngle) {
-        // double currentAngle = getAngle().in(Units.Degrees);
-
-        // if(Math.abs(currentAngle - goalAngle) <= 5) {
-        //     io.setAngleMotorPercentOutput(0);
-        // }
-        // else if (currentAngle > goalAngle) {
-        //     io.setAngleMotorPercentOutput(0.1);
-        // }
-        // else if (currentAngle < goalAngle) {
-        //     io.setAngleMotorPercentOutput(-0.2);
-        // }
-
-        io.setAngleMotorPercentOutput(0);
-    }
-
     public Command setAngle(Angle target) {
         return Commands.runOnce(
             () -> {
