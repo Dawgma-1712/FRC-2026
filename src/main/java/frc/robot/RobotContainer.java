@@ -24,8 +24,6 @@ import frc.robot.subsystems.Launcher.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Revolver.*;
 
-import frc.robot.commandFactories.ShootOnTheMove;
-
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -52,6 +50,8 @@ import frc.robot.utils.FuelSim;
 
 import java.util.Set;
 import java.util.function.Supplier;
+
+import frc.robot.commandFactories.AutoPreloads;
 
 public class RobotContainer {
 
@@ -99,7 +99,8 @@ public class RobotContainer {
 
   private static final String NO_AUTO = "None";
 
-  // holds auto names, not commands, so a fresh PathPlannerAuto gets built every time auto runs
+  // holds auto names, not commands, so a fresh PathPlannerAuto gets built every
+  // time auto runs
   private SendableChooser<String> autoChooser;
   private SendableChooser<Boolean> useModularAuto;
   private ModularAutoHandler autoHandler;
@@ -159,10 +160,10 @@ public class RobotContainer {
     this.revolver = new RevolverSubsystem(this.revolverIO);
     this.vision = new VisionSubsystem(this.drivetrain, this.visionInterface);
 
-    /* 
-    intake.setAngle(Units.Degrees.of(90));
-    */
-    NamedCommands.registerCommand("Shoot", getAutoPreloads());
+    /*
+     * intake.setAngle(Units.Degrees.of(90));
+     */
+    NamedCommands.registerCommand("Shoot", AutoPreloads.getAutoPreloads(launcher, drivetrain, revolver));
     NamedCommands.registerCommand("Intake", Commands.sequence(
         Commands.runOnce(() -> {
           intake.setAngleDirect(Units.Degrees.of(0));
@@ -212,14 +213,15 @@ public class RobotContainer {
           intake.setAngleSupplier(stickSupplier);
         }, intake));
 
-
-    // lists every auto in deploy/pathplanner/autos, same as AutoBuilder.buildAutoChooser() did
+    // lists every auto in deploy/pathplanner/autos, same as
+    // AutoBuilder.buildAutoChooser() did
     autoChooser = new SendableChooser<String>();
     autoChooser.addOption("None", NO_AUTO);
     for (String autoName : AutoBuilder.getAllAutoNames().stream().sorted().toList()) {
       autoChooser.addOption(autoName, autoName);
 
-      // loads the auto's paths into PathPlanner's cache now so building it at auto start is quick
+      // loads the auto's paths into PathPlanner's cache now so building it at auto
+      // start is quick
       try {
         PathPlannerAuto.getPathGroupFromAutoFile(autoName);
       } catch (Exception e) {
@@ -229,7 +231,8 @@ public class RobotContainer {
     autoChooser.setDefaultOption("OuterBumpRight", "OuterBumpRight");
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    // pick between the preset auto above and the modular auto (Starting Side + Action 1-3)
+    // pick between the preset auto above and the modular auto (Starting Side +
+    // Action 1-3)
     useModularAuto = new SendableChooser<Boolean>();
     useModularAuto.setDefaultOption("Preset Auto", false);
     useModularAuto.addOption("Modular Auto", true);
@@ -307,27 +310,30 @@ public class RobotContainer {
           launcher.setKickerPercentOutput(0);
         }));
 
-        /* 
-    new JoystickButton(driver, OperatorConstants.DRIVER_A).onTrue(Commands.sequence(
-        Commands.runOnce(() -> {
-          intake.setAngleDirect(Units.Degrees.of(0));
-        }),
-        Commands.run(() -> {
-          intake.setIntakeMotorSpeed(1);
-        })));
-
-    new JoystickButton(driver, OperatorConstants.DRIVER_START)
-        .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
-    new JoystickButton(operator, OperatorConstants.OPERATOR_B).onTrue(Commands.runOnce(() -> {
-      intake.toggleIntake();
-    }));
-
-    new JoystickButton(operator, OperatorConstants.OPERATOR_X).onTrue(Commands.runOnce(() -> {
-      intake.setAngleDirect(Units.Degrees.of(0));
-    }));
-
-    */
+    /*
+     * new JoystickButton(driver,
+     * OperatorConstants.DRIVER_A).onTrue(Commands.sequence(
+     * Commands.runOnce(() -> {
+     * intake.setAngleDirect(Units.Degrees.of(0));
+     * }),
+     * Commands.run(() -> {
+     * intake.setIntakeMotorSpeed(1);
+     * })));
+     * 
+     * new JoystickButton(driver, OperatorConstants.DRIVER_START)
+     * .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+     * 
+     * new JoystickButton(operator,
+     * OperatorConstants.OPERATOR_B).onTrue(Commands.runOnce(() -> {
+     * intake.toggleIntake();
+     * }));
+     * 
+     * new JoystickButton(operator,
+     * OperatorConstants.OPERATOR_X).onTrue(Commands.runOnce(() -> {
+     * intake.setAngleDirect(Units.Degrees.of(0));
+     * }));
+     * 
+     */
     // spindexer manual CCW
     new JoystickButton(operator, OperatorConstants.OPERATOR_RB).whileTrue(
         Commands.run(() -> {
@@ -361,49 +367,19 @@ public class RobotContainer {
     // launcher.calculateDistance()));
   }
 
-  public Command getAutoPreloads() {
-    Command autoPreloads;
-    Command prepAutoPreloads;
-    Command launchAutoPreloads;
-
-    prepAutoPreloads = Commands.defer(() -> {
-
-      return Commands.run(() -> {
-        launcher.launcherLookupTable(drivetrain.getState().Pose);
-      });
-
-    }, Set.of(launcher))
-
-        .finallyDo(() -> {
-          launcher.setLauncherVelocity(Units.RadiansPerSecond.of(0));
-          launcher.setHoodPosition(Units.Degrees.of(0));
-        });
-
-    launchAutoPreloads = new SequentialCommandGroup(new WaitCommand(1), Commands.run(() -> {
-      revolver.setRevolverPercentOutput(-RevolverConstants.SHOOTING_PERCENTAGE_OUTPUT);
-      launcher.setKickerPercentOutput(LauncherConstants.KICKER_PERCENT_OUTPUT);
-    }).finallyDo(
-        () -> {
-          revolver.setRevolverPercentOutput(-0);
-          launcher.setKickerPercentOutput(0);
-        }));
-
-    autoPreloads = Commands.parallel(prepAutoPreloads.raceWith(new WaitCommand(LauncherConstants.SHOOT_WAIT_LENGTH)),
-        launchAutoPreloads.raceWith(new WaitCommand(LauncherConstants.SHOOT_WAIT_LENGTH)));
-    return autoPreloads;
-  }
-
   public Command getAutonomousCommand() {
     drivetrain.configureAutoBuilder();
 
     Command auto;
     if (useModularAuto.getSelected()) {
-      // built here (called from autonomousInit) so it uses the current chooser selections
+      // built here (called from autonomousInit) so it uses the current chooser
+      // selections
       auto = autoHandler.getSelectedModularCommand();
     } else {
       String autoName = autoChooser.getSelected();
       System.out.println(autoName);
-      // built new each time, reusing the same PathPlannerAuto would throw the second time auto is enabled
+      // built new each time, reusing the same PathPlannerAuto would throw the second
+      // time auto is enabled
       auto = autoName.equals(NO_AUTO) ? Commands.none() : new PathPlannerAuto(autoName);
     }
 
